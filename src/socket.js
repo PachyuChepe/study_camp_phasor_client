@@ -1,11 +1,13 @@
 import io from 'socket.io-client';
+import { configDotenv } from 'dotenv';
+configDotenv();
 class SocketDate {
   constructor() {
     if (SocketDate.instance) {
       return SocketDate.instance;
     }
 
-    this.socket = io('http://localhost:3003');
+    this.socket = io(process.env.SOCKET);
 
     window.addEventListener('beforeunload', () => {
       // 소켓 연결 해제
