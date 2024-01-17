@@ -10,6 +10,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.tileSize = tileSize;
     this.tilePos = pos;
     this.isMove = false;
+    this.isAniMove = false;
     this.isSit = false;
 
     this.setOrigin(0, 0);
@@ -62,34 +63,48 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         vector[0] = 1;
       }
     }
-    this.isMove = false;
     if (vector[0] || vector[1]) {
+      this.isMove = false;
       this.movePlayer(vector[0], vector[1]);
     } else {
+      this.isMove = false;
       this.moveAnimation(vector[0], vector[1]);
     }
   }
 
   moveAnimation(deltaX, deltaY) {
     let vector = [deltaX, deltaY];
-    if (vector[1] === -1 && this.m_moving[1] !== vector[1]) {
+    if (
+      vector[1] === -1 &&
+      (this.m_moving[1] !== vector[1] || !this.isAniMove)
+    ) {
       this.play('player_walk_up');
     }
 
-    if (vector[1] === 1 && this.m_moving[1] !== vector[1]) {
+    if (
+      vector[1] === 1 &&
+      (this.m_moving[1] !== vector[1] || !this.isAniMove)
+    ) {
       this.play('player_walk_down');
     }
 
-    if (vector[0] === -1 && this.m_moving[0] !== vector[0]) {
+    if (
+      vector[0] === -1 &&
+      (this.m_moving[0] !== vector[0] || !this.isAniMove)
+    ) {
       this.play('player_walk_left');
     }
 
-    if (vector[0] === 1 && this.m_moving[0] !== vector[0]) {
+    if (
+      vector[0] === 1 &&
+      (this.m_moving[0] !== vector[0] || !this.isAniMove)
+    ) {
       this.play('player_walk_right');
     }
 
     if (vector[0] === 0 && vector[1] === 0) {
       this.isMove = false;
+      this.isAniMove = false;
       if (this.m_moving[1] === -1) {
         this.play('player_idle_up');
       } else if (this.m_moving[1] === 1) {
@@ -100,6 +115,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         this.play('player_idle_right');
       }
     } else {
+      this.isAniMove = true;
       this.m_moving = vector;
     }
   }
@@ -154,8 +170,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   movePlayer(deltaX, deltaY) {
     if (this.isMove) return;
+    if (
+      this.tilePos.x + deltaX < 0 ||
+      this.tilePos.x + deltaX >= this.scene.tileMapWitdh ||
+      this.tilePos.y + deltaY < 0 ||
+      this.tilePos.y + deltaY >= this.scene.tileMapHeight
+    )
+      return;
+
     this.isMove = true;
     this.tilePos = { x: this.tilePos.x + deltaX, y: this.tilePos.y + deltaY };
+
     this.moveAnimation(deltaX, deltaY);
     SocketInstance.sendMovePlayer(this.tilePos.x, this.tilePos.y);
 

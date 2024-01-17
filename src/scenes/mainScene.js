@@ -13,7 +13,7 @@ export default class MainScene extends Phaser.Scene {
   create() {
     this.tileSize = 48;
     this.tileMapWitdh = 40;
-    this.tileMapHeight = 40;
+    this.tileMapHeight = 20;
     // 모달
     // this.m_loginModal = new LoginModal(this);
     // this.m_isOpenModal = false;
