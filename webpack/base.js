@@ -37,4 +37,9 @@ module.exports = {
       template: './index.html',
     }),
   ],
+  devServer: {
+    host: '0.0.0.0',
+    port: 8080, // 사용할 포트 번호
+    allowedHosts: 'all', // 모든 호스트를 허용
+  },
 };
