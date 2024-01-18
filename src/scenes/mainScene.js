@@ -76,26 +76,27 @@ export default class MainScene extends Phaser.Scene {
     this.otherPlayers = {};
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
     SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
-    SocketManager.getInstance().updateSpace();
   }
 
   eventscallback(namespace, data) {
     switch (namespace) {
-      case 'updateSpaceUsers':
+      case 'spaceUsers':
         data.forEach((playerdata) => {
           if (playerdata.id !== SocketManager.getInstance().getID()) {
-            this.otherPlayers[playerdata.id] = new Player(
-              this,
-              playerdata.id,
-              this.tileSize,
-              { x: playerdata.x, y: playerdata.y },
-            );
+            if (!this.otherPlayers[data.id]) {
+              this.otherPlayers[playerdata.id] = new Player(
+                this,
+                playerdata.id,
+                this.tileSize,
+                { x: playerdata.x, y: playerdata.y },
+              );
+            }
           }
         });
         break;
       case 'joinSpacePlayer':
         if (data.id !== SocketManager.getInstance().getID()) {
-          if (!this.otherPlayers[data.id])
+          if (!this.otherPlayers[data.id]) {
             this.otherPlayers[data.id] = new Player(
               this,
               data.id,
@@ -105,6 +106,7 @@ export default class MainScene extends Phaser.Scene {
                 y: data.y,
               },
             );
+          }
         }
         break;
       case 'leavSpace':

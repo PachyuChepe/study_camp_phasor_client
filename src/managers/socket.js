@@ -17,9 +17,9 @@ export default class SocketManager {
 
     this.callbacks = [];
 
-    this.socket.on('updateSpaceUsers', (data) => {
-      console.log('updateSpaceUsers', data);
-      this.publish('updateSpaceUsers', data);
+    this.socket.on('spaceUsers', (data) => {
+      console.log('spaceUsers', data);
+      this.publish('spaceUsers', data);
     });
     this.socket.on('joinSpacePlayer', (data) => {
       console.log('joinSpacePlayer', data);
@@ -64,14 +64,6 @@ export default class SocketManager {
 
   getID() {
     return this.socket.id;
-  }
-
-  updateSpace(tileX, tileY) {
-    this.socket.emit('updateSpace', {
-      id: this.socket.id,
-      x: tileX,
-      y: tileY,
-    });
   }
 
   sendJoinSpacePlayer(tileX, tileY) {
