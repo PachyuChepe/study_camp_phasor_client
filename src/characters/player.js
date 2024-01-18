@@ -26,12 +26,66 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         y: 8,
       },
     });
-    this.nicknameText.setOrigin(0.5, 0.5);
+    this.nicknameText.setOrigin(0, 0.5);
 
     this.setDepth(20);
     this.setBodySize(48, 68);
 
     this.m_moving = [0, 0];
+  }
+
+  remove() {
+    this.nicknameText.destroy();
+    this.removeBubble();
+    if (this.tween) {
+      this.tween.stop();
+      this.tween.remove();
+    }
+    if (this.bubbleDisappearEvent) {
+      this.bubbleDisappearEvent.remove();
+    }
+  }
+
+  createBubble(id, message) {
+    // this.removeBubble();
+    if (this.bubbleDisappearEvent) {
+      this.bubbleDisappearEvent.remove();
+    }
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    canvas.width = 100;
+    canvas.height = 100; //parseInt(message.length / 20) * 50;
+    context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.font = '16px Arial'; // 폰트 설정
+    context.fillStyle = '#000'; // 텍스트 색상 설정
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(message, canvas.width / 2, canvas.height / 2);
+    // context.save();
+
+    this.bubbleTexture = this.scene.textures.addImage(
+      'bubbleTexture' + id,
+      canvas,
+    );
+    this.bubble = this.scene.add.image(this.x, this.y, 'bubbleTexture' + id);
+    this.bubble.setOrigin(0, 1);
+
+    this.bubbleDisappearEvent = this.scene.time.addEvent({
+      delay: 5000,
+      callback: this.removeBubble,
+      callbackScope: this,
+    });
+  }
+
+  removeBubble() {
+    if (this.bubbleTexture) {
+      this.scene.textures.remove('bubbleTexture' + SocketInstance.getID());
+      this.bubbleTexture = null;
+    }
+    if (this.bubble) {
+      this.bubble.destroy();
+    }
   }
 
   getPos() {
@@ -67,6 +121,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       this.isMove = false;
       this.movePlayer(vector[0], vector[1]);
     } else {
+      this.isAniMove = false;
       this.isMove = false;
       this.moveAnimation(vector[0], vector[1]);
     }
@@ -104,7 +159,6 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     if (vector[0] === 0 && vector[1] === 0) {
       this.isMove = false;
-      this.isAniMove = false;
       if (this.m_moving[1] === -1) {
         this.play('player_idle_up');
       } else if (this.m_moving[1] === 1) {
@@ -185,8 +239,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     SocketInstance.sendMovePlayer(this.tilePos.x, this.tilePos.y);
 
     const self = this;
-    this.scene.tweens.add({
-      targets: [this, this.nicknameText],
+    this.tween = this.scene.tweens.add({
+      targets: [this, this.nicknameText, this.bubble],
       x: this.tilePos.x * this.tileSize,
       y: this.tilePos.y * this.tileSize,
       duration: 300,
@@ -209,12 +263,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     const self = this;
     this.scene.tweens.add({
-      targets: [this, this.nicknameText],
+      targets: [this, this.nicknameText, this.bubble],
       x: this.tilePos.x * this.tileSize,
       y: this.tilePos.y * this.tileSize,
       duration: 300,
       ease: 'Linear',
       onComplete: function () {
+        self.isAniMove = false;
         self.moveAnimation(0, 0);
       },
     });

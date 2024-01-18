@@ -60,8 +60,8 @@ export default class MainScene extends Phaser.Scene {
       const newZoom = this.cameras.main.zoom + deltaY * zoomSpeed;
       // 배경의 크기에 따라 줌 제한 설정
       const maxZoom = Math.min(
-        this.game.config.width / bgWidth,
-        this.game.config.height / bgHeight,
+        (window.innerWidth - 20) / bgWidth,
+        (window.innerHeight - 20) / bgHeight,
       );
       // 줌 값 범위 설정
       this.cameras.main.zoom = Phaser.Math.Clamp(newZoom, maxZoom, 2);
@@ -89,6 +89,15 @@ export default class MainScene extends Phaser.Scene {
           x: data.x,
           y: data.y,
         });
+    });
+    SocketInstance.getIO().on('leavSpace', (data) => {
+      console.log('leavSpace', data);
+      if (this.otherPlayers[data.id]) {
+        const leavePlayer = this.otherPlayers[data.id];
+        leavePlayer.remove();
+        leavePlayer.destroy();
+        this.otherPlayers[data.id] = null;
+      }
     });
     SocketInstance.getIO().on('movePlayer', (data) => {
       console.log('movePlayer', data);
@@ -118,7 +127,24 @@ export default class MainScene extends Phaser.Scene {
       }
     });
 
+    SocketInstance.getIO().on('chatPlayer', (data) => {
+      console.log('chatPlayer', data);
+      if (data.id === SocketInstance.getID()) {
+        console.log('본인');
+        this.m_player.createBubble(data.id, data.message);
+        return;
+      }
+      if (this.otherPlayers[data.id]) {
+        this.otherPlayers[data.id].createBubble(data.id, data.message);
+      }
+    });
+
     SocketInstance.updateSpace();
+
+    // // Phaser Scene에서 버튼 클릭 시 테스트 코드
+    // this.input.on('pointerdown', function (pointer) {
+    //   SocketInstance.sendChatMessage('asdgsdgasdgsad');
+    // });
   }
 
   update() {}

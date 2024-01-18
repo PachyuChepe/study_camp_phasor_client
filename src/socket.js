@@ -7,9 +7,7 @@ class SocketDate {
       return SocketDate.instance;
     }
 
-    this.socket = io(
-      'https://port-0-study-camp-socket-server-51ih2alri9k0f8.sel5.cloudtype.app/',
-    );
+    this.socket = io(process.env.SOCKET);
 
     window.addEventListener('beforeunload', () => {
       // 소켓 연결 해제
@@ -55,6 +53,13 @@ class SocketDate {
     this.socket.emit('sit', {
       id: this.socket.id,
       isSit: isSit,
+    });
+  }
+
+  sendChatMessage(message) {
+    this.socket.emit('chat', {
+      id: this.socket.id,
+      message: message,
     });
   }
 }

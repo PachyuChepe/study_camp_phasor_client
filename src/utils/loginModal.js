@@ -1,5 +1,3 @@
-import Config from '../config.js';
-
 /**
  * scene의 로그인 모달 생성 함수
  * @param {Phaser.Scene} scene
