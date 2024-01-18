@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import Player from '../characters/player.js';
-import LoginModal from '../utils/loginModal.js';
-import SocketInstance from '../socket.js';
+// import LoginModal from '../domelements/loginModal.js';
+import SocketManager from '../managers/socket.js';
+import ChatBox from '../domelements/chatbox.js';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -16,6 +17,7 @@ export default class MainScene extends Phaser.Scene {
     this.tileMapHeight = 20;
     // 모달
     // this.m_loginModal = new LoginModal(this);
+    this.m_chatBox = new ChatBox(this);
     // this.m_isOpenModal = false;
 
     const bgWidth = this.tileSize * this.tileMapWitdh;
@@ -67,84 +69,74 @@ export default class MainScene extends Phaser.Scene {
       this.cameras.main.zoom = Phaser.Math.Clamp(newZoom, maxZoom, 2);
     });
 
-    this.otherPlayers = {};
-    SocketInstance.getIO().on('updateSpaceUsers', (data) => {
-      console.log('updateSpaceUsers', data);
-
-      data.forEach((playerdata) => {
-        if (playerdata.id !== SocketInstance.getID()) {
-          this.otherPlayers[playerdata.id] = new Player(
-            this,
-            playerdata.id,
-            this.tileSize,
-            { x: playerdata.x, y: playerdata.y },
-          );
-        }
-      });
-    });
-    SocketInstance.getIO().on('joinSpacePlayer', (data) => {
-      console.log('joinSpacePlayer', data);
-      if (!this.otherPlayers[data.id])
-        this.otherPlayers[data.id] = new Player(this, data.id, this.tileSize, {
-          x: data.x,
-          y: data.y,
-        });
-    });
-    SocketInstance.getIO().on('leavSpace', (data) => {
-      console.log('leavSpace', data);
-      if (this.otherPlayers[data.id]) {
-        const leavePlayer = this.otherPlayers[data.id];
-        leavePlayer.remove();
-        leavePlayer.destroy();
-        this.otherPlayers[data.id] = null;
-      }
-    });
-    SocketInstance.getIO().on('movePlayer', (data) => {
-      console.log('movePlayer', data);
-      if (data.id === SocketInstance.getID()) {
-        console.log('본인');
-        return;
-      }
-      if (this.otherPlayers[data.id]) {
-        // 위치 업데이트
-        this.otherPlayers[data.id].moveOtherPlayer(data.x, data.y);
-      } else {
-        // 새 플레이어 생성
-        this.otherPlayers[data.id] = new Player(this, data.id, this.tileSize, {
-          x: data.x,
-          y: data.y,
-        });
-      }
-    });
-    SocketInstance.getIO().on('sitPlayer', (data) => {
-      console.log('sitPlayer', data);
-      if (data.id === SocketInstance.getID()) {
-        console.log('본인');
-        return;
-      }
-      if (this.otherPlayers[data.id]) {
-        this.otherPlayers[data.id].sitOtherPlayer(data.isSit);
-      }
-    });
-
-    SocketInstance.getIO().on('chatPlayer', (data) => {
-      console.log('chatPlayer', data);
-      if (data.id === SocketInstance.getID()) {
-        console.log('본인');
-        this.m_player.createBubble(data.id, data.message);
-        return;
-      }
-      if (this.otherPlayers[data.id]) {
-        this.otherPlayers[data.id].createBubble(data.id, data.message);
-      }
-    });
-
-    SocketInstance.updateSpace();
-
     // // Phaser Scene에서 버튼 클릭 시 테스트 코드
     // this.input.on('pointerdown', function (pointer) {
     //   SocketInstance.sendChatMessage('asdgsdgasdgsad');
     // });
+    this.otherPlayers = {};
+    SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
+    SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
+    SocketManager.getInstance().updateSpace();
+  }
+
+  eventscallback(namespace, data) {
+    switch (namespace) {
+      case 'updateSpaceUsers':
+        data.forEach((playerdata) => {
+          if (playerdata.id !== SocketManager.getInstance().getID()) {
+            this.otherPlayers[playerdata.id] = new Player(
+              this,
+              playerdata.id,
+              this.tileSize,
+              { x: playerdata.x, y: playerdata.y },
+            );
+          }
+        });
+        break;
+      case 'joinSpacePlayer':
+        if (data.id !== SocketManager.getInstance().getID()) {
+          if (!this.otherPlayers[data.id])
+            this.otherPlayers[data.id] = new Player(
+              this,
+              data.id,
+              this.tileSize,
+              {
+                x: data.x,
+                y: data.y,
+              },
+            );
+        }
+        break;
+      case 'leavSpace':
+        if (this.otherPlayers[data.id]) {
+          const leavePlayer = this.otherPlayers[data.id];
+          leavePlayer.remove();
+          leavePlayer.destroy();
+          this.otherPlayers[data.id] = null;
+        }
+        break;
+      case 'movePlayer':
+        if (this.otherPlayers[data.id]) {
+          // 위치 업데이트
+          this.otherPlayers[data.id].moveOtherPlayer(data.x, data.y);
+        }
+        break;
+      case 'sitPlayer':
+        if (this.otherPlayers[data.id]) {
+          this.otherPlayers[data.id].sitOtherPlayer(data.isSit);
+        }
+        break;
+      case 'chatPlayer':
+        if (data.id === SocketManager.getInstance().getID()) {
+          console.log('본인');
+          this.m_player.createBubble(data.id, data.message);
+          return;
+        }
+        if (this.otherPlayers[data.id]) {
+          this.otherPlayers[data.id].createBubble(data.id, data.message);
+        }
+        break;
+    }
   }
 
   update() {}

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import SocketInstance from '../socket';
+import SocketManager from '../managers/socket';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
   constructor(scene, nickname, tileSize, pos) {
@@ -37,17 +37,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
   remove() {
     this.nicknameText.destroy();
     this.removeBubble();
-    if (this.tween) {
-      this.tween.stop();
-      this.tween.remove();
-    }
+    // if (this.tween) {
+    //   this.tween.stop();
+    //   this.tween.remove();
+    // }
     if (this.bubbleDisappearEvent) {
       this.bubbleDisappearEvent.remove();
     }
   }
 
   createBubble(id, message) {
-    // this.removeBubble();
+    this.removeBubble();
     if (this.bubbleDisappearEvent) {
       this.bubbleDisappearEvent.remove();
     }
@@ -80,7 +80,9 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   removeBubble() {
     if (this.bubbleTexture) {
-      this.scene.textures.remove('bubbleTexture' + SocketInstance.getID());
+      this.scene.textures.remove(
+        'bubbleTexture' + SocketManager.getInstance().getID(),
+      );
       this.bubbleTexture = null;
     }
     if (this.bubble) {
@@ -193,7 +195,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       else this.play('player_sit_down');
     }
     this.isSit = !this.isSit;
-    SocketInstance.sendSitPlayer(this.isSit);
+    SocketManager.getInstance().sendSitPlayer(this.isSit);
   }
 
   sitOtherPlayer(isSit) {
@@ -236,7 +238,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.tilePos = { x: this.tilePos.x + deltaX, y: this.tilePos.y + deltaY };
 
     this.moveAnimation(deltaX, deltaY);
-    SocketInstance.sendMovePlayer(this.tilePos.x, this.tilePos.y);
+    SocketManager.getInstance().sendMovePlayer(this.tilePos.x, this.tilePos.y);
 
     const self = this;
     this.tween = this.scene.tweens.add({

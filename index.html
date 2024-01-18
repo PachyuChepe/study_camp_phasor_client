@@ -3,6 +3,75 @@
   <head>
     <meta charset="utf-8" />
     <title>Phaser 3 Project Template</title>
+    <style>
+      .chat-box {
+        min-width: 500px;
+        position: fixed;
+        bottom: 0%;
+        left: 50%;
+        transform: translate(-50%, 0%);
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        height: 30%;
+        width: 60%;
+        border: 2px solid #ddd;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+      }
+      .chat-container {
+        background-color: #ffffff50;
+        height: 100%;
+        width: 100%;
+        min-width: 350px;
+        box-sizing: border-box;
+      }
+      .chat-messages-box {
+        padding-left: 10px;
+        flex: 2;
+        box-sizing: border-box;
+        overflow-y: auto;
+        height: calc(100% - 50px);
+      }
+      .chat-message {
+        margin-bottom: 10px;
+        padding: 10px;
+        background-color: #fff;
+        border-radius: 5px;
+      }
+      .chat-form {
+        background: rgba(0, 0, 0, 0.15);
+        padding: 0.25rem;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        height: 3rem;
+        box-sizing: border-box;
+        backdrop-filter: blur(10px);
+      }
+      .chat-form > button {
+        background: #333;
+        border: none;
+        padding: 0 1rem;
+        margin: 0.25rem;
+        border-radius: 3px;
+        outline: none;
+        color: #fff;
+      }
+      .chat-input {
+        flex: 1;
+        border: none;
+        padding: 0 1rem;
+        flex-grow: 1;
+        border-radius: 2rem;
+        margin: 0.25rem;
+      }
+      .chat-input:focus {
+        outline: none;
+      }
+    </style>
   </head>
   <body></body>
 </html>

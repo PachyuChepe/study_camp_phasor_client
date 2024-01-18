@@ -5,34 +5,34 @@
 export default class LoginModal {
   constructor(scene) {
     this.scene = scene;
-    const loginModal = document.createElement('div');
-    loginModal.id = 'loginModal';
+    this.loginModal = document.createElement('div');
+    this.loginModal.id = 'loginModal';
 
     // 모달 스타일 설정
-    loginModal.style.display = 'none';
-    loginModal.style.position = 'fixed';
-    loginModal.style.top = '50%';
-    loginModal.style.left = '50%';
-    loginModal.style.transform = 'translate(-50%, -50%)';
-    loginModal.style.padding = '20px';
-    loginModal.style.backgroundColor = '#fff';
-    loginModal.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    loginModal.style.zIndex = '1';
-    loginModal.style.borderRadius = '5px';
-    loginModal.style.alignItems = 'center';
-    loginModal.style.justifyContent = 'center';
-    document.body.appendChild(loginModal);
+    this.loginModal.style.display = 'none';
+    this.loginModal.style.position = 'fixed';
+    this.loginModal.style.top = '50%';
+    this.loginModal.style.left = '50%';
+    this.loginModal.style.transform = 'translate(-50%, -50%)';
+    this.loginModal.style.padding = '20px';
+    this.loginModal.style.backgroundColor = '#fff';
+    this.loginModal.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    this.loginModal.style.zIndex = '1';
+    this.loginModal.style.borderRadius = '5px';
+    this.loginModal.style.alignItems = 'center';
+    this.loginModal.style.justifyContent = 'center';
+    document.body.appendChild(this.loginModal);
 
     const modalContent = document.createElement('div');
     modalContent.id = 'loginModal';
     modalContent.classList.add('modal-content');
-    loginModal.appendChild(modalContent);
+    this.loginModal.appendChild(modalContent);
 
     // Create the close button span
     const closeButton = document.createElement('span');
     closeButton.classList.add('modal-close');
     closeButton.innerHTML = '&times;';
-    closeButton.onclick = this.closeModal;
+    closeButton.onclick = this.closeModal.bind(this);
     closeButton.style.position = 'absolute';
     closeButton.style.top = '5px';
     closeButton.style.right = '5px';
@@ -81,7 +81,7 @@ export default class LoginModal {
     // Create the login button
     const loginButton = document.createElement('button');
     loginButton.textContent = 'Login';
-    loginButton.onclick = this.login;
+    loginButton.onclick = this.login.bind(this);
     loginButton.style.marginTop = '5px';
     loginButton.style.width = '100%';
     loginButton.style.boxSizing = 'border-box';
@@ -95,11 +95,11 @@ export default class LoginModal {
   }
 
   openModal() {
-    document.getElementById('loginModal').style.display = 'block';
+    this.loginModal.style.display = 'block';
   }
 
   closeModal() {
-    document.getElementById('loginModal').style.display = 'none';
+    this.loginModal.style.display = 'none';
   }
 
   login() {

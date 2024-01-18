@@ -27,22 +27,24 @@ module.exports = {
     ],
   },
   plugins: [
+    new Dotenv(), // 플러그인 상단
     new CleanWebpackPlugin({
       root: path.resolve(__dirname, '../'),
     }),
     new webpack.DefinePlugin({
+      // 'process.env.EXPRESS_SOCKET_SERVER': JSON.stringify(
+      //   process.env.EXPRESS_SOCKET_SERVER,
+      // ),
       CANVAS_RENDERER: JSON.stringify(true),
       WEBGL_RENDERER: JSON.stringify(true),
-      'process.env.SOCKET': JSON.stringify(process.env.SOCKET),
     }),
     new HtmlWebpackPlugin({
       template: './index.html',
     }),
-    // new Dotenv(),
   ],
   devServer: {
     host: '0.0.0.0',
     port: 8080, // 사용할 포트 번호
-    allowedHosts: 'all', // 모든 호스트를 허용
+    allowedHosts: ['all'], // 모든 호스트를 허용
   },
 };
