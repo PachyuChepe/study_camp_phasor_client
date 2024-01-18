@@ -12,6 +12,9 @@ RUN npm install
 # 애플리케이션 파일 복사
 COPY . .
 
+# 환경 변수 설정
+ENV SOCKET ${SOCKET}
+
 # 애플리케이션 실행 포트 설정 (webpack-dev-server 포트)
 EXPOSE 8080
 
