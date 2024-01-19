@@ -47,26 +47,6 @@ export default class LoadingScene extends Phaser.Scene {
       frameWidth: 48,
       frameHeight: 64,
     });
-    // this.load.spritesheet("mob1", mobImg1, {
-    //   frameWidth: 28,
-    //   frameHeight: 28,
-    // });
-    // this.load.spritesheet("mob2", mobImg2, {
-    //   frameWidth: 32,
-    //   frameHeight: 32,
-    // });
-    // this.load.spritesheet("mob3", mobImg3, {
-    //   frameWidth: 32,
-    //   frameHeight: 32,
-    // });
-    // this.load.spritesheet("mob4", mobImg4, {
-    //   frameWidth: 32,
-    //   frameHeight: 32,
-    // });
-    // this.load.spritesheet("lion", lionImg, {
-    //   frameWidth: 48,
-    //   frameHeight: 64,
-    // });
     // this.load.spritesheet("explosion", explosionImg, {
     //   frameWidth: 32,
     //   frameHeight: 32,

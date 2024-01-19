@@ -1,3 +1,5 @@
+import { requestLogin, requestProfile } from '../utils/request';
+
 /**
  * scene의 로그인 모달 생성 함수
  * @param {Phaser.Scene} scene
@@ -50,13 +52,13 @@ export default class LoginModal {
     emailLabel.style.marginBottom = '5px';
     emailGroup.appendChild(emailLabel);
 
-    const emailInput = document.createElement('input');
-    emailInput.type = 'text';
-    emailInput.id = 'login-email';
-    emailInput.style.width = '100%';
-    emailInput.style.boxSizing = 'border-box';
-    emailInput.style.border = '2px solid #ccc';
-    emailGroup.appendChild(emailInput);
+    this.emailInput = document.createElement('input');
+    this.emailInput.type = 'text';
+    this.emailInput.id = 'login-email';
+    this.emailInput.style.width = '100%';
+    this.emailInput.style.boxSizing = 'border-box';
+    this.emailInput.style.border = '2px solid #ccc';
+    emailGroup.appendChild(this.emailInput);
 
     const passwordGroup = document.createElement('div');
     passwordGroup.style.display = 'flex';
@@ -69,19 +71,18 @@ export default class LoginModal {
     passwordLabel.style.marginBottom = '5px';
     passwordGroup.appendChild(passwordLabel);
 
-    const passwordInput = document.createElement('input');
-    passwordInput.id = 'login-password';
-    passwordInput.type = 'password';
-    passwordInput.id = 'login-email';
-    passwordInput.style.width = '100%';
-    passwordInput.style.boxSizing = 'border-box';
-    passwordInput.style.border = '2px solid #ccc';
-    passwordGroup.appendChild(passwordInput);
+    this.passwordInput = document.createElement('input');
+    this.passwordInput.id = 'login-password';
+    this.passwordInput.type = 'password';
+    this.passwordInput.style.width = '100%';
+    this.passwordInput.style.boxSizing = 'border-box';
+    this.passwordInput.style.border = '2px solid #ccc';
+    passwordGroup.appendChild(this.passwordInput);
 
     // Create the login button
     const loginButton = document.createElement('button');
     loginButton.textContent = 'Login';
-    loginButton.onclick = this.login.bind(this);
+    loginButton.onclick = this.reqLogin.bind(this);
     loginButton.style.marginTop = '5px';
     loginButton.style.width = '100%';
     loginButton.style.boxSizing = 'border-box';
@@ -102,10 +103,35 @@ export default class LoginModal {
     this.loginModal.style.display = 'none';
   }
 
-  login() {
+  reqLogin() {
     // 로그인 처리 로직을 추가할 수 있음
     console.log('Logging in...');
+    requestLogin(
+      {
+        email: this.emailInput.value,
+        password: this.passwordInput.value,
+      },
+      this.successLogin.bind(this),
+      this.failureLogin.bind(this),
+    );
+  }
+
+  successLogin() {
+    //로그인성공시 프로필 조회
+    this.reqProfile();
+  }
+
+  failureLogin() {}
+
+  reqProfile() {
+    requestProfile(this.successLogin.bind(this), this.failureLogin.bind(this));
+  }
+
+  successProfile() {
+    // 프로필 조회 성공시 스페이스 입장
     this.closeModal();
     this.scene.scene.start('SpaceScene');
   }
+
+  failureProfile() {}
 }
