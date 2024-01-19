@@ -1,6 +1,6 @@
 import LoadingScene from './scenes/loadingScene.js';
 import MainScene from './scenes/mainScene.js';
-import RoomScene from './scenes/roomScene.js';
+import SpaceScene from './scenes/spaceScene.js';
 
 const Config = {
   // 게임 화면의 크기와 색을 설정하는 부분입니다.
@@ -9,7 +9,7 @@ const Config = {
   backgroundColor: 0x000000,
 
   // 사용할 scene은 config의 scene 프로퍼티의 배열에 추가해줘야 합니다.
-  scene: [LoadingScene, MainScene, RoomScene],
+  scene: [LoadingScene, MainScene, SpaceScene],
 
   // pixelArt를 사용할 경우 pixelArt: true로 설정해야 선명하게 보입니다.
   pixelArt: true,

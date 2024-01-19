@@ -105,5 +105,7 @@ export default class LoginModal {
   login() {
     // 로그인 처리 로직을 추가할 수 있음
     console.log('Logging in...');
+    this.closeModal();
+    this.scene.scene.start('SpaceScene');
   }
 }

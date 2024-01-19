@@ -16,6 +16,7 @@ export default class ChatBox {
     chatContainer.appendChild(this.messages);
 
     this.form = document.createElement('form');
+    this.form.id = 'form';
     this.form.classList.add('chat-from');
     chatContainer.appendChild(this.form);
     this.form.addEventListener('submit', (e) => {
@@ -28,9 +29,10 @@ export default class ChatBox {
 
     this.input = document.createElement('input');
     this.input.classList.add('chat-input');
-    chatContainer.appendChild(this.input);
+    this.form.appendChild(this.input);
 
     this.button = document.createElement('button');
+    this.input.classList.add('chat-button');
     this.button.innerText = '보내기';
     this.button.onclick = () => {
       if (this.input.value) {
@@ -39,7 +41,7 @@ export default class ChatBox {
       }
     };
 
-    chatContainer.appendChild(this.button);
+    this.form.appendChild(this.button);
 
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
   }
