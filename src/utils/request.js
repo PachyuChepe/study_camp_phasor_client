@@ -16,6 +16,37 @@ export const requestLogin = (data, successCallback) => {
     });
 };
 
+// 구글 로그인
+export const requestGoogleLogin = (userId, successCallback) => {
+  const eventSource = new EventSource(
+    `${process.env.DB}/auth/stream/${userId}`,
+  );
+
+  eventSource.onmessage = function (event) {
+    const data = JSON.parse(event.data);
+    console.log(data, '무슨 데이터가 들어오니?');
+
+    if (data.access_token) {
+      localStorage.setItem('access_token', data.access_token);
+      // 페이지 리다이렉션 로직
+      const response = {
+        data: {
+          member_search: data.member_search,
+          member_spaces: data.member_spaces,
+        },
+      };
+      successCallback(response);
+      eventSource.close();
+    }
+  };
+
+  eventSource.onerror = function (error) {
+    console.error('SSE 오류:', error);
+    alert('로그인 중 오류가 발생했습니다. 다시 시도해주세요.');
+    eventSource.close();
+  };
+};
+
 export const requestSpaceList = (successCallback) => {
   const accessToken = localStorage.getItem('access_token');
   axios
