@@ -115,15 +115,22 @@ export default class Sidebar {
     this.isActiveMic = !this.isActiveMic;
   }
 
+  setCamFunc(onCamFunc, offCamFunc) {
+    this.onCamFunc = onCamFunc;
+    this.offCamFunc = offCamFunc;
+  }
+
   clickCam() {
     if (this.isActiveCam) {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam_off
       </span>`;
+      this.offCamFunc();
     } else {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam
     </span>`;
+      this.onCamFunc();
     }
     this.isActiveCam = !this.isActiveCam;
   }
@@ -186,7 +193,6 @@ export default class Sidebar {
     chat_bubble
     </span>`;
     this.insidebuttonbox.appendChild(this.groupChatBtn);
-    
 
     //TODO 전체 채팅
     //TODO none으로 해라 hidden이다.
@@ -201,51 +207,7 @@ export default class Sidebar {
     chat
     </span>`;
     this.insidebuttonbox.appendChild(this.chatBtn);
-    //일단 영역 전개 완료
-    //채팅 영역을 전개한다.
-    this.sideChatBox = document.createElement("div");
-    this.sideChatBox.style.height = '76vh';
-    this.sideChatBox.style.width = '205x';
-    this.sideChatBox.style.backgroundColor = "transparent";
-    this.sideChatBox.style.padding = '20px';
-    this.sideChatBox.style.display = 'none';
-    this.sideChatBox.style.overflowY = 'auto'
-    this.sidebar.appendChild(this.sideChatBox);
-    this.isVisibleChatBox = false;
-
-    //버튼 클릭해야 보이게 해야지 정훈아
-    //지금은 전채 채팅만 집중하겠다 다른 건 응용하면 그만
-    this.chatBtn.onclick = () => {
-      if(this.isVisibleChatBox){
-        this.sideChatBox.style.display = 'none'; // 이 부분을 추가하여 숨김 처리
-        this.sideChatInput.style.display = 'none';
-
-      }else {
-        this.sideChatBox.style.display = 'block';
-        this.sideChatInput.style.display = 'block';
-      }
-      this.isVisibleChatBox = !this.isVisibleChatBox
-    }
-    //이번에는 채팅입력창을 만들어야 한다.
-    this.sideChatInput = document.createElement('input');
-    this.sideChatInput.style.border = '1px solid white';
-    this.sideChatInput.style.borderRadius = '5px';
-    this.sideChatInput.style.display = 'none';
-    this.sideChatInput.style.height = '5vh';
-    this.sideChatInput.style.width = '205px';
-    this.sideChatInput.style.backgroundColor = "transparent";
-    this.sideChatInput.style.marginTop = '10px';
-    this.sideChatInput.style.marginLeft = '20px';
-    this.sideChatInput.style.color = 'white';
-    this.sideChatInput.addEventListener('keydown', function(event) {
-      // event.key === 'Enter'은 엔터 키를 눌렀을 때를 확인합니다.
-      if (event.key === 'Enter') {
-        SocketManager.getInstance().sendChatMessage(this.value);
-        // this.value를 사용하여 input 요소의 현재 값에 접근합니다.
-        this.value = ''; // 입력창 비우기
-      }
-    });
-    this.sidebar.appendChild(this.sideChatInput);
+    this.createChatBox();
 
     // 우편함
     this.mailBtn = document.createElement('button');
@@ -269,7 +231,55 @@ export default class Sidebar {
     </span>`;
     this.insidebuttonbox.appendChild(this.usersBtn);
   }
-////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////
+
+  createChatBox() {
+    //일단 영역 전개 완료
+    //채팅 영역을 전개한다.
+    this.sideChatBox = document.createElement('div');
+    this.sideChatBox.style.height = '76vh';
+    this.sideChatBox.style.width = '205x';
+    this.sideChatBox.style.backgroundColor = 'transparent';
+    this.sideChatBox.style.padding = '20px';
+    this.sideChatBox.style.display = 'none';
+    this.sideChatBox.style.overflowY = 'auto';
+    this.sidebar.appendChild(this.sideChatBox);
+    this.isVisibleChatBox = false;
+
+    //버튼 클릭해야 보이게 해야지 정훈아
+    //지금은 전채 채팅만 집중하겠다 다른 건 응용하면 그만
+    this.chatBtn.onclick = () => {
+      if (this.isVisibleChatBox) {
+        this.sideChatBox.style.display = 'none'; // 이 부분을 추가하여 숨김 처리
+        this.sideChatInput.style.display = 'none';
+      } else {
+        this.sideChatBox.style.display = 'block';
+        this.sideChatInput.style.display = 'block';
+      }
+      this.isVisibleChatBox = !this.isVisibleChatBox;
+    };
+    //이번에는 채팅입력창을 만들어야 한다.
+    this.sideChatInput = document.createElement('input');
+    this.sideChatInput.style.border = '1px solid white';
+    this.sideChatInput.style.borderRadius = '5px';
+    this.sideChatInput.style.display = 'none';
+    this.sideChatInput.style.height = '5vh';
+    this.sideChatInput.style.width = '205px';
+    this.sideChatInput.style.backgroundColor = 'transparent';
+    this.sideChatInput.style.marginTop = '10px';
+    this.sideChatInput.style.marginLeft = '20px';
+    this.sideChatInput.style.color = 'white';
+    this.sideChatInput.addEventListener('keydown', function (event) {
+      // event.key === 'Enter'은 엔터 키를 눌렀을 때를 확인합니다.
+      if (event.key === 'Enter') {
+        SocketManager.getInstance().sendChatMessage(this.value);
+        // this.value를 사용하여 input 요소의 현재 값에 접근합니다.
+        this.value = ''; // 입력창 비우기
+      }
+    });
+    this.sidebar.appendChild(this.sideChatInput);
+  }
+
   chatMessage(nickName, msg) {
     const item = document.createElement('div');
     item.innerHTML = `${nickName}<br>${msg}`;

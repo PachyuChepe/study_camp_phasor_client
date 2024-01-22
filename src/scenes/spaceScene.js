@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 import Player from '../characters/player.js';
-import ChatBox from '../elements/chatbox.js';
 import SocketManager from '../managers/socket.js';
 import PlayerData from '../utils/playerData.js';
 import Sidebar from '../elements/sidebar.js';
+import UserCard from '../elements/userCard.js';
 
 export default class RoomScene extends Phaser.Scene {
   constructor() {
@@ -17,8 +17,12 @@ export default class RoomScene extends Phaser.Scene {
     this.tileMapWitdh = 40;
     this.tileMapHeight = 20;
 
-    this.chatBox = new ChatBox(this);
-    this.sidebar = new Sidebar(this);
+    this.userCards = new UserCard();
+    this.sidebar = new Sidebar();
+    this.sidebar.setCamFunc(
+      this.userCards.onCam.bind(this.userCards),
+      this.userCards.offCam.bind(this.userCards),
+    );
     //TODO사이드바 안에 버튼들 있고
 
     const bgWidth = this.tileSize * this.tileMapWitdh;
