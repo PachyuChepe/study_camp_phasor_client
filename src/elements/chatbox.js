@@ -1,5 +1,5 @@
 import SocketManager from '../managers/socket';
-
+//참고
 export default class ChatBox {
   constructor(scene) {
     this.scene = scene;
