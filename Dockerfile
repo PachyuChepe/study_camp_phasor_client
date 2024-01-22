@@ -19,6 +19,7 @@ COPY . .
 
 # .env 파일 생성 및 환경 변수 값 입력
 RUN echo "SOCKET=${SOCKET}" > .env
+RUN echo "DB=${DB}" > .env
 
 # 애플리케이션 실행 포트 설정
 EXPOSE 8080
