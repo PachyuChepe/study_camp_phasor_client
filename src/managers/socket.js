@@ -95,7 +95,7 @@ export default class SocketManager {
   sendChatMessage(message) {
     this.socket.emit('chat', {
       id: this.socket.id,
-      nickName: nickName,
+      nickName: PlayerData.nickName,
       message: message,
     });
   }
