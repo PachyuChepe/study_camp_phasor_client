@@ -123,7 +123,6 @@ export default class Sidebar {
 
   hideContainers() {
     // 모든 탭들 다 안보이게 하기
-    // this.chatContainer.classList.add('hidden');
     this.chatContainer.style.display = 'none';
   }
 
@@ -136,7 +135,6 @@ export default class Sidebar {
         break;
       case 'chat':
         this.chatContainer.style.display = 'flex';
-        // this.chatContainer.classList.remove('hidden');
         break;
       case 'mail':
         break;
