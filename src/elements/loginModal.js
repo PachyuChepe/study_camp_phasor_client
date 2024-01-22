@@ -1,5 +1,4 @@
-import { requestLogin } from '../utils/request';
-
+import { requestLogin, requestGoogleLogin } from '../utils/request';
 /**
  * scene의 로그인 모달 생성 함수
  * @param {Phaser.Scene} scene
@@ -43,7 +42,7 @@ export default class LoginModal {
     modalContent.appendChild(passwordGroup);
 
     const passwordLabel = document.createElement('label');
-    passwordLabel.textContent = 'Password:';
+    passwordLabel.textContent = 'Password';
     passwordGroup.appendChild(passwordLabel);
 
     this.passwordInput = document.createElement('input');
@@ -57,6 +56,21 @@ export default class LoginModal {
     loginButton.onclick = this.reqLogin.bind(this);
     loginButton.style.width = '100%';
     modalContent.appendChild(loginButton);
+
+    // Create the Google login button
+    const googleLoginButton = document.createElement('button');
+    googleLoginButton.style.backgroundImage =
+      "url('https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FNnEFT%2FbtsDNKKUzIm%2Fz6dDZz9KaQ5Qvk6qSSfTeK%2Fimg.png')";
+    googleLoginButton.style.backgroundSize = 'cover'; // 이미지가 버튼을 가득 채우도록 설정
+    googleLoginButton.style.backgroundPosition = 'center'; // 이미지 위치를 중앙으로 설정
+    googleLoginButton.style.backgroundRepeat = 'no-repeat'; // 이미지 반복 없음
+    googleLoginButton.style.width = '300px'; // 버튼의 너비 설정
+    googleLoginButton.style.height = '35px'; // 버튼의 높이 설정
+    googleLoginButton.style.border = 'none'; // 버튼 테두리 제거
+    googleLoginButton.style.cursor = 'pointer'; // 커서를 포인터로 설정
+    // 클라이언트 측: Google 로그인 버튼 핸들러
+    googleLoginButton.onclick = this.googleLogin.bind(this);
+    modalContent.appendChild(googleLoginButton);
 
     // const self = this;
     // // Phaser Scene에서 버튼 클릭 시 모달 열기
@@ -86,6 +100,29 @@ export default class LoginModal {
         password: this.passwordInput.value,
       },
       this.successLogin.bind(this),
+    );
+  }
+
+  googleLogin() {
+    // 구글 로그인 팝업창
+    const popup = window.open(
+      'http://localhost:4000/auth/google',
+      'google-login',
+      'width=500,height=500',
+    );
+
+    // 팝업창 메세지 수신 대기
+    window.addEventListener(
+      'message',
+      (event) => {
+        if (event.data.type === 'auth-complete') {
+          requestGoogleLogin(
+            event.data.data.userId,
+            this.successLogin.bind(this),
+          );
+        }
+      },
+      false,
     );
   }
 
