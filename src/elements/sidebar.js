@@ -44,15 +44,16 @@ export default class Sidebar {
     this.sidebar.appendChild(this.insidebuttonbox);
 
     // 정보 수정 닉네임 스킨
-    this.enditBtn = document.createElement('button');
-    this.enditBtn.style.backgroundColor = 'white';
-    this.enditBtn.style.border = '2px solid white';
-    this.enditBtn.style.color = '#a2cfff';
-    this.enditBtn.style.padding = '4px';
-    this.enditBtn.innerHTML = `<span class="material-symbols-outlined">
+    this.editBtn = document.createElement('button');
+    this.editBtn.style.backgroundColor = 'white';
+    this.editBtn.style.border = '2px solid white';
+    this.editBtn.style.color = '#a2cfff';
+    this.editBtn.style.padding = '4px';
+    this.editBtn.innerHTML = `<span class="material-symbols-outlined">
     person
     </span>`;
-    this.insidebuttonbox.appendChild(this.enditBtn);
+    this.insidebuttonbox.appendChild(this.editBtn);
+    this.editBtn.onclick = this.showContainers.bind(this, 'edit');
 
     // DM
     this.dmBtn = document.createElement('button');
@@ -64,6 +65,7 @@ export default class Sidebar {
     forum
     </span>`;
     this.insidebuttonbox.appendChild(this.dmBtn);
+    this.dmBtn.onclick = this.showContainers.bind(this, 'dm');
 
     // 구역 채팅
     this.groupChatBtn = document.createElement('button');
@@ -75,6 +77,7 @@ export default class Sidebar {
     chat_bubble
     </span>`;
     this.insidebuttonbox.appendChild(this.groupChatBtn);
+    this.groupChatBtn.onclick = this.showContainers.bind(this, 'group');
 
     //TODO 전체 채팅
     //TODO none으로 해라 hidden이다.
@@ -90,6 +93,7 @@ export default class Sidebar {
     </span>`;
     this.insidebuttonbox.appendChild(this.chatBtn);
     this.createChatBox();
+    this.chatBtn.onclick = this.showContainers.bind(this, 'chat');
 
     // 우편함
     this.mailBtn = document.createElement('button');
@@ -101,6 +105,7 @@ export default class Sidebar {
     mail
     </span>`;
     this.insidebuttonbox.appendChild(this.mailBtn);
+    this.mailBtn.onclick = this.showContainers.bind(this, 'mail');
 
     // 접속자
     this.usersBtn = document.createElement('button');
@@ -112,44 +117,70 @@ export default class Sidebar {
     person_search
     </span>`;
     this.insidebuttonbox.appendChild(this.usersBtn);
+    this.usersBtn.onclick = this.showContainers.bind(this, 'users');
   }
   ////////////////////////////////////////////////////////
+
+  hideContainers() {
+    // 모든 탭들 다 안보이게 하기
+    // this.chatContainer.classList.add('hidden');
+    this.chatContainer.style.display = 'none';
+  }
+
+  showContainers(typestr) {
+    this.hideContainers();
+    switch (typestr) {
+      case 'edit':
+        break;
+      case 'group':
+        break;
+      case 'chat':
+        this.chatContainer.style.display = 'flex';
+        // this.chatContainer.classList.remove('hidden');
+        break;
+      case 'mail':
+        break;
+      case 'users':
+        break;
+    }
+  }
 
   createChatBox() {
     //일단 영역 전개 완료
     //채팅 영역을 전개한다.
+    this.chatContainer = document.createElement('div');
+    this.chatContainer.style.width = '95%';
+    this.chatContainer.style.height = '98%';
+    this.chatContainer.style.alignItems = 'center';
+    this.chatContainer.style.justifyContent = 'center';
+    this.chatContainer.style.display = 'flex';
+    this.chatContainer.style.flexDirection = 'column';
+    this.chatContainer.style.padding = '5px';
+    this.sidebar.appendChild(this.chatContainer);
+
+    this.sideChatBoxText = document.createElement('h3');
+    this.sideChatBoxText.innerText = '전체 채팅';
+    this.sideChatBoxText.style.color = 'white';
+    this.sideChatBoxText.style.fontWeight = 'bold';
+    this.chatContainer.appendChild(this.sideChatBoxText);
+
     this.sideChatBox = document.createElement('div');
-    this.sideChatBox.style.height = '76vh';
-    this.sideChatBox.style.width = '205x';
-    this.sideChatBox.style.backgroundColor = 'transparent';
-    this.sideChatBox.style.padding = '20px';
-    this.sideChatBox.style.display = 'none';
+    this.sideChatBox.style.height = '80vh';
+    this.sideChatBox.style.width = '100%';
     this.sideChatBox.style.overflowY = 'auto';
-    this.sidebar.appendChild(this.sideChatBox);
-    this.isVisibleChatBox = false;
+    this.sideChatBox.style.transition = 'transform 0.3s ease-in-out';
+    this.sideChatBox.style.boxShadow = 'inset 0 0 10px rgba(0, 0, 0, 0.1)';
+    this.chatContainer.appendChild(this.sideChatBox);
 
     //버튼 클릭해야 보이게 해야지 정훈아
     //지금은 전채 채팅만 집중하겠다 다른 건 응용하면 그만
-    this.chatBtn.onclick = () => {
-      if (this.isVisibleChatBox) {
-        this.sideChatBox.style.display = 'none'; // 이 부분을 추가하여 숨김 처리
-        this.sideChatInput.style.display = 'none';
-      } else {
-        this.sideChatBox.style.display = 'block';
-        this.sideChatInput.style.display = 'block';
-      }
-      this.isVisibleChatBox = !this.isVisibleChatBox;
-    };
     //이번에는 채팅입력창을 만들어야 한다.
     this.sideChatInput = document.createElement('input');
     this.sideChatInput.style.border = '1px solid white';
     this.sideChatInput.style.borderRadius = '5px';
-    this.sideChatInput.style.display = 'none';
-    this.sideChatInput.style.height = '5vh';
-    this.sideChatInput.style.width = '205px';
+    this.sideChatInput.style.width = '100%';
     this.sideChatInput.style.backgroundColor = 'transparent';
     this.sideChatInput.style.marginTop = '10px';
-    this.sideChatInput.style.marginLeft = '20px';
     this.sideChatInput.style.color = 'white';
     this.sideChatInput.addEventListener('keydown', function (event) {
       // event.key === 'Enter'은 엔터 키를 눌렀을 때를 확인합니다.
@@ -159,7 +190,7 @@ export default class Sidebar {
         this.value = ''; // 입력창 비우기
       }
     });
-    this.sidebar.appendChild(this.sideChatInput);
+    this.chatContainer.appendChild(this.sideChatInput);
   }
 
   chatMessage(nickName, msg) {
