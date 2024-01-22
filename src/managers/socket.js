@@ -1,4 +1,5 @@
 import io from 'socket.io-client';
+import PlayerData from '../utils/playerData';
 
 export default class SocketManager {
   constructor() {
@@ -25,9 +26,9 @@ export default class SocketManager {
       console.log('joinSpacePlayer', data);
       this.publish('joinSpacePlayer', data);
     });
-    this.socket.on('leavSpace', (data) => {
-      console.log('leavSpace', data);
-      this.publish('leavSpace', data);
+    this.socket.on('leaveSpace', (data) => {
+      console.log('leaveSpace', data);
+      this.publish('leaveSpace', data);
     });
     this.socket.on('movePlayer', (data) => {
       console.log('movePlayer', data);
@@ -69,6 +70,8 @@ export default class SocketManager {
   sendJoinSpacePlayer(tileX, tileY) {
     this.socket.emit('joinSpace', {
       id: this.socket.id,
+      nickName: PlayerData.nickName,
+      spaceId: PlayerData.spaceId,
       x: tileX,
       y: tileY,
     });
@@ -92,6 +95,7 @@ export default class SocketManager {
   sendChatMessage(message) {
     this.socket.emit('chat', {
       id: this.socket.id,
+      nickName: nickName,
       message: message,
     });
   }

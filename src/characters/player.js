@@ -248,7 +248,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
       duration: 300,
       ease: 'Linear',
       onComplete: function () {
-        console.log(self.x, self.y);
+        // console.log(self.x, self.y);
         self.checkKeyPress();
       },
     });
