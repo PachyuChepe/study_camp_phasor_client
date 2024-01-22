@@ -1,8 +1,5 @@
 import { requestLogin, requestGoogleLogin } from '../utils/request';
-/**
- * scene의 로그인 모달 생성 함수
- * @param {Phaser.Scene} scene
- */
+
 export default class LoginModal {
   constructor() {
     this.loginModal = document.createElement('div');

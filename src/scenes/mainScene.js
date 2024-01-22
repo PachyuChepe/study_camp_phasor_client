@@ -126,7 +126,7 @@ export default class MainScene extends Phaser.Scene {
     detailHeader.classList.add('modal-header');
     detailHeader.innerText = 'ENTER SPACE';
     this.detailBox.appendChild(detailHeader);
-
+//TODO이거 참고해서 전체 채팅 방 만들어라 
     const detailGroup = document.createElement('div');
     detailGroup.classList.add('group');
     this.detailBox.appendChild(detailGroup);
@@ -139,7 +139,7 @@ export default class MainScene extends Phaser.Scene {
     this.detailText.classList.add('text');
     this.detailText.textContent = '';
     detailGroup.appendChild(this.detailText);
-
+//
     const detailButton = document.createElement('button');
     detailButton.textContent = 'Enter';
     detailButton.onclick = this.enterSpace.bind(this);
