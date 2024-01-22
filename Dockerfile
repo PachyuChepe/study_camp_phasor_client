@@ -6,6 +6,7 @@ WORKDIR /app
 
 # ARG를 사용하여 빌드 시점에 변수 값을 받음
 ARG SOCKET
+ARG DB
 
 # 환경 변수 설정
 ENV SOCKET ${SOCKET}

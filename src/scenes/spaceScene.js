@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import Player from '../characters/player.js';
-import ChatBox from '../domelements/chatbox.js';
+import ChatBox from '../elements/chatbox.js';
 import SocketManager from '../managers/socket.js';
+import PlayerData from '../utils/playerData.js';
+import Sidebar from '../elements/sidebar.js';
 
 export default class RoomScene extends Phaser.Scene {
   constructor() {
@@ -14,10 +16,9 @@ export default class RoomScene extends Phaser.Scene {
     this.tileSize = 48;
     this.tileMapWitdh = 40;
     this.tileMapHeight = 20;
-    // 모달
-    // this.m_loginModal = new LoginModal(this);
-    this.m_chatBox = new ChatBox(this);
-    // this.m_isOpenModal = false;
+
+    this.chatBox = new ChatBox(this);
+    this.sidebar = new Sidebar(this);
 
     const bgWidth = this.tileSize * this.tileMapWitdh;
     const bgHeight = this.tileSize * this.tileMapHeight;
@@ -26,23 +27,26 @@ export default class RoomScene extends Phaser.Scene {
       .tileSprite(0, 0, bgWidth, bgHeight, 'background1')
       .setOrigin(0, 0);
     this.m_table0 = this.add
-      .sprite(96, 96 + 96 * 0, 'table')
+      .sprite(48 * 3, 96 + 96 * 0, 'table')
       .setOrigin(0.5, 0.5);
     this.m_table1 = this.add
-      .sprite(96, 96 + 96 * 1, 'table')
+      .sprite(48 * 3, 96 + 96 * 1, 'table')
       .setOrigin(0.5, 0.5);
     this.m_table2 = this.add
-      .sprite(96, 96 + 96 * 2, 'table')
+      .sprite(48 * 3, 96 + 96 * 2, 'table')
       .setOrigin(0.5, 0.5);
 
-    this.m_player = new Player(this, '닉네임', this.tileSize, { x: 1, y: 1 });
+    this.player = new Player(this, PlayerData.nickName, this.tileSize, {
+      x: 1,
+      y: 1,
+    });
     this.physics.world.setBounds(0, 0, bgWidth, bgHeight);
     this.cameras.main.setBounds(0, 0, bgWidth, bgHeight);
-    this.cameras.main.startFollow(this.m_player, false, 0.5, 0.5);
+    this.cameras.main.startFollow(this.player, false, 0.5, 0.5);
 
     // 플레이어에 물리 엔진 활성화
     this.physics.world.setBounds(0, 0, bgWidth, bgHeight);
-    this.physics.add.existing(this.m_player);
+    this.physics.add.existing(this.player);
 
     this.m_cursorKeys = this.input.keyboard.createCursorKeys();
     this.wKey = this.input.keyboard.addKey('W');
@@ -60,7 +64,7 @@ export default class RoomScene extends Phaser.Scene {
     this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
       const newZoom = this.cameras.main.zoom + deltaY * zoomSpeed;
       // 배경의 크기에 따라 줌 제한 설정
-      const maxZoom = Math.min(
+      const maxZoom = Math.max(
         (window.innerWidth - 20) / bgWidth,
         (window.innerHeight - 20) / bgHeight,
       );
@@ -68,10 +72,6 @@ export default class RoomScene extends Phaser.Scene {
       this.cameras.main.zoom = Phaser.Math.Clamp(newZoom, maxZoom, 2);
     });
 
-    // // Phaser Scene에서 버튼 클릭 시 테스트 코드
-    // this.input.on('pointerdown', function (pointer) {
-    //   SocketInstance.sendChatMessage('asdgsdgasdgsad');
-    // });
     this.otherPlayers = {};
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
     SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
@@ -98,7 +98,7 @@ export default class RoomScene extends Phaser.Scene {
           if (!this.otherPlayers[data.id]) {
             this.otherPlayers[data.id] = new Player(
               this,
-              data.id,
+              data.nickName,
               this.tileSize,
               {
                 x: data.x,
@@ -108,7 +108,7 @@ export default class RoomScene extends Phaser.Scene {
           }
         }
         break;
-      case 'leavSpace':
+      case 'leaveSpace':
         if (this.otherPlayers[data.id]) {
           const leavePlayer = this.otherPlayers[data.id];
           leavePlayer.remove();
@@ -130,7 +130,7 @@ export default class RoomScene extends Phaser.Scene {
       case 'chatPlayer':
         if (data.id === SocketManager.getInstance().getID()) {
           console.log('본인');
-          this.m_player.createBubble(data.id, data.message);
+          this.player.createBubble(data.id, data.message);
           return;
         }
         if (this.otherPlayers[data.id]) {
@@ -164,11 +164,11 @@ export default class RoomScene extends Phaser.Scene {
         deltaY = 1;
         break;
       case 'KeyX':
-        this.m_player.sitAnimation();
+        this.player.sitAnimation();
         break;
     }
 
     // 플레이어 이동
-    if (deltaX || deltaY) this.m_player.movePlayer(deltaX, deltaY);
+    if (deltaX || deltaY) this.player.movePlayer(deltaX, deltaY);
   }
 }

@@ -6,7 +6,7 @@ const Config = {
   // 게임 화면의 크기와 색을 설정하는 부분입니다.
   width: window.innerWidth - 20,
   height: window.innerHeight - 20,
-  backgroundColor: 0x000000,
+  backgroundColor: 0x94cfff,
 
   // 사용할 scene은 config의 scene 프로퍼티의 배열에 추가해줘야 합니다.
   scene: [LoadingScene, MainScene, SpaceScene],
