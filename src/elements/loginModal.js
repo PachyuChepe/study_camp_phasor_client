@@ -103,7 +103,7 @@ export default class LoginModal {
   googleLogin() {
     // 구글 로그인 팝업창
     const popup = window.open(
-      'http://localhost:4000/auth/google',
+      `${process.env.DB}/auth/google`,
       'google-login',
       'width=500,height=500',
     );

@@ -19,7 +19,7 @@ export const requestLogin = (data, successCallback) => {
 // 구글 로그인
 export const requestGoogleLogin = (userId, successCallback) => {
   const eventSource = new EventSource(
-    `http://localhost:4000/auth/stream/${userId}`,
+    `${process.env.DB}/auth/stream/${userId}`,
   );
 
   eventSource.onmessage = function (event) {
