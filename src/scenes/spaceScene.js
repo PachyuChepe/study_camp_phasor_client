@@ -19,6 +19,7 @@ export default class RoomScene extends Phaser.Scene {
 
     this.chatBox = new ChatBox(this);
     this.sidebar = new Sidebar(this);
+    //TODO사이드바 안에 버튼들 있고
 
     const bgWidth = this.tileSize * this.tileMapWitdh;
     const bgHeight = this.tileSize * this.tileMapHeight;
