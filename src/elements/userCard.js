@@ -20,35 +20,36 @@ export default class UserCard {
     this.container.style.maxWidth = '90%';
     this.container.style.display = 'flex';
     this.container.style.overflowX = 'auto';
-    this.camList = [];
+    this.cardList = [];
 
     // 자식 요소 생성 (예시)
     for (let i = 0; i < 3; i++) {
-      this.createCam();
+      this.createCard();
     }
   }
 
-  createCam() {
-    const cam = document.createElement('div');
-    cam.style.margin = '10px';
-    cam.style.width = '200px';
-    cam.style.height = '200px';
-    cam.style.backgroundColor = 'white';
-    cam.style.cursor = 'pointer';
-    cam.style.transition = 'transform 0.3s ease-in-out';
-    cam.style.borderRadius = '5px';
-    cam.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    cam.style.textAlign = 'center';
-    cam.style.display = 'flex';
-    cam.style.flexDirection = 'column';
-    cam.style.justifyContent = 'center';
-    cam.style.textAlign = 'center';
-    cam.innerText = '캠';
-    this.container.appendChild(cam);
-    this.camList.push(cam);
+  createCard() {
+    const card = document.createElement('div');
+    card.style.margin = '10px';
+    card.style.width = '200px';
+    card.style.height = '200px';
+    card.style.backgroundColor = 'white';
+    card.style.cursor = 'pointer';
+    card.style.transition = 'transform 0.3s ease-in-out';
+    card.style.borderRadius = '5px';
+    card.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    card.style.textAlign = 'center';
+    card.style.display = 'flex';
+    card.style.flexDirection = 'column';
+    card.style.justifyContent = 'center';
+    card.style.textAlign = 'center';
+    card.innerText = '캠';
+    this.container.appendChild(card);
+    this.cardList.push(card);
     // cam.onclick =
   }
 
+  // MainScene -> Sidebar -> SidebarOut과 연결 된 함수
   onCam() {
     console.log('cam on');
   }

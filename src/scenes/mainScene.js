@@ -1,10 +1,6 @@
 import Phaser from 'phaser';
 import LoginModal from '../elements/loginModal.js';
-import {
-  requestCreateSpace,
-  requestProfile,
-  requestSpaceList,
-} from '../utils/request.js';
+import { requestCreateSpace, requestSpaceList } from '../utils/request.js';
 import PlayerData from '../utils/playerData.js';
 
 export default class MainScene extends Phaser.Scene {
@@ -26,13 +22,6 @@ export default class MainScene extends Phaser.Scene {
       // 로그인을 안했을경우 토큰이 없을경우 등
       this.loginModal.openModal();
     }
-
-    // const bgWidth = this.tileSize * this.tileMapWitdh;
-    // const bgHeight = this.tileSize * this.tileMapHeight;
-
-    // this.m_background = this.add
-    //   .tileSprite(0, 0, bgWidth, bgHeight, 'background1')
-    //   .setOrigin(0, 0);
 
     this.title = document.createElement('header');
     this.title.innerHTML = '<h1>STUDY CAMP</h1>';
@@ -126,7 +115,7 @@ export default class MainScene extends Phaser.Scene {
     detailHeader.classList.add('modal-header');
     detailHeader.innerText = 'ENTER SPACE';
     this.detailBox.appendChild(detailHeader);
-//TODO이거 참고해서 전체 채팅 방 만들어라 
+    //TODO이거 참고해서 전체 채팅 방 만들어라
     const detailGroup = document.createElement('div');
     detailGroup.classList.add('group');
     this.detailBox.appendChild(detailGroup);
@@ -139,7 +128,7 @@ export default class MainScene extends Phaser.Scene {
     this.detailText.classList.add('text');
     this.detailText.textContent = '';
     detailGroup.appendChild(this.detailText);
-//
+    //
     const detailButton = document.createElement('button');
     detailButton.textContent = 'Enter';
     detailButton.onclick = this.enterSpace.bind(this);

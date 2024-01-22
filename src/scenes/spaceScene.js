@@ -19,6 +19,7 @@ export default class RoomScene extends Phaser.Scene {
 
     this.userCards = new UserCard();
     this.sidebar = new Sidebar();
+    // userCard함수를 sidebar out 버튼에 연결한 부분
     this.sidebar.setCamFunc(
       this.userCards.onCam.bind(this.userCards),
       this.userCards.offCam.bind(this.userCards),
