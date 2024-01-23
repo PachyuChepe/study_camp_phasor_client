@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import LoginModal from '../elements/loginModal.js';
 import { requestCreateSpace, requestSpaceList } from '../utils/request.js';
-import PlayerData from '../utils/playerData.js';
+import PlayerData from '../config/playerData.js';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {

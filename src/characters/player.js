@@ -13,7 +13,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.isAniMove = false;
     this.isSit = false;
 
-    this.setOrigin(0, 0);
+    this.setOrigin(0, 0.5);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.scale = 1;
@@ -26,7 +26,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         y: 8,
       },
     });
-    this.nicknameText.setOrigin(0, 0.5);
+    this.nicknameText.setOrigin(0, 1.5);
 
     this.setDepth(20);
     this.setBodySize(48, 68);
@@ -243,12 +243,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     const self = this;
     this.tween = this.scene.tweens.add({
       targets: [this, this.nicknameText, this.bubble],
-      x: this.tilePos.x * this.tileSize,
-      y: this.tilePos.y * this.tileSize,
+      x: this.tilePos.x * this.tileSize + 1,
+      y: this.tilePos.y * this.tileSize + 1,
       duration: 300,
       ease: 'Linear',
       onComplete: function () {
         // console.log(self.x, self.y);
+        self.scene.innerLayer();
         self.checkKeyPress();
       },
     });
@@ -263,11 +264,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.moveAnimation(deltaX, deltaY);
 
+    if (this.otherTween) {
+      this.otherTween.stop();
+      this.otherTween = null;
+    }
+
     const self = this;
-    this.scene.tweens.add({
+    this.otherTween = this.scene.tweens.add({
       targets: [this, this.nicknameText, this.bubble],
-      x: this.tilePos.x * this.tileSize,
-      y: this.tilePos.y * this.tileSize,
+      x: this.tilePos.x * this.tileSize + 1,
+      y: this.tilePos.y * this.tileSize + 1,
       duration: 300,
       ease: 'Linear',
       onComplete: function () {

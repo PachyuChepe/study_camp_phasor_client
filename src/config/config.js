@@ -1,6 +1,6 @@
-import LoadingScene from './scenes/loadingScene.js';
-import MainScene from './scenes/mainScene.js';
-import SpaceScene from './scenes/spaceScene.js';
+import LoadingScene from '../scenes/loadingScene.js';
+import MainScene from '../scenes/mainScene.js';
+import SpaceScene from '../scenes/spaceScene.js';
 
 const Config = {
   // 게임 화면의 크기와 색을 설정하는 부분입니다.

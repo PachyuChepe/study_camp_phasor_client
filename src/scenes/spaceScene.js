@@ -1,11 +1,11 @@
 import Phaser from 'phaser';
 import Player from '../characters/player.js';
 import SocketManager from '../managers/socket.js';
-import PlayerData from '../utils/playerData.js';
+import PlayerData from '../config/playerData.js';
 import Sidebar from '../elements/sidebar.js';
 import UserCard from '../elements/userCard.js';
 
-export default class RoomScene extends Phaser.Scene {
+export default class SpaceScene extends Phaser.Scene {
   constructor() {
     super('SpaceScene');
   }
@@ -15,7 +15,41 @@ export default class RoomScene extends Phaser.Scene {
   create() {
     this.tileSize = 48;
     this.tileMapWitdh = 40;
-    this.tileMapHeight = 20;
+    this.tileMapHeight = 30;
+
+    this.map = this.make.tilemap({
+      data: this.createTileMap(this.tileMapWitdh, this.tileMapHeight),
+      tileWidth: this.tileSize,
+      tileHeight: this.tileSize,
+    });
+    this.map.addTilesetImage('tiles');
+    this.layers = [];
+    this.mainLayer = this.map.createLayer(0, 'tiles', 0, 0);
+    this.layers.push(this.mainLayer);
+
+    const group = [
+      [3, 4, 4, 4, 4, 5],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [15, 16, 16, 16, 16, 17],
+    ];
+    this.groupmap = this.make.tilemap({
+      data: group,
+      tileWidth: this.tileSize,
+      tileHeight: this.tileSize,
+    });
+    this.groupmap.addTilesetImage('tiles');
+    this.layers.push(
+      (this.grouplayer = this.groupmap.createLayer(
+        0,
+        'tiles',
+        this.tileSize * 3,
+        this.tileSize * 3,
+      )),
+    );
 
     this.userCards = new UserCard();
     this.sidebar = new Sidebar();
@@ -29,18 +63,15 @@ export default class RoomScene extends Phaser.Scene {
     const bgWidth = this.tileSize * this.tileMapWitdh;
     const bgHeight = this.tileSize * this.tileMapHeight;
 
-    this.m_background = this.add
-      .tileSprite(0, 0, bgWidth, bgHeight, 'background1')
-      .setOrigin(0, 0);
     this.m_table0 = this.add
-      .sprite(48 * 3, 96 + 96 * 0, 'table')
-      .setOrigin(0.5, 0.5);
+      .sprite(this.tileSize * 4 - this.tileSize / 2, 96 + 96 * 0, 'table')
+      .setOrigin(0, 0);
     this.m_table1 = this.add
-      .sprite(48 * 3, 96 + 96 * 1, 'table')
-      .setOrigin(0.5, 0.5);
+      .sprite(this.tileSize * 4 - this.tileSize / 2, 96 + 96 * 1, 'table')
+      .setOrigin(0, 0);
     this.m_table2 = this.add
-      .sprite(48 * 3, 96 + 96 * 2, 'table')
-      .setOrigin(0.5, 0.5);
+      .sprite(this.tileSize * 4 - this.tileSize / 2, 96 + 96 * 2, 'table')
+      .setOrigin(0, 0);
 
     this.player = new Player(this, PlayerData.nickName, this.tileSize, {
       x: 1,
@@ -83,6 +114,65 @@ export default class RoomScene extends Phaser.Scene {
     SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
   }
 
+  createTileMap(width, height) {
+    const tileMap = [];
+
+    for (let i = 0; i < height; i++) {
+      const row = [];
+      for (let j = 0; j < width; j++) {
+        if (i === 0) {
+          if (j === 0) {
+            row.push(0);
+          } else if (j === width - 1) {
+            row.push(2);
+          } else {
+            row.push(1);
+          }
+        } else if (i === height - 1) {
+          if (j === 0) {
+            row.push(12);
+          } else if (j === width - 1) {
+            row.push(14);
+          } else {
+            row.push(13);
+          }
+        } else {
+          if (j === 0) {
+            row.push(6);
+          } else if (j === width - 1) {
+            row.push(8);
+          } else {
+            row.push(7);
+          }
+        }
+      }
+      tileMap.push(row);
+    }
+
+    return tileMap;
+  }
+
+  innerLayer() {
+    this.layers.forEach((layer) => {
+      if (
+        Phaser.Geom.Rectangle.Contains(
+          layer.getBounds(),
+          this.player.x,
+          this.player.y,
+        )
+      ) {
+        layer.setAlpha(1);
+        if (layer !== this.mainLayer) {
+          this.layers.forEach(function (otherLayer) {
+            if (otherLayer !== layer) {
+              otherLayer.setAlpha(0.9);
+            }
+          });
+        }
+      }
+    });
+  }
+
   eventscallback(namespace, data) {
     switch (namespace) {
       case 'spaceUsers':
@@ -91,7 +181,7 @@ export default class RoomScene extends Phaser.Scene {
             if (!this.otherPlayers[data.id]) {
               this.otherPlayers[playerdata.id] = new Player(
                 this,
-                playerdata.id,
+                playerdata.nickName,
                 this.tileSize,
                 { x: playerdata.x, y: playerdata.y },
               );

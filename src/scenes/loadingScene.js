@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import fontPng from '../assets/font/font.png';
 import fontXml from '../assets/font/font.xml';
 
+import tiles from '../assets/images/tiles.png';
 import bgImg1 from '../assets/images/background.png';
 import bgImg2 from '../assets/images/background-2.png';
 import bgImg3 from '../assets/images/background-3.png';
@@ -35,6 +36,7 @@ export default class LoadingScene extends Phaser.Scene {
 
   preload() {
     // IMAGES
+    this.load.image('tiles', tiles);
     this.load.image('background1', bgImg1);
     this.load.image('background2', bgImg2);
     this.load.image('background3', bgImg3);
