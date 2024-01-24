@@ -42,6 +42,10 @@ export default class SocketManager {
       console.log('chatPlayer', data);
       this.publish('chatPlayer', data);
     });
+    this.socket.on('directMessage', (data) => {
+      console.log('directMessage', data);
+      this.publish('directMessage', data);
+    })
   }
 
   static getInstance() {
@@ -97,6 +101,15 @@ export default class SocketManager {
       id: this.socket.id,
       nickName: PlayerData.nickName,
       message: message,
+    });
+  }
+
+  //#TODO
+  sendDirectMessageToPlayer(getterId, message){
+    this.socket.emit('directMessageToPlayer', {
+      senderId: this.socket.id,
+      getterId,
+      message,
     });
   }
 }

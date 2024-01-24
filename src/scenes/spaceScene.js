@@ -18,7 +18,7 @@ export default class RoomScene extends Phaser.Scene {
     this.tileMapHeight = 20;
 
     this.userCards = new UserCard();
-    this.sidebar = new Sidebar();
+    this.sidebar = new Sidebar(this);
     // userCard함수를 sidebar out 버튼에 연결한 부분
     this.sidebar.setCamFunc(
       this.userCards.onCam.bind(this.userCards),
@@ -91,7 +91,7 @@ export default class RoomScene extends Phaser.Scene {
             if (!this.otherPlayers[data.id]) {
               this.otherPlayers[playerdata.id] = new Player(
                 this,
-                playerdata.id,
+                playerdata.nickName,
                 this.tileSize,
                 { x: playerdata.x, y: playerdata.y },
               );
