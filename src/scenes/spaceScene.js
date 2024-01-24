@@ -223,16 +223,16 @@ export default class SpaceScene extends Phaser.Scene {
           this.otherPlayers[data.id].sitOtherPlayer(data.isSit);
         }
         break;
-      case 'chatPlayer':
-        if (data.id === SocketManager.getInstance().getID()) {
-          console.log('본인');
-          this.player.createBubble(data.id, data.message);
-          return;
-        }
-        if (this.otherPlayers[data.id]) {
-          this.otherPlayers[data.id].createBubble(data.id, data.message);
-        }
-        break;
+      // case 'chatPlayer':
+      //   if (data.id === SocketManager.getInstance().getID()) {
+      //     console.log('본인');
+      //     this.player.createBubble(data.id, data.message);
+      //     return;
+      //   }
+      //   if (this.otherPlayers[data.id]) {
+      //     this.otherPlayers[data.id].createBubble(data.id, data.message);
+      //   }
+      //   break;
     }
   }
 

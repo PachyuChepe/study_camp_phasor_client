@@ -1,5 +1,7 @@
 import SocketManager from '../managers/socket';
 import SidebarOut from './sidebarOut';
+import PlayerData from '../config/playerData';
+import EditModal from './editModal';
 
 export default class Sidebar {
   constructor(scene) {
@@ -69,6 +71,7 @@ export default class Sidebar {
     </span>`;
     this.insidebuttonbox.appendChild(this.editBtn);
     this.editBtn.onclick = this.showContainers.bind(this, 'edit');
+    this.createEditBox();
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // DM
     //일단 전챗의 반대로 가면 될거 같다.
@@ -143,6 +146,7 @@ export default class Sidebar {
 
   hideContainers() {
     // 모든 탭들 다 안보이게 하기
+    this.editContainer.style.display = 'none';
     this.chatContainer.style.display = 'none';
     this.directMessageContainer.style.display = 'none';
     //TODO# 여기서 조금 더 고민을 해봐야 한다.
@@ -157,6 +161,7 @@ export default class Sidebar {
     this.hideContainers();
     switch (typestr) {
       case 'edit':
+        this.editContainer.style.display = 'flex';
         break;
       case 'group':
         break;
@@ -171,6 +176,47 @@ export default class Sidebar {
       case 'users':
         break;
     }
+  }
+
+  createEditBox() {
+    //유저 정보
+    this.editContainer = document.createElement('div');
+    this.editContainer.style.width = '95%';
+    this.editContainer.style.height = '98%';
+    this.editContainer.style.alignItems = 'center';
+    this.editContainer.style.justifyContent = 'center';
+    this.editContainer.style.display = 'flex';
+    this.editContainer.style.flexDirection = 'column';
+    this.editContainer.style.padding = '5px';
+    this.sidebar.appendChild(this.editContainer);
+
+    this.sideEditBoxText = document.createElement('h3');
+    this.sideEditBoxText.innerText = PlayerData.nickName;
+    this.sideEditBoxText.style.color = 'white';
+    this.sideEditBoxText.style.fontWeight = 'bold';
+    this.editContainer.appendChild(this.sideEditBoxText);
+
+    this.sideEditBox = document.createElement('div');
+    this.sideEditBox.style.height = '90vh';
+    this.sideEditBox.style.width = '100%';
+    // this.sideEditBox.style.backgroundColor = 'white';
+    this.editContainer.appendChild(this.sideEditBox);
+
+    const editbutton = document.createElement('button');
+    editbutton.style.padding = '0px';
+    editbutton.style.width = '100%';
+    editbutton.style.backgroundColor = 'white';
+    editbutton.style.border = '2px solid white';
+    editbutton.style.color = '#a2cfff';
+    editbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    apparel
+    </span> 아바타 꾸미기</p>`;
+    editbutton.onclick = () => {
+      this.editModal.openModal();
+    };
+    this.sideEditBox.appendChild(editbutton);
+
+    this.editModal = new EditModal();
   }
 
   createChatBox() {
@@ -431,7 +477,9 @@ export default class Sidebar {
           const item = document.createElement('div');
           item.innerHTML = `나<br>${event.target.value}`;
           item.style.color = 'white';
-          this.directMessageRoomContainer[divElement.id].chatBox.appendChild(item)
+          this.directMessageRoomContainer[divElement.id].chatBox.appendChild(
+            item,
+          );
           SocketManager.getInstance().sendDirectMessageToPlayer(
             divElement.id,
             event.target.value,
@@ -446,7 +494,6 @@ export default class Sidebar {
       this.directMessageRoomContainer[divElement.id].chatInput,
     );
   }
-
 
   //#
   chatMessage(nickName, msg) {
@@ -464,7 +511,6 @@ export default class Sidebar {
     item.innerHTML = `${nickname}<br>${msg}`;
     item.style.color = 'white';
     if (!this.directMessageRoomContainer[senderId]) {
-      
       //div안에 유저 이름과 속성으로 id를 줄 것이다.
       const divElement = document.createElement('div');
       divElement.setAttribute('id', userId);
@@ -476,7 +522,7 @@ export default class Sidebar {
       divElement.style.color = 'white';
       this.createDirectMessageRoom(divElement);
     } else {
-      this.directMessageRoomContainer[senderId].style.display = "flex"
+      this.directMessageRoomContainer[senderId].style.display = 'flex';
     }
     this.directMessageRoomContainer[senderId].chatBox.appendChild(item);
   }
