@@ -12,6 +12,8 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.isMove = false;
     this.isAniMove = false;
     this.isSit = false;
+    //생각하지 말고 일단 해보자 이게 맞는거 같다.
+    this.nickName = nickname;
 
     this.setOrigin(0, 0.5);
     scene.add.existing(this);

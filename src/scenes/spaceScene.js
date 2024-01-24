@@ -52,7 +52,7 @@ export default class SpaceScene extends Phaser.Scene {
     );
 
     this.userCards = new UserCard();
-    this.sidebar = new Sidebar();
+    this.sidebar = new Sidebar(this);
     // userCard함수를 sidebar out 버튼에 연결한 부분
     this.sidebar.setCamFunc(
       this.userCards.onCam.bind(this.userCards),
