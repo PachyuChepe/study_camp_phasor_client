@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import Config from './config.js';
+import Config from './config/config.js';
 
 const game = new Phaser.Game(Config);
 window.addEventListener(
