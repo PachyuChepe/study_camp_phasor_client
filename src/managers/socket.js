@@ -105,11 +105,13 @@ export default class SocketManager {
   }
 
   //#TODO
-  sendDirectMessageToPlayer(getterId, message){
+  sendDirectMessageToPlayer(getterId, senderNickName, getterNickName, message){
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
       getterId,
       message,
+      senderNickName,
+      getterNickName,
     });
   }
 }

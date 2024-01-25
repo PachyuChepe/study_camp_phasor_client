@@ -1,6 +1,14 @@
 import SocketManager from '../managers/socket';
 import SidebarOut from './sidebarOut';
 
+//https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
+//유저가 특정 구역에 진입하면 소켓으로 특정 룸에 참가해야 하는데
+//생각을 해봐야 겠네
+//소켓도 건들고
+//스페이스씬도 건들고
+//룸에 참가하고
+//
+
 export default class Sidebar {
   constructor(scene) {
     this.scene = scene;
@@ -85,7 +93,9 @@ export default class Sidebar {
     </span>`;
     this.insidebuttonbox.appendChild(this.dmBtn);
     this.createDMBox();
-    this.dmBtn.onclick = this.showContainers.bind(this, 'dm');
+    this.createDMList();
+    //#TODO 일단 여기서 보여주는거 바꿔야 한다.
+    this.dmBtn.onclick = this.showContainers.bind(this,'dmlist');
 
     // 구역 채팅
     this.groupChatBtn = document.createElement('button');
@@ -145,11 +155,43 @@ export default class Sidebar {
     // 모든 탭들 다 안보이게 하기
     this.chatContainer.style.display = 'none';
     this.directMessageContainer.style.display = 'none';
+    this.directMessageListContainer.style.display = "none";
     //TODO# 여기서 조금 더 고민을 해봐야 한다.
     for (const directMessageRoomContainer in this.directMessageRoomContainer) {
       this.directMessageRoomContainer[
         directMessageRoomContainer
       ].style.display = 'none';
+    }
+  }
+
+  //#TODO## 대화상자 있는지 보기
+  getAllDirectMessage() {
+    while(this.directMessageListBox.firstChild){
+      this.directMessageListBox.removeChild(this.directMessageListBox.firstChild);
+    }
+    for (const directMessageRoomContainer in this.directMessageRoomContainer){
+      if(this.directMessageRoomContainer[directMessageRoomContainer].chatBox.lastChild){
+        //기존 다이렉트 메세지가 있는지 없는지도 봐야하네
+        //window.console.log(this.directMessageRoomContainer[directMessageRoomContainer].chatBox.lastChild.innerHTML)
+        const directMessageDiv = document.createElement('div');
+        directMessageDiv.style.marginTop = "10px";
+        const nameDiv = document.createElement('div');
+        nameDiv.style.color = "white";
+        nameDiv.style.fontWeight = "bold";
+
+        nameDiv.innerHTML = this.scene.otherPlayers[directMessageRoomContainer].nickName;
+        const messageDiv = document.createElement('div');
+        messageDiv.style.color = "white";
+        messageDiv.style.fontSize = "0.8rem";
+        messageDiv.innerHTML = this.directMessageRoomContainer[directMessageRoomContainer].chatBox.lastChild.innerHTML.replace(/<br>/g, ':');
+        directMessageDiv.appendChild(nameDiv);
+        directMessageDiv.appendChild(messageDiv);
+        this.directMessageListBox.appendChild(directMessageDiv);
+        this.directMessageListBox.onclick = () => {this.createDirectMessageRoom(directMessageRoomContainer);}
+        //일단 div박스 만들고
+        //위에는 이름 시간 시간은 조금 뒤에 해야겠네
+        //아래는 보낸사람: 메세지네
+      }
     }
   }
 
@@ -162,6 +204,11 @@ export default class Sidebar {
         break;
       case 'dm':
         this.directMessageContainer.style.display = 'flex';
+        break;
+      case 'dmlist':
+        //#TODO 누르면 여태 대화했던 DM메세지 목록들도 다 가져와야 한다.
+        this.getAllDirectMessage();
+        this.directMessageListContainer.style.display = 'flex';
         break;
       case 'chat':
         this.chatContainer.style.display = 'flex';
@@ -212,7 +259,7 @@ export default class Sidebar {
     this.sideChatInput.style.color = 'white';
     this.sideChatInput.addEventListener('keydown', function (event) {
       // event.key === 'Enter'은 엔터 키를 눌렀을 때를 확인합니다.
-      if (event.key === 'Enter') {
+      if (event.key === 'Enter' && event.target.value) {
         SocketManager.getInstance().sendChatMessage(this.value);
         // this.value를 사용하여 input 요소의 현재 값에 접근합니다.
         this.value = ''; // 입력창 비우기
@@ -221,6 +268,37 @@ export default class Sidebar {
     this.chatContainer.appendChild(this.sideChatInput);
   }
 
+  createDMList() {
+    //처음은 목록부터 보여줘야 한다.
+    this.directMessageListContainer = document.createElement('div');
+    this.directMessageListContainer.style.width = '95%';
+    this.directMessageListContainer.style.height = '98%';
+    this.directMessageListContainer.style.alignItems = 'center';
+    this.directMessageListContainer.style.justifyContent = 'center';
+    this.directMessageListContainer.style.display = 'none';
+    this.directMessageListContainer.style.flexDirection = 'column';
+    this.directMessageListContainer.style.padding = '5px';
+    this.sidebar.appendChild(this.directMessageListContainer);
+    //#TODO일단 리스트들을 보여주자 근데 버튼누르면 DM목록 갱신하는거 만들어야 한다.
+    this.directMessageListBox = document.createElement('div');
+    this.directMessageListBox.style.height = '80vh';
+    this.directMessageListBox.style.width = '100%';
+    this.directMessageListBox.style.overflowY = 'auto';
+    this.directMessageListBox.style.transition = 'transform 0.3s ease-in-out';
+    this.directMessageListBox.style.boxShadow = 'inset 0 0 10px rgba(0, 0, 0, 0.1)';
+    this.directMessageListContainer.appendChild(this.directMessageListBox);
+    //그 다음은 new message다.
+    this.directMessageBtn = document.createElement('button');
+    this.directMessageBtn.style.border = '1px solid white';
+    this.directMessageBtn.style.borderRadius = '5px';
+    this.directMessageBtn.style.width = '100%';
+    this.directMessageBtn.style.backgroundColor = 'transparent';
+    this.directMessageBtn.style.marginTop = '10px';
+    this.directMessageBtn.style.color = 'white';
+    this.directMessageBtn.textContent = 'New Message';
+    this.directMessageListContainer.appendChild(this.directMessageBtn);
+    this.directMessageBtn.onclick = this.showContainers.bind(this, 'dm');
+  }
   ////////////////////////////////////////////////////////////////////////////////////////////////////
   createDMBox() {
     //게더랑 비슷하게 만들어보자.
@@ -232,6 +310,7 @@ export default class Sidebar {
     toText.style.color = 'white';
     //DM박스를 먼저 만들자
     //전채 채팅 그대로 가져오고
+    //#####################################################################################################################################
     this.directMessageContainer = document.createElement('div');
     this.directMessageContainer.style.width = '95%';
     this.directMessageContainer.style.height = '98%';
@@ -334,13 +413,13 @@ export default class Sidebar {
         const divElement = document.createElement('div');
         divElement.setAttribute('id', userId);
         divElement.innerHTML = `${nickname}`;
-        //#TODO 게더처럼
+
         divElement.style.width = 'auto';
         divElement.style.backgroundColor = 'transparent';
         divElement.style.marginTop = '10px';
         divElement.style.color = 'white';
         divElement.addEventListener('click', () => {
-          this.createDirectMessageRoom(divElement);
+          this.createDirectMessageRoom(divElement.id);
         });
 
         this.directMessageBox.appendChild(divElement);
@@ -361,64 +440,68 @@ export default class Sidebar {
     this.directMessageContainer.appendChild(this.directMessageBox);
   }
   //#####
-  createDirectMessageRoom(divElement) {
+  //divElement는 otherPlayers 소켓 아이디입니다.
+  //처음 이름을 잘못지어서 불상사가 났네요.
+  //나중에 리팩토링하면서 다른것들고 고치자.
+  createDirectMessageRoom(otherPlayerSocketId) {
     this.hideContainers();
-    if (this.directMessageRoomContainer[divElement.id]) {
-      this.directMessageRoomContainer[divElement.id].style.display = 'flex';
+    if (this.directMessageRoomContainer[otherPlayerSocketId]) {
+      this.directMessageRoomContainer[otherPlayerSocketId].style.display = 'flex';
       return;
     }
     //일단 컨테이너에 넣어야 나중에 안보이게 하기 편하다.
     //this.directMessageRoomContainer = {};
 
-    this.directMessageRoomContainer[divElement.id] =
+    this.directMessageRoomContainer[otherPlayerSocketId] =
       document.createElement('div');
-    this.directMessageRoomContainer[divElement.id].style.width = '95%';
-    this.directMessageRoomContainer[divElement.id].style.height = '98%';
-    this.directMessageRoomContainer[divElement.id].style.alignItems = 'center';
-    this.directMessageRoomContainer[divElement.id].style.justifyContent =
+    this.directMessageRoomContainer[otherPlayerSocketId].style.width = '95%';
+    this.directMessageRoomContainer[otherPlayerSocketId].style.height = '98%';
+    this.directMessageRoomContainer[otherPlayerSocketId].style.alignItems = 'center';
+    this.directMessageRoomContainer[otherPlayerSocketId].style.justifyContent =
       'center';
-    this.directMessageRoomContainer[divElement.id].style.display = 'flex';
-    this.directMessageRoomContainer[divElement.id].style.flexDirection =
+    this.directMessageRoomContainer[otherPlayerSocketId].style.display = 'flex';
+    this.directMessageRoomContainer[otherPlayerSocketId].style.flexDirection =
       'column';
-    this.directMessageRoomContainer[divElement.id].style.padding = '5px';
-    this.sidebar.appendChild(this.directMessageRoomContainer[divElement.id]);
+    this.directMessageRoomContainer[otherPlayerSocketId].style.padding = '5px';
+    this.sidebar.appendChild(this.directMessageRoomContainer[otherPlayerSocketId]);
 
-    this.directMessageRoomContainer[divElement.id].chatBox =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatBox =
       document.createElement('div');
-    this.directMessageRoomContainer[divElement.id].chatBox.style.height =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatBox.style.height =
       '80vh';
-    this.directMessageRoomContainer[divElement.id].chatBox.style.width = '100%';
-    this.directMessageRoomContainer[divElement.id].chatBox.style.overflowY =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatBox.style.width = '100%';
+    this.directMessageRoomContainer[otherPlayerSocketId].chatBox.style.overflowY =
       'auto';
-    this.directMessageRoomContainer[divElement.id].chatBox.style.transition =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatBox.style.transition =
       'transform 0.3s ease-in-out';
-    this.directMessageRoomContainer[divElement.id].chatBox.style.boxShadow =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatBox.style.boxShadow =
       'inset 0 0 10px rgba(0, 0, 0, 0.1)';
-    this.directMessageRoomContainer[divElement.id].appendChild(
-      this.directMessageRoomContainer[divElement.id].chatBox,
+    this.directMessageRoomContainer[otherPlayerSocketId].appendChild(
+      this.directMessageRoomContainer[otherPlayerSocketId].chatBox,
     );
 
-    this.directMessageRoomContainer[divElement.id].chatInput =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatInput =
       document.createElement('input');
-    this.directMessageRoomContainer[divElement.id].chatInput.style.border =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatInput.style.border =
       '1px solid white';
     this.directMessageRoomContainer[
-      divElement.id
+      otherPlayerSocketId
     ].chatInput.style.borderRadius = '5px';
-    this.directMessageRoomContainer[divElement.id].chatInput.style.width =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatInput.style.width =
       '100%';
     this.directMessageRoomContainer[
-      divElement.id
+      otherPlayerSocketId
     ].chatInput.style.backgroundColor = 'transparent';
-    this.directMessageRoomContainer[divElement.id].chatInput.style.marginTop =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatInput.style.marginTop =
       '10px';
-    this.directMessageRoomContainer[divElement.id].chatInput.style.color =
+    this.directMessageRoomContainer[otherPlayerSocketId].chatInput.style.color =
       'white';
 
-    this.directMessageRoomContainer[divElement.id].chatInput.addEventListener(
+    this.directMessageRoomContainer[otherPlayerSocketId].chatInput.addEventListener(
       'keydown',
       (event) => {
         //#TODO 여기가 중요하다.
+        //참고해야할 곳
         //일단 socket.io건들고 있다니깐 내 전략을 생각하자.
         //일단 sendChatMessage가 아닌 새로운 SocketManaget메서드를 만들어야 한다.
         //해당메서드는 상대방의 socket.id도 파라미터로 받는다.
@@ -427,13 +510,15 @@ export default class Sidebar {
         //왜냐하면 상대방이 socket.id받아서 방 만들어져야 하기 때문이다.
         //여기 this IDE가 이상하게 해석하네 유의해야겠다. 오류나면 여기보자.
         //여기부터 확인해보자.
-        if (event.key === 'Enter') {
+        if (event.key === 'Enter' && event.target.value) {
           const item = document.createElement('div');
           item.innerHTML = `나<br>${event.target.value}`;
           item.style.color = 'white';
-          this.directMessageRoomContainer[divElement.id].chatBox.appendChild(item)
+          this.directMessageRoomContainer[otherPlayerSocketId].chatBox.appendChild(item)
           SocketManager.getInstance().sendDirectMessageToPlayer(
-            divElement.id,
+            otherPlayerSocketId,
+            this.scene.player.nickName,
+            this.scene.otherPlayers[otherPlayerSocketId].nickName,
             event.target.value,
           );
           //여기 추가해야 하나 나한테도 올라와야 하니
@@ -442,8 +527,8 @@ export default class Sidebar {
         }
       },
     );
-    this.directMessageRoomContainer[divElement.id].appendChild(
-      this.directMessageRoomContainer[divElement.id].chatInput,
+    this.directMessageRoomContainer[otherPlayerSocketId].appendChild(
+      this.directMessageRoomContainer[otherPlayerSocketId].chatInput,
     );
   }
 
@@ -469,12 +554,12 @@ export default class Sidebar {
       const divElement = document.createElement('div');
       divElement.setAttribute('id', userId);
       divElement.innerHTML = `${nickname}`;
-      //#TODO 게더처럼
+
       divElement.style.width = 'auto';
       divElement.style.backgroundColor = 'transparent';
       divElement.style.marginTop = '10px';
       divElement.style.color = 'white';
-      this.createDirectMessageRoom(divElement);
+      this.createDirectMessageRoom(divElement.id);
     } else {
       this.directMessageRoomContainer[senderId].style.display = "flex"
     }
