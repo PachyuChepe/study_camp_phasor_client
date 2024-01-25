@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import PlayerData from '../config/playerData';
+import PlayerData from '../config/playerData.js';
 
 export default class SocketManager {
   constructor() {

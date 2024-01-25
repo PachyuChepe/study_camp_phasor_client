@@ -1,6 +1,6 @@
 import SocketManager from '../managers/socket';
 import SidebarOut from './sidebarOut';
-import PlayerData from '../config/playerData';
+import PlayerData from '../config/playerData.js';
 import EditModal from './editModal';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node

@@ -5,6 +5,8 @@ export default class Player {
   constructor(scene, data) {
     this.scene = scene;
     this.data = data;
+    this.userId = data.userId;
+    this.memberId = data.memberId;
     // this.data = {
     //   nickName,
     //   memberId,

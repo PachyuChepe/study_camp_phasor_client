@@ -6,7 +6,7 @@ import {
   requestMemberProfile,
   requestGetSpaceClass,
 } from '../utils/request.js';
-import PlayerData from '../utils/playerData.js';
+import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
 import TossPaymentPopup from '../elements/tossPaymentPopup.js';
 
