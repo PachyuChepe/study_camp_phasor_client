@@ -24,7 +24,6 @@ export const requestGoogleLogin = (userId, successCallback) => {
 
   eventSource.onmessage = function (event) {
     const data = JSON.parse(event.data);
-    console.log(data, '무슨 데이터가 들어오니?');
 
     if (data.access_token) {
       localStorage.setItem('access_token', data.access_token);
@@ -33,6 +32,7 @@ export const requestGoogleLogin = (userId, successCallback) => {
         data: {
           member_search: data.member_search,
           member_spaces: data.member_spaces,
+          member_customer_key: data.member_customer_key,
         },
       };
       successCallback(response);
@@ -74,6 +74,20 @@ export const requestCreateSpace = (data, successCallback) => {
     })
     .catch((error) => {
       console.error('학습공간 생성 실패:', error);
+    });
+};
+
+export const requestGetSpaceClass = (successCallback) => {
+  const accessToken = localStorage.getItem('access_token');
+  axios
+    .get(`${process.env.DB}/spaces/classes`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      successCallback(response.data);
+    })
+    .catch((error) => {
+      console.error('클래스 목록을 불러오는 데 실패했습니다:', error);
     });
 };
 
