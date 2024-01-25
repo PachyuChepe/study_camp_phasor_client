@@ -1,4 +1,6 @@
 import PlayerData from '../config/playerData';
+import SocketManager from '../managers/socket';
+import { requestEditUserProfile } from '../utils/request';
 
 export default class EditModal {
   constructor() {
@@ -36,9 +38,7 @@ export default class EditModal {
     const editbutton = document.createElement('button');
     editbutton.style.width = '100%';
     editbutton.innerText = '적용하기';
-    editbutton.onclick = () => {
-      console.log(this.info);
-    };
+    editbutton.onclick = this.requestSave.bind(this);
     this.editModal.appendChild(editbutton);
 
     this.colorArray = [
@@ -58,6 +58,33 @@ export default class EditModal {
     this.createClothesTab();
     this.createSkinTab();
     this.createFaceTab();
+  }
+
+  requestSave() {
+    requestEditUserProfile(
+      {
+        skin: this.info.skinIndex,
+        hair: this.info.hairIndex,
+        face: this.info.faceIndex,
+        clothes: this.info.clothesIndex,
+        hair_color: this.info.hairColorIndex,
+        clothes_color: this.info.clothesColorIndex,
+      },
+      this.save.bind(this),
+    );
+  }
+
+  save() {
+    PlayerData.hair = this.info.hairIndex;
+    PlayerData.skin = this.info.skinIndex;
+    PlayerData.face = this.info.faceIndex;
+    PlayerData.clothes = this.info.clothesIndex;
+    PlayerData.hair_color = this.info.hairColorIndex;
+    PlayerData.clothes_color = this.info.clothesColorIndex;
+
+    SocketManager.getInstance().sendUpdatePlayer();
+
+    this.closeModal();
   }
 
   openModal() {

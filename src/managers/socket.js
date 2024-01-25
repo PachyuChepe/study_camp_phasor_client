@@ -49,7 +49,11 @@ export default class SocketManager {
     this.socket.on('chatInGroup', (data) => {
       console.log('chatInGroup', data);
       this.publish('chatInGroup', data)
-    })
+    });
+    this.socket.on('updateSkinPlayer', (data) => {
+      console.log('updateSkinPlayer', data);
+      this.publish('updateSkinPlayer', data);
+    });
   }
 
   static getInstance() {
@@ -79,10 +83,17 @@ export default class SocketManager {
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
+      memberId: PlayerData.memberId,
       spaceId: PlayerData.spaceId,
       x: tileX,
       y: tileY,
-      accessToken: localStorage.getItem('access_token')
+      accessToken: localStorage.getItem('access_token'),
+      skin: PlayerData.skin,
+      face: PlayerData.face,
+      hair: PlayerData.hair,
+      hair_color: PlayerData.hair_color,
+      clothes: PlayerData.clothes,
+      clothes_color: PlayerData.clothes_color,
     });
   }
 
@@ -101,6 +112,18 @@ export default class SocketManager {
     });
   }
 
+  sendUpdatePlayer() {
+    this.socket.emit('updateSkin', {
+      id: this.socket.id,
+      skin: PlayerData.skin,
+      face: PlayerData.face,
+      hair: PlayerData.hair,
+      hair_color: PlayerData.hair_color,
+      clothes: PlayerData.clothes,
+      clothes_color: PlayerData.clothes_color,
+    });
+  }
+
   sendChatMessage(message) {
     this.socket.emit('chat', {
       id: this.socket.id,
@@ -109,8 +132,6 @@ export default class SocketManager {
     });
   }
 
-  //#TODO 돌고 돌아 여길 고쳐야 하네 소켓아이디, 유저아이디, 유저아이디로 구분
-  // 소켓아이디 뿐만 아니라 그냥 아이디도 보내야 한다.
   sendDirectMessageToPlayer(getterId, senderNickName, getterNickName, message){
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
