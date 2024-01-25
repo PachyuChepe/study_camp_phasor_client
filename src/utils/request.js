@@ -1,5 +1,4 @@
 import axios from 'axios';
-// import PlayerData from './playerData';
 
 export const requestLogin = (data, successCallback) => {
   // data = {email,password}
@@ -98,3 +97,33 @@ export const requestCreateSpace = (data, successCallback) => {
 //       console.error('프로필 조회 실패:', error);
 //     });
 // };
+
+export const requestMemberProfile = (data, successCallback) => {
+  const accessToken = localStorage.getItem('access_token');
+  axios
+    .post(`${process.env.DB}/space-members/info`, data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      console.log('스페이스 멤버 정보 조회 성공:', response.data);
+      successCallback(response);
+    })
+    .catch((error) => {
+      console.error('스페이스 멤버 정보 조회 실패:', error);
+    });
+};
+
+export const requestEditUserProfile = (data, successCallback) => {
+  const accessToken = localStorage.getItem('access_token');
+  axios
+    .patch(`${process.env.DB}/users`, data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      console.log('유저 정보 수정 성공:', response);
+      successCallback(response);
+    })
+    .catch((error) => {
+      console.error('유저 정보 수정  실패:', error);
+    });
+};

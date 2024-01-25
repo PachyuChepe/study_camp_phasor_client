@@ -1,6 +1,10 @@
 import Phaser from 'phaser';
 import LoginModal from '../elements/loginModal.js';
-import { requestCreateSpace, requestSpaceList } from '../utils/request.js';
+import {
+  requestCreateSpace,
+  requestMemberProfile,
+  requestSpaceList,
+} from '../utils/request.js';
 import PlayerData from '../config/playerData.js';
 
 export default class MainScene extends Phaser.Scene {
@@ -11,9 +15,6 @@ export default class MainScene extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.tileSize = 48;
-    this.tileMapWitdh = 40;
-    this.tileMapHeight = 20;
     // 모달
     this.loginModal = new LoginModal();
     this.loginModal.setLoginFunction(this.successLogin.bind(this));
@@ -251,19 +252,24 @@ export default class MainScene extends Phaser.Scene {
     // );
   }
 
-  enterSpace(spaceId) {
+  enterSpace() {
     // this.createBox.style.display = 'none';
     // this.detailBox.style.display = 'block';
     // requestProfile(
     //   this.successProfile.bind(this, this.spaceId),
     // );
-    PlayerData.spaceId = spaceId;
+    PlayerData.spaceId = this.spaceId;
     // 현재 씬 멈춤
     this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
     this.loginModal.closeModal();
     this.title.style.display = 'none';
     this.container.style.display = 'none';
+
+    requestMemberProfile(
+      { spaceId: this.spaceId },
+      this.successMemberProfile.bind(this),
+    );
 
     // 스페이스 씬 시작
     this.scene.start('SpaceScene');
@@ -283,6 +289,11 @@ export default class MainScene extends Phaser.Scene {
 
   successSpaceList(response) {
     this.createSpaceList(response.data);
+  }
+
+  successMemberProfile(response) {
+    PlayerData.role = response.data.role;
+    PlayerData.memberId = response.data.id;
   }
 
   update() {}

@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
-import Player from '../characters/player.js';
+import Player from '../player/player.js';
 import SocketManager from '../managers/socket.js';
 import PlayerData from '../config/playerData.js';
+import MapData from '../config/mapData.js';
 import Sidebar from '../elements/sidebar.js';
 import UserCard from '../elements/userCard.js';
 
@@ -13,14 +14,10 @@ export default class SpaceScene extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.tileSize = 48;
-    this.tileMapWitdh = 40;
-    this.tileMapHeight = 30;
-
     this.map = this.make.tilemap({
-      data: this.createTileMap(this.tileMapWitdh, this.tileMapHeight),
-      tileWidth: this.tileSize,
-      tileHeight: this.tileSize,
+      data: this.createTileMap(MapData.column, MapData.row),
+      tileWidth: MapData.tileSize,
+      tileHeight: MapData.tileSize,
     });
     this.map.addTilesetImage('tiles');
     this.layers = [];
@@ -38,16 +35,16 @@ export default class SpaceScene extends Phaser.Scene {
     ];
     this.groupmap = this.make.tilemap({
       data: group,
-      tileWidth: this.tileSize,
-      tileHeight: this.tileSize,
+      tileWidth: MapData.tileSize,
+      tileHeight: MapData.tileSize,
     });
     this.groupmap.addTilesetImage('tiles');
     this.layers.push(
       (this.grouplayer = this.groupmap.createLayer(
         0,
         'tiles',
-        this.tileSize * 3,
-        this.tileSize * 3,
+        MapData.tileSize * 3,
+        MapData.tileSize * 3,
       )),
     );
 
@@ -60,30 +57,27 @@ export default class SpaceScene extends Phaser.Scene {
     );
     //TODO사이드바 안에 버튼들 있고
 
-    const bgWidth = this.tileSize * this.tileMapWitdh;
-    const bgHeight = this.tileSize * this.tileMapHeight;
+    const bgWidth = MapData.tileSize * MapData.column;
+    const bgHeight = MapData.tileSize * MapData.row;
 
     this.m_table0 = this.add
-      .sprite(this.tileSize * 4 - this.tileSize / 2, 96 + 96 * 0, 'table')
+      .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 0, 'table')
       .setOrigin(0, 0);
     this.m_table1 = this.add
-      .sprite(this.tileSize * 4 - this.tileSize / 2, 96 + 96 * 1, 'table')
+      .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 1, 'table')
       .setOrigin(0, 0);
     this.m_table2 = this.add
-      .sprite(this.tileSize * 4 - this.tileSize / 2, 96 + 96 * 2, 'table')
+      .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 2, 'table')
       .setOrigin(0, 0);
 
-    this.player = new Player(this, PlayerData.nickName, this.tileSize, {
-      x: 1,
-      y: 1,
-    });
+    this.player = new Player(this, { ...PlayerData, x: 1, y: 1 });
     this.physics.world.setBounds(0, 0, bgWidth, bgHeight);
     this.cameras.main.setBounds(0, 0, bgWidth, bgHeight);
-    this.cameras.main.startFollow(this.player, false, 0.5, 0.5);
+    this.cameras.main.startFollow(this.player.getSprite(), false, 0.5, 0.5);
 
     // 플레이어에 물리 엔진 활성화
     this.physics.world.setBounds(0, 0, bgWidth, bgHeight);
-    this.physics.add.existing(this.player);
+    // this.physics.add.existing(this.player);
 
     this.m_cursorKeys = this.input.keyboard.createCursorKeys();
     this.wKey = this.input.keyboard.addKey('W');
@@ -157,8 +151,8 @@ export default class SpaceScene extends Phaser.Scene {
       if (
         Phaser.Geom.Rectangle.Contains(
           layer.getBounds(),
-          this.player.x,
-          this.player.y,
+          this.player.getSprite().x,
+          this.player.getSprite().y,
         )
       ) {
         layer.setAlpha(1);
@@ -179,12 +173,7 @@ export default class SpaceScene extends Phaser.Scene {
         data.forEach((playerdata) => {
           if (playerdata.id !== SocketManager.getInstance().getID()) {
             if (!this.otherPlayers[data.id]) {
-              this.otherPlayers[playerdata.id] = new Player(
-                this,
-                playerdata.nickName,
-                this.tileSize,
-                { x: playerdata.x, y: playerdata.y },
-              );
+              this.otherPlayers[playerdata.id] = new Player(this, playerdata);
             }
           }
         });
@@ -192,23 +181,15 @@ export default class SpaceScene extends Phaser.Scene {
       case 'joinSpacePlayer':
         if (data.id !== SocketManager.getInstance().getID()) {
           if (!this.otherPlayers[data.id]) {
-            this.otherPlayers[data.id] = new Player(
-              this,
-              data.nickName,
-              this.tileSize,
-              {
-                x: data.x,
-                y: data.y,
-              },
-            );
+            this.otherPlayers[data.id] = new Player(this, data);
           }
         }
         break;
       case 'leaveSpace':
         if (this.otherPlayers[data.id]) {
           const leavePlayer = this.otherPlayers[data.id];
-          leavePlayer.remove();
-          leavePlayer.destroy();
+          // leavePlayer.remove();
+          // leavePlayer.destroy();
           this.otherPlayers[data.id] = null;
         }
         break;
@@ -221,6 +202,13 @@ export default class SpaceScene extends Phaser.Scene {
       case 'sitPlayer':
         if (this.otherPlayers[data.id]) {
           this.otherPlayers[data.id].sitOtherPlayer(data.isSit);
+        }
+        break;
+      case 'updateSkinPlayer':
+        if (data.id === SocketManager.getInstance().getID()) {
+          this.player.updateSkin(data);
+        } else if (this.otherPlayers[data.id]) {
+          this.otherPlayers[data.id].updateSkin(data);
         }
         break;
       // case 'chatPlayer':

@@ -1,7 +1,9 @@
 const PlayerData = {
   email: '',
   nickName: '',
+  memberId: 0,
   spaceId: 0,
+  role: 3,
   skin: 0,
   face: 0,
   hair: 0,
