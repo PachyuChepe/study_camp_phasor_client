@@ -8,5 +8,6 @@ const PlayerData = {
   hair_color: 0,
   clothes: 0,
   clothes_color: 0,
+  userId: 0,
 };
 export default PlayerData;

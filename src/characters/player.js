@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import SocketManager from '../managers/socket';
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
-  constructor(scene, nickname, tileSize, pos) {
+  constructor(scene, nickname, tileSize, pos, userId) {
     const tileposX = pos.x * tileSize;
     const tileposY = pos.y * tileSize;
     super(scene, tileposX, tileposY, 'player');
@@ -14,6 +14,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.isSit = false;
     //생각하지 말고 일단 해보자 이게 맞는거 같다.
     this.nickName = nickname;
+    this.userId = userId;
 
     this.setOrigin(0, 0.5);
     scene.add.existing(this);
@@ -38,47 +39,47 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   remove() {
     this.nicknameText.destroy();
-    this.removeBubble();
-    // if (this.tween) {
-    //   this.tween.stop();
-    //   this.tween.remove();
+    // this.removeBubble();
+    // // if (this.tween) {
+    // //   this.tween.stop();
+    // //   this.tween.remove();
+    // // }
+    // if (this.bubbleDisappearEvent) {
+    //   this.bubbleDisappearEvent.remove();
     // }
-    if (this.bubbleDisappearEvent) {
-      this.bubbleDisappearEvent.remove();
-    }
   }
 
-  createBubble(id, message) {
-    this.removeBubble();
-    if (this.bubbleDisappearEvent) {
-      this.bubbleDisappearEvent.remove();
-    }
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = 100;
-    canvas.height = 100; //parseInt(message.length / 20) * 50;
-    context.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = '16px Arial'; // 폰트 설정
-    context.fillStyle = '#000'; // 텍스트 색상 설정
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
-    // context.save();
+  // createBubble(id, message) {
+  //   this.removeBubble();
+  //   if (this.bubbleDisappearEvent) {
+  //     this.bubbleDisappearEvent.remove();
+  //   }
+  //   const canvas = document.createElement('canvas');
+  //   const context = canvas.getContext('2d');
+  //   canvas.width = 100;
+  //   canvas.height = 100; //parseInt(message.length / 20) * 50;
+  //   context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  //   context.fillRect(0, 0, canvas.width, canvas.height);
+  //   context.font = '16px Arial'; // 폰트 설정
+  //   context.fillStyle = '#000'; // 텍스트 색상 설정
+  //   context.textAlign = 'center';
+  //   context.textBaseline = 'middle';
+  //   context.fillText(message, canvas.width / 2, canvas.height / 2);
+  //   // context.save();
 
-    this.bubbleTexture = this.scene.textures.addImage(
-      'bubbleTexture' + id,
-      canvas,
-    );
-    this.bubble = this.scene.add.image(this.x, this.y, 'bubbleTexture' + id);
-    this.bubble.setOrigin(0, 1);
+  //   this.bubbleTexture = this.scene.textures.addImage(
+  //     'bubbleTexture' + id,
+  //     canvas,
+  //   );
+  //   this.bubble = this.scene.add.image(this.x, this.y, 'bubbleTexture' + id);
+  //   this.bubble.setOrigin(0, 1);
 
-    this.bubbleDisappearEvent = this.scene.time.addEvent({
-      delay: 5000,
-      callback: this.removeBubble,
-      callbackScope: this,
-    });
-  }
+  //   this.bubbleDisappearEvent = this.scene.time.addEvent({
+  //     delay: 5000,
+  //     callback: this.removeBubble,
+  //     callbackScope: this,
+  //   });
+  // }
 
   removeBubble() {
     if (this.bubbleTexture) {

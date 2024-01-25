@@ -45,6 +45,10 @@ export default class SocketManager {
     this.socket.on('directMessage', (data) => {
       console.log('directMessage', data);
       this.publish('directMessage', data);
+    });
+    this.socket.on('chatInGroup', (data) => {
+      console.log('chatInGroup', data);
+      this.publish('chatInGroup', data)
     })
   }
 
@@ -78,6 +82,7 @@ export default class SocketManager {
       spaceId: PlayerData.spaceId,
       x: tileX,
       y: tileY,
+      accessToken: localStorage.getItem('access_token')
     });
   }
 
@@ -104,7 +109,8 @@ export default class SocketManager {
     });
   }
 
-  //#TODO
+  //#TODO 돌고 돌아 여길 고쳐야 하네 소켓아이디, 유저아이디, 유저아이디로 구분
+  // 소켓아이디 뿐만 아니라 그냥 아이디도 보내야 한다.
   sendDirectMessageToPlayer(getterId, senderNickName, getterNickName, message){
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
@@ -113,5 +119,14 @@ export default class SocketManager {
       senderNickName,
       getterNickName,
     });
+  }
+
+  sendGroupChatMessage(room, message){
+    this.socket.emit('groupChat', {
+      room,
+      message,
+      senderId: this.socket.id,
+      nickName: PlayerData.nickName,
+    })
   }
 }
