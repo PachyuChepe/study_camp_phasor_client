@@ -12,8 +12,10 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     this.isMove = false;
     this.isAniMove = false;
     this.isSit = false;
+    //생각하지 말고 일단 해보자 이게 맞는거 같다.
+    this.nickName = nickname;
 
-    this.setOrigin(0, 0);
+    this.setOrigin(0, 0.5);
     scene.add.existing(this);
     scene.physics.add.existing(this);
     this.scale = 1;
@@ -26,7 +28,7 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         y: 8,
       },
     });
-    this.nicknameText.setOrigin(0, 0.5);
+    this.nicknameText.setOrigin(0, 1.5);
 
     this.setDepth(20);
     this.setBodySize(48, 68);
@@ -36,47 +38,47 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
   remove() {
     this.nicknameText.destroy();
-    this.removeBubble();
-    // if (this.tween) {
-    //   this.tween.stop();
-    //   this.tween.remove();
+    // this.removeBubble();
+    // // if (this.tween) {
+    // //   this.tween.stop();
+    // //   this.tween.remove();
+    // // }
+    // if (this.bubbleDisappearEvent) {
+    //   this.bubbleDisappearEvent.remove();
     // }
-    if (this.bubbleDisappearEvent) {
-      this.bubbleDisappearEvent.remove();
-    }
   }
 
-  createBubble(id, message) {
-    this.removeBubble();
-    if (this.bubbleDisappearEvent) {
-      this.bubbleDisappearEvent.remove();
-    }
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-    canvas.width = 100;
-    canvas.height = 100; //parseInt(message.length / 20) * 50;
-    context.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = '16px Arial'; // 폰트 설정
-    context.fillStyle = '#000'; // 텍스트 색상 설정
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillText(message, canvas.width / 2, canvas.height / 2);
-    // context.save();
+  // createBubble(id, message) {
+  //   this.removeBubble();
+  //   if (this.bubbleDisappearEvent) {
+  //     this.bubbleDisappearEvent.remove();
+  //   }
+  //   const canvas = document.createElement('canvas');
+  //   const context = canvas.getContext('2d');
+  //   canvas.width = 100;
+  //   canvas.height = 100; //parseInt(message.length / 20) * 50;
+  //   context.fillStyle = 'rgba(255, 255, 255, 0.8)';
+  //   context.fillRect(0, 0, canvas.width, canvas.height);
+  //   context.font = '16px Arial'; // 폰트 설정
+  //   context.fillStyle = '#000'; // 텍스트 색상 설정
+  //   context.textAlign = 'center';
+  //   context.textBaseline = 'middle';
+  //   context.fillText(message, canvas.width / 2, canvas.height / 2);
+  //   // context.save();
 
-    this.bubbleTexture = this.scene.textures.addImage(
-      'bubbleTexture' + id,
-      canvas,
-    );
-    this.bubble = this.scene.add.image(this.x, this.y, 'bubbleTexture' + id);
-    this.bubble.setOrigin(0, 1);
+  //   this.bubbleTexture = this.scene.textures.addImage(
+  //     'bubbleTexture' + id,
+  //     canvas,
+  //   );
+  //   this.bubble = this.scene.add.image(this.x, this.y, 'bubbleTexture' + id);
+  //   this.bubble.setOrigin(0, 1);
 
-    this.bubbleDisappearEvent = this.scene.time.addEvent({
-      delay: 5000,
-      callback: this.removeBubble,
-      callbackScope: this,
-    });
-  }
+  //   this.bubbleDisappearEvent = this.scene.time.addEvent({
+  //     delay: 5000,
+  //     callback: this.removeBubble,
+  //     callbackScope: this,
+  //   });
+  // }
 
   removeBubble() {
     if (this.bubbleTexture) {
@@ -243,12 +245,13 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
     const self = this;
     this.tween = this.scene.tweens.add({
       targets: [this, this.nicknameText, this.bubble],
-      x: this.tilePos.x * this.tileSize,
-      y: this.tilePos.y * this.tileSize,
+      x: this.tilePos.x * this.tileSize + 1,
+      y: this.tilePos.y * this.tileSize + 1,
       duration: 300,
       ease: 'Linear',
       onComplete: function () {
         // console.log(self.x, self.y);
+        self.scene.innerLayer();
         self.checkKeyPress();
       },
     });
@@ -263,11 +266,16 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
 
     this.moveAnimation(deltaX, deltaY);
 
+    if (this.otherTween) {
+      this.otherTween.stop();
+      this.otherTween = null;
+    }
+
     const self = this;
-    this.scene.tweens.add({
+    this.otherTween = this.scene.tweens.add({
       targets: [this, this.nicknameText, this.bubble],
-      x: this.tilePos.x * this.tileSize,
-      y: this.tilePos.y * this.tileSize,
+      x: this.tilePos.x * this.tileSize + 1,
+      y: this.tilePos.y * this.tileSize + 1,
       duration: 300,
       ease: 'Linear',
       onComplete: function () {

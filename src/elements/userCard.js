@@ -4,7 +4,6 @@ export default class UserCard {
     this.container.id = 'video-cam-container';
     document.body.appendChild(this.container);
 
-    // container.style.display = 'none';
     this.container.style.position = 'fixed';
     this.container.style.top = '20%';
     this.container.style.left = '50%';
@@ -22,6 +21,7 @@ export default class UserCard {
     this.container.style.overflowX = 'auto';
     this.cardList = [];
 
+    this.container.style.display = 'none';
     // 자식 요소 생성 (예시)
     for (let i = 0; i < 3; i++) {
       this.createCard();
