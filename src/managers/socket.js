@@ -133,6 +133,8 @@ export default class SocketManager {
   }
 
   sendDirectMessageToPlayer(getterId, senderNickName, getterNickName, message){
+    //2번 senderNickName가 getterNickName가는지 확인해야 한다.
+    console.log("sendDirectMessageToPlayer:", getterId, senderNickName, getterNickName, message)
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
       getterId,

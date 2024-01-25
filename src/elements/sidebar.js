@@ -194,7 +194,7 @@ export default class Sidebar {
       ) {
         //기존 다이렉트 메세지가 있는지 없는지도 봐야하네
         //window.console.log(this.directMessageRoomContainer[directMessageRoomContainer].chatBox.lastChild.innerHTML)
-        window.console.log(this.scene.mockOtherPlayers)
+        window.console.log(this.scene.mockOtherPlayers);
         const directMessageDiv = document.createElement('div');
         directMessageDiv.style.marginTop = '10px';
         const nameDiv = document.createElement('div');
@@ -649,6 +649,13 @@ export default class Sidebar {
         this.directMessageRoomContainer[
           otherPlayerSocketId
         ].chatBox.appendChild(item);
+        console.log(
+          'SocketManager.getInstance().sendDirectMessageToPlayer()',
+          otherPlayerSocketId,
+          this.scene.player.nickName,
+          this.scene.otherPlayers[otherPlayerSocketId].nickName,
+          event.target.value,
+        );
         SocketManager.getInstance().sendDirectMessageToPlayer(
           otherPlayerSocketId,
           this.scene.player.nickName,
