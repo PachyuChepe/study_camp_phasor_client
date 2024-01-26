@@ -1,4 +1,4 @@
-import PlayerData from '../config/playerData';
+import PlayerData from '../config/playerData.js';
 import SocketManager from '../managers/socket';
 import { requestEditUserProfile } from '../utils/request';
 

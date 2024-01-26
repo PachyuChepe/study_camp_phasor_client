@@ -5,6 +5,11 @@ export default class Player {
   constructor(scene, data) {
     this.scene = scene;
     this.data = data;
+    this.userId = data.userId;
+    this.nickName = data.nickName;
+    //왜 고쳐지는거니?
+    //아무것도 안했는데? 장난해?
+    //
     // this.data = {
     //   nickName,
     //   memberId,

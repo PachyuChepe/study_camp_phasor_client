@@ -230,6 +230,7 @@ export default class MainScene extends Phaser.Scene {
 
   successLogin(response) {
     // 유저 정보
+    window.console.log("내가 원하는 respone:", response)
     PlayerData.email = response.data.member_search.email;
     PlayerData.nickName = response.data.member_search.nick_name;
     PlayerData.skin = response.data.member_search.skin;
@@ -238,7 +239,9 @@ export default class MainScene extends Phaser.Scene {
     PlayerData.clothes = response.data.member_search.clothes;
     PlayerData.hair_color = response.data.member_search.hair_color;
     PlayerData.clothes_color = response.data.member_search.clothes_color;
+    PlayerData.userId = response.data.member_search.id;
     playerPayment.customer_key = response.data.member_customer_key.customer_key;
+
 
     // 모달 닫기
     this.loginModal.closeModal();
