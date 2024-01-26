@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import PlayerData from '../config/playerData';
+import PlayerData from '../config/playerData.js';
 
 export default class SocketManager {
   constructor() {
@@ -46,6 +46,10 @@ export default class SocketManager {
       console.log('directMessage', data);
       this.publish('directMessage', data);
     });
+    this.socket.on('chatInGroup', (data) => {
+      console.log('chatInGroup', data);
+      this.publish('chatInGroup', data)
+    });
     this.socket.on('updateSkinPlayer', (data) => {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
@@ -83,6 +87,7 @@ export default class SocketManager {
       spaceId: PlayerData.spaceId,
       x: tileX,
       y: tileY,
+      accessToken: localStorage.getItem('access_token'),
       skin: PlayerData.skin,
       face: PlayerData.face,
       hair: PlayerData.hair,
@@ -127,12 +132,24 @@ export default class SocketManager {
     });
   }
 
-  //#TODO
-  sendDirectMessageToPlayer(getterId, message) {
+  sendDirectMessageToPlayer(getterId, senderNickName, getterNickName, message){
+    //2번 senderNickName가 getterNickName가는지 확인해야 한다.
+    console.log("sendDirectMessageToPlayer:", getterId, senderNickName, getterNickName, message)
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
       getterId,
       message,
+      senderNickName,
+      getterNickName,
     });
+  }
+
+  sendGroupChatMessage(room, message){
+    this.socket.emit('groupChat', {
+      room,
+      message,
+      senderId: this.socket.id,
+      nickName: PlayerData.nickName,
+    })
   }
 }

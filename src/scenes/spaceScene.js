@@ -14,6 +14,12 @@ export default class SpaceScene extends Phaser.Scene {
   preload() {}
 
   create() {
+    this.tileSize = 48;
+    this.tileMapWitdh = 40;
+    this.tileMapHeight = 30;
+
+    //소켓 통신을 위한 구역 지정 변수
+    this.room = "outLayer"
     this.map = this.make.tilemap({
       data: this.createTileMap(MapData.column, MapData.row),
       tileWidth: MapData.tileSize,
@@ -69,7 +75,11 @@ export default class SpaceScene extends Phaser.Scene {
     this.m_table2 = this.add
       .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 2, 'table')
       .setOrigin(0, 0);
-
+    //혹시 모르니 일단 이렇게
+    // this.player = new Player(this, PlayerData.nickName, this.tileSize, {
+    //   x: 1,
+    //   y: 1,
+    // }, PlayerData.userId);
     this.player = new Player(this, { ...PlayerData, x: 1, y: 1 });
     this.physics.world.setBounds(0, 0, bgWidth, bgHeight);
     this.cameras.main.setBounds(0, 0, bgWidth, bgHeight);
@@ -102,6 +112,8 @@ export default class SpaceScene extends Phaser.Scene {
       // 줌 값 범위 설정
       this.cameras.main.zoom = Phaser.Math.Clamp(newZoom, maxZoom, 2);
     });
+
+    this.mockOtherPlayers = {};
 
     this.otherPlayers = {};
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
@@ -146,7 +158,13 @@ export default class SpaceScene extends Phaser.Scene {
     return tileMap;
   }
 
+  //여기서 join해야하는건 알고 있다.
+  //join이후가 문제다.
+  //join을 어떻게 삭제할것이며
+  //어떻게 플레이어가 구역내에서 채팅보냈다는걸 알려줄래?
+  //이거 작동방식도 어떤지 몰라서 한번 봐야겠네
   innerLayer() {
+    const self = this;
     this.layers.forEach((layer) => {
       if (
         Phaser.Geom.Rectangle.Contains(
@@ -160,9 +178,16 @@ export default class SpaceScene extends Phaser.Scene {
           this.layers.forEach(function (otherLayer) {
             if (otherLayer !== layer) {
               otherLayer.setAlpha(0.9);
+              //내부
+              self.room = "inLayer";
+              window.console.log('내부??????????????????????????????????');
             }
           });
         }
+      } else {
+        //외부
+        this.room = "outLayer";
+        window.console.log('외부??????????????????????????????????');
       }
     });
   }
@@ -173,7 +198,16 @@ export default class SpaceScene extends Phaser.Scene {
         data.forEach((playerdata) => {
           if (playerdata.id !== SocketManager.getInstance().getID()) {
             if (!this.otherPlayers[data.id]) {
+              // this.otherPlayers[playerdata.id] = new Player(
+              //   this,
+              //   playerdata.nickName,
+              //   this.tileSize,
+              //   { x: playerdata.x, y: playerdata.y },
+              //   playerdata.memberId,
+              // );
               this.otherPlayers[playerdata.id] = new Player(this, playerdata);
+              this.mockOtherPlayers[playerdata.id] = {};
+              this.mockOtherPlayers[playerdata.id].nickName = playerdata.nickName;
             }
           }
         });
@@ -181,8 +215,21 @@ export default class SpaceScene extends Phaser.Scene {
       case 'joinSpacePlayer':
         if (data.id !== SocketManager.getInstance().getID()) {
           if (!this.otherPlayers[data.id]) {
+            // this.otherPlayers[data.id] = new Player(
+            //   this,
+            //   data.nickName,
+            //   this.tileSize,
+            //   {
+            //     x: data.x,
+            //     y: data.y,
+            //   },
+            //   data.memberId,
+            // );
             this.otherPlayers[data.id] = new Player(this, data);
           }
+          this.mockOtherPlayers[data.id] = {};
+          this.mockOtherPlayers[data.id].nickName = data.nickName;
+          console.log("joinSpacePlayer", data);
         }
         break;
       case 'leaveSpace':
