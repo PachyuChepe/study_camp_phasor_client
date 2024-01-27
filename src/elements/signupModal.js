@@ -66,11 +66,11 @@ export default class SignupModal {
     this.signupModal.appendChild(modalContent);
 
     // 닫기 버튼
-    const closeButton = document.createElement('span');
-    closeButton.classList.add('modal-close');
-    closeButton.innerHTML = '&times;';
-    closeButton.onclick = this.closeModal.bind(this);
-    modalContent.appendChild(closeButton);
+    // const closeButton = document.createElement('span');
+    // closeButton.classList.add('modal-close');
+    // closeButton.innerHTML = '&times;';
+    // closeButton.onclick = this.closeModal.bind(this);
+    // modalContent.appendChild(closeButton);
 
     // 이메일 입력 그룹
     const emailGroup = document.createElement('div');

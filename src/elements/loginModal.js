@@ -16,11 +16,11 @@ export default class LoginModal {
     this.loginModal.appendChild(modalContent);
 
     // Create the close button span
-    const closeButton = document.createElement('span');
-    closeButton.classList.add('modal-close');
-    closeButton.innerHTML = '&times;';
-    closeButton.onclick = this.closeModal.bind(this);
-    modalContent.appendChild(closeButton);
+    // const closeButton = document.createElement('span');
+    // closeButton.classList.add('modal-close');
+    // closeButton.innerHTML = '&times;';
+    // closeButton.onclick = this.closeModal.bind(this);
+    // modalContent.appendChild(closeButton);
 
     const emailGroup = document.createElement('div');
     emailGroup.classList.add('group');
