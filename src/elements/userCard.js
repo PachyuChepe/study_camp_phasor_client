@@ -1,5 +1,13 @@
 export default class UserCard {
+  static instance;
+
   constructor() {
+    if (UserCard.instance) {
+      return UserCard.instance;
+    }
+    console.log('UserCard 생성');
+    UserCard.instance = this;
+
     this.container = document.createElement('div');
     this.container.id = 'video-cam-container';
     document.body.appendChild(this.container);
@@ -21,31 +29,59 @@ export default class UserCard {
     this.container.style.display = 'flex';
     this.container.style.overflowX = 'auto';
     this.cardList = [];
-
-    // 자식 요소 생성 (예시)
-    for (let i = 0; i < 3; i++) {
-      this.createCard();
+  }
+  static getInstance() {
+    if (!UserCard.instance) {
+      UserCard.instance = new UserCard();
     }
+    return UserCard.instance;
   }
 
-  createCard() {
-    const card = document.createElement('div');
-    card.style.margin = '10px';
-    card.style.width = '200px';
-    card.style.height = '200px';
-    card.style.backgroundColor = 'white';
-    card.style.cursor = 'pointer';
-    card.style.transition = 'transform 0.3s ease-in-out';
-    card.style.borderRadius = '5px';
-    card.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    card.style.textAlign = 'center';
-    card.style.display = 'flex';
-    card.style.flexDirection = 'column';
-    card.style.justifyContent = 'center';
-    card.style.textAlign = 'center';
-    card.innerText = '캠';
-    this.container.appendChild(card);
-    this.cardList.push(card);
+  createLocalCard() {
+    const localCard = document.createElement('video');
+    localCard.id = 'local-video';
+    localCard.autoplay = true;
+    localCard.style.margin = '10px';
+    localCard.style.width = '200px';
+    localCard.style.height = '150px';
+    localCard.style.backgroundColor = 'white';
+    localCard.style.cursor = 'pointer';
+    localCard.style.transition = 'transform 0.3s ease-in-out';
+    localCard.style.borderRadius = '5px';
+    localCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    localCard.style.textAlign = 'center';
+    localCard.style.display = 'flex';
+    localCard.style.flexDirection = 'column';
+    localCard.style.justifyContent = 'center';
+    localCard.style.textAlign = 'center';
+
+    this.container.appendChild(localCard);
+    this.cardList.push(localCard);
+    return localCard;
+    // cam.onclick =
+  }
+
+  createRemoteCard(socketId) {
+    const RemoteCard = document.createElement('video');
+    RemoteCard.id = `remote-video-${socketId}`;
+    RemoteCard.autoplay = true;
+    RemoteCard.style.margin = '10px';
+    RemoteCard.style.width = '200px';
+    RemoteCard.style.height = '150px';
+    RemoteCard.style.backgroundColor = 'white';
+    RemoteCard.style.cursor = 'pointer';
+    RemoteCard.style.transition = 'transform 0.3s ease-in-out';
+    RemoteCard.style.borderRadius = '5px';
+    RemoteCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    RemoteCard.style.textAlign = 'center';
+    RemoteCard.style.display = 'flex';
+    RemoteCard.style.flexDirection = 'column';
+    RemoteCard.style.justifyContent = 'center';
+    RemoteCard.style.textAlign = 'center';
+
+    this.container.appendChild(RemoteCard);
+    this.cardList.push(RemoteCard);
+    return RemoteCard;
     // cam.onclick =
   }
 

@@ -1,5 +1,6 @@
 import io from 'socket.io-client';
 import PlayerData from '../utils/playerData';
+import UserCard from '../elements/userCard';
 
 export default class SocketManager {
   constructor() {
@@ -15,6 +16,29 @@ export default class SocketManager {
     //   // 소켓 연결 해제
     //   this.socket.disconnect();
     // });
+
+    // 변수
+    this.stream;
+    this.shareScreenStream;
+    this.localStream;
+    this.allUserList; //서버로부터 받는 현재 참가한 유저 리스트
+    this.selectedUser = []; // 나를 제외한 유저 리스트
+    this.selectedUser_id = [];
+    this.pcs = []; //[{socket.id : peerConnection}]
+    this.localPeerOffer; // offer 생성후 담는 변수
+    this.iceServers = {
+      iceServer: [
+        {
+          urls: [
+            'stun:stun1.1.google.com:19302',
+            'stun:stun1.l.google.com:19302',
+            'stun:stun2.l.google.com:19302',
+            'stun:stun3.l.google.com:19302',
+            'stun:stun4.l.google.com:19302',
+          ],
+        },
+      ],
+    };
 
     this.callbacks = [];
 
@@ -41,6 +65,114 @@ export default class SocketManager {
     this.socket.on('chatPlayer', (data) => {
       console.log('chatPlayer', data);
       this.publish('chatPlayer', data);
+    });
+    this.socket.on('connect', this.handleSocketConnected);
+    this.socket.on('disconnected', (data) => {
+      this.removeDisconnectedUser(data);
+    });
+    this.socket.on('update-user-list', this.onUpdateUserList);
+    this.socket.on('mediaOffer', async (data) => {
+      console.log(
+        'mediaOffer : 웹브라우저에서 다른 유저의 offer 메시지 받고 peerConnection 생성',
+      );
+      let peerConnection = new RTCPeerConnection({
+        iceServers: [{ urls: 'stun:stun1.1.google.com:19302' }],
+      });
+
+      this.stream
+        .getTracks()
+        .forEach((track) => peerConnection.addTrack(track, this.stream));
+
+      let pc = data.from;
+      this.selectedUser_id.push(pc);
+      this.pcs.push(peerConnection);
+
+      peerConnection.addEventListener('icegatheringstatechange', async (ev) => {
+        switch (peerConnection.iceGatheringState) {
+          case 'new':
+            console.log(' / ' + 'new');
+            break;
+          case 'gathering':
+            console.log(' / ' + 'gathering');
+            break;
+          case 'complete':
+            console.log(' / ' + 'complete');
+            break;
+        }
+      });
+
+      peerConnection.onicecandidate = (event) => {
+        console.log(event);
+
+        if (event.candidate) {
+          this.sendIceCandidate(event, pc);
+        } else {
+          console.log('추가된 후보자가 없을 때 else 문');
+        }
+      };
+      peerConnection.addEventListener('track', (event) => {
+        const [stream] = event.streams;
+        console.log('미디어 정보', stream);
+        const streamId = stream.id;
+
+        if (!this.streams) {
+          this.streams = {};
+        }
+
+        if (!this.streams[streamId]) {
+          this.streams[streamId] = {
+            stream: stream,
+            videoCreated: false,
+          };
+        }
+
+        if (!this.streams[streamId].videoCreated) {
+          const newVideo = UserCard.getInstance().createRemoteCard(pc);
+          newVideo.srcObject = stream;
+
+          console.log('remote stream ===>', newVideo.srcObject);
+          this.streams[streamId].videoCreated = true;
+        }
+      });
+
+      await peerConnection.setRemoteDescription(
+        new RTCSessionDescription(data.offer),
+      );
+
+      const peerAnswer = await peerConnection.createAnswer();
+      peerConnection.setLocalDescription(new RTCSessionDescription(peerAnswer));
+      this.sendMediaAnswer(peerAnswer, data);
+    });
+
+    this.socket.on('mediaAnswer', async (data) => {
+      console.log('mediaAnswer : answer 메시지 받음');
+      const pc = data.from;
+      for (let i = 0; i < this.selectedUser.length; i++) {
+        if (this.selectedUser_id[i] == pc) {
+          let peerConnection = this.pcs[i];
+          await peerConnection.setRemoteDescription(
+            new RTCSessionDescription(data.answer),
+          );
+          break;
+        }
+      }
+    });
+
+    this.socket.on('remotePeerIceCandidate', async (data) => {
+      console.log('remotePeerIceCandidate : candidate 받음');
+      console.log('remotePeerIceCandidate :' + data);
+      try {
+        const candidate = new RTCIceCandidate(data.candidate);
+        for (let i = 0; i < this.selectedUser.length; i++) {
+          let pc = data.from;
+          if (this.selectedUser_id[i] == pc) {
+            const peerConnection = this.pcs[i];
+            await peerConnection.addIceCandidate(candidate);
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
     });
   }
 
@@ -99,4 +231,144 @@ export default class SocketManager {
       message: message,
     });
   }
+
+  handleSocketConnected = async () => {
+    console.log(`socket: ${this.socket.id}`);
+    console.log(`소켓 연결 되면 handleSocketConnected 함수 호출!`);
+    console.log(`onSocketConnected 함수 호출 예정`);
+    this.onSocketConnected();
+  };
+
+  removeDisconnectedUser = (disconnectedUserId) => {
+    const videoElementId = `remote-video-${disconnectedUserId}`;
+    const videoElement = document.getElementById(videoElementId);
+    if (videoElement) {
+      videoElement.parentNode.removeChild(videoElement);
+    }
+  };
+
+  onSocketConnected = async () => {
+    console.log(`onSocketConnected 함수 시작`);
+    const constraints = {
+      audio: true,
+      video: { facingMode: 'user' },
+    };
+
+    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    this.localStream = UserCard.getInstance().createLocalCard();
+    this.localStream.srcObject = this.stream;
+    this.socket.emit('requestUserList');
+  };
+
+  onUpdateUserList = async ({ userIds }) => {
+    this.allUserList = userIds;
+    this.selectedUser = userIds.filter((id) => id !== this.socket.id);
+    let userIdCount = userIds.length;
+    console.log('유저 수', userIdCount);
+
+    if (userIdCount > 1 && this.socket.id == userIds[userIdCount - 1]) {
+      for (let i = 0; i < userIdCount - 1; i++) {
+        const peerConnection = new RTCPeerConnection({
+          iceServers: [{ urls: 'stun:stun1.1.google.com:19302' }],
+        });
+        this.selectedUser_id.push(this.selectedUser[i]);
+        this.pcs.push(peerConnection);
+
+        this.stream
+          .getTracks()
+          .forEach((track) => peerConnection.addTrack(track, this.stream));
+        peerConnection.addEventListener('icegatheringstatechange', (ev) => {
+          switch (peerConnection.iceGatheringState) {
+            case 'new':
+              console.log(' / ' + ' new ');
+              break;
+            case 'gathering':
+              console.log(' / ' + ' gathering ');
+              break;
+            case 'complete':
+              console.log(' / ' + ' complete ');
+              break;
+          }
+        });
+        peerConnection.onicecandidate = (event) => {
+          if (event.candidate) {
+            this.sendIceCandidate(event, this.selectedUser[i]);
+          } else {
+            console.log('후보자가 없으면 else문');
+          }
+        };
+        peerConnection.addEventListener('track', (event) => {
+          const [stream] = event.streams;
+          const streamId = stream.id;
+
+          if (!this.streams) {
+            this.streams = {};
+          }
+
+          if (!this.streams[streamId]) {
+            this.streams[streamId] = {
+              stream: stream,
+              videoCreated: false,
+            };
+          }
+
+          if (!this.streams[streamId].videoCreated) {
+            console.log('selected User ====>', this.selectedUser);
+            const newVideo = UserCard.getInstance().createRemoteCard(
+              this.selectedUser[i],
+            );
+            newVideo.srcObject = stream;
+
+            console.log('remote stream ===>', newVideo.srcObject);
+            this.streams[streamId].videoCreated = true;
+          }
+        });
+
+        this.localPeerOffer = await peerConnection.createOffer();
+        peerConnection.setLocalDescription(
+          new RTCSessionDescription(this.localPeerOffer),
+        );
+        this.sendMediaOffer(this.localPeerOffer, this.selectedUser[i]);
+      }
+    }
+  };
+
+  sendIceCandidate = (event, toUser) => {
+    this.socket.emit('iceCandidate', {
+      from: this.socket.id,
+      to: toUser,
+      candidate: event.candidate,
+    });
+  };
+
+  sendMediaOffer = (localPeerOffer, toUser) => {
+    this.socket.emit('mediaOffer', {
+      offer: localPeerOffer,
+      from: this.socket.id,
+      to: toUser,
+    });
+  };
+
+  sendMediaAnswer = (peerAnswer, data) => {
+    console.log('sendMediaAnswer 함수 시작 서버에 answer 보냄');
+    this.socket.emit('mediaAnswer', {
+      answer: peerAnswer,
+      from: this.socket.id,
+      to: data.from,
+    });
+  };
+
+  handleCameraClick = () => {
+    if (this.stream && this.stream.getVideoTracks().length > 0) {
+      const videoTrack = this.stream.getVideoTracks()[0];
+      videoTrack.enabled = !videoTrack.enabled;
+    }
+  };
+
+  handleMicClick = () => {
+    if (this.stream && this.stream.getAudioTracks().length > 0) {
+      const audioTrack = this.stream.getAudioTracks()[0];
+      audioTrack.enabled = !audioTrack.enabled;
+    }
+  };
 }

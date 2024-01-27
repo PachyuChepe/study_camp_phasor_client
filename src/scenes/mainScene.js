@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import LoginModal from '../elements/loginModal.js';
 import { requestCreateSpace, requestSpaceList } from '../utils/request.js';
 import PlayerData from '../utils/playerData.js';
+import SocketManager from '../managers/socket.js';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -131,7 +132,9 @@ export default class MainScene extends Phaser.Scene {
     //
     const detailButton = document.createElement('button');
     detailButton.textContent = 'Enter';
-    detailButton.onclick = this.enterSpace.bind(this);
+    detailButton.onclick = () => {
+      this.enterSpace(this.spaceId);
+    };
     detailButton.style.width = '100%';
     this.detailBox.appendChild(detailButton);
   }

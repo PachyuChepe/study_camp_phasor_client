@@ -1,3 +1,5 @@
+import SocketManager from '../managers/socket';
+
 export default class SidebarOut {
   constructor(sidebar) {
     this.sidebar = sidebar;
@@ -86,6 +88,7 @@ export default class SidebarOut {
   }
 
   clickMic() {
+    SocketManager.getInstance().handleMicClick();
     if (this.isActiveMic) {
       this.micBtn.innerHTML = `<span class="material-symbols-outlined">
       mic_off
@@ -99,18 +102,21 @@ export default class SidebarOut {
   }
 
   clickCam() {
+    SocketManager.getInstance().handleCameraClick();
     if (this.isActiveCam) {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam_off
       </span>`;
       this.offCamFunc();
+      this.isActiveCam = false;
     } else {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam
     </span>`;
       this.onCamFunc();
+      this.isActiveCam = true;
     }
-    this.isActiveCam = !this.isActiveCam;
+    // this.isActiveCam = !this.isActiveCam;
   }
 
   clickShare() {
