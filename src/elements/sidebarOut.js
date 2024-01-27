@@ -1,7 +1,15 @@
 import SocketManager from '../managers/socket';
 
 export default class SidebarOut {
+  static instance;
+
   constructor(sidebar) {
+    if (SidebarOut.instance) {
+      return SidebarOut.instance;
+    }
+    console.log('SidebarOut 생성');
+    SidebarOut.instance = this;
+
     this.sidebar = sidebar;
 
     this.buttonbox = document.createElement('div');
@@ -65,6 +73,13 @@ export default class SidebarOut {
     this.buttonbox.appendChild(this.sidebarBtn);
   }
 
+  static getInstance() {
+    if (!SidebarOut.instance) {
+      SidebarOut.instance = new SidebarOut();
+    }
+    return SidebarOut.instance;
+  }
+
   // UserCard 와 이벤트 연결 된 부분
   // MainScene -> Sidebar -> 여기로 연결
   setCamFunc(onCamFunc, offCamFunc) {
@@ -93,10 +108,12 @@ export default class SidebarOut {
       this.micBtn.innerHTML = `<span class="material-symbols-outlined">
       mic_off
       </span>`;
+      console.log('마이크 off');
     } else {
       this.micBtn.innerHTML = `<span class="material-symbols-outlined">
     mic
     </span>`;
+      console.log('마이크 on');
     }
     this.isActiveMic = !this.isActiveMic;
   }
@@ -108,15 +125,13 @@ export default class SidebarOut {
       videocam_off
       </span>`;
       this.offCamFunc();
-      this.isActiveCam = false;
     } else {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam
     </span>`;
       this.onCamFunc();
-      this.isActiveCam = true;
     }
-    // this.isActiveCam = !this.isActiveCam;
+    this.isActiveCam = !this.isActiveCam;
   }
 
   clickShare() {

@@ -17,10 +17,10 @@ export default class UserCard {
     this.container.style.left = '50%';
     this.container.style.transform = 'translate(-50%, -50%)';
     this.container.style.padding = '20px';
-    this.container.style.backgroundColor = '#fff';
-    this.container.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    // this.container.style.backgroundColor = '#fff';
+    // this.container.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     this.container.style.zIndex = '1';
-    this.container.style.borderRadius = '5px';
+    // this.container.style.borderRadius = '5px';
     this.container.style.alignItems = 'center';
     this.container.style.justifyContent = 'center';
     this.container.style.width = '90%';
