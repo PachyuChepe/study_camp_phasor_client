@@ -1,5 +1,5 @@
 import io from 'socket.io-client';
-import PlayerData from '../utils/playerData';
+import PlayerData from '../config/playerData';
 import UserCard from '../elements/userCard';
 
 export default class SocketManager {
@@ -65,6 +65,18 @@ export default class SocketManager {
     this.socket.on('chatPlayer', (data) => {
       console.log('chatPlayer', data);
       this.publish('chatPlayer', data);
+    });
+    this.socket.on('directMessage', (data) => {
+      console.log('directMessage', data);
+      this.publish('directMessage', data);
+    });
+    this.socket.on('chatInGroup', (data) => {
+      console.log('chatInGroup', data);
+      this.publish('chatInGroup', data);
+    });
+    this.socket.on('updateSkinPlayer', (data) => {
+      console.log('updateSkinPlayer', data);
+      this.publish('updateSkinPlayer', data);
     });
     this.socket.on('connect', this.handleSocketConnected);
     this.socket.on('disconnected', (data) => {
@@ -203,9 +215,17 @@ export default class SocketManager {
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
+      memberId: PlayerData.memberId,
       spaceId: PlayerData.spaceId,
       x: tileX,
       y: tileY,
+      accessToken: localStorage.getItem('access_token'),
+      skin: PlayerData.skin,
+      face: PlayerData.face,
+      hair: PlayerData.hair,
+      hair_color: PlayerData.hair_color,
+      clothes: PlayerData.clothes,
+      clothes_color: PlayerData.clothes_color,
     });
   }
 
@@ -224,11 +244,50 @@ export default class SocketManager {
     });
   }
 
+  sendUpdatePlayer() {
+    this.socket.emit('updateSkin', {
+      id: this.socket.id,
+      skin: PlayerData.skin,
+      face: PlayerData.face,
+      hair: PlayerData.hair,
+      hair_color: PlayerData.hair_color,
+      clothes: PlayerData.clothes,
+      clothes_color: PlayerData.clothes_color,
+    });
+  }
+
   sendChatMessage(message) {
     this.socket.emit('chat', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
       message: message,
+    });
+  }
+
+  sendDirectMessageToPlayer(getterId, senderNickName, getterNickName, message) {
+    //2번 senderNickName가 getterNickName가는지 확인해야 한다.
+    console.log(
+      'sendDirectMessageToPlayer:',
+      getterId,
+      senderNickName,
+      getterNickName,
+      message,
+    );
+    this.socket.emit('directMessageToPlayer', {
+      senderId: this.socket.id,
+      getterId,
+      message,
+      senderNickName,
+      getterNickName,
+    });
+  }
+
+  sendGroupChatMessage(room, message) {
+    this.socket.emit('groupChat', {
+      room,
+      message,
+      senderId: this.socket.id,
+      nickName: PlayerData.nickName,
     });
   }
 

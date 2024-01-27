@@ -1,5 +1,4 @@
 import axios from 'axios';
-// import PlayerData from './playerData';
 
 export const requestLogin = (data, successCallback) => {
   // data = {email,password}
@@ -24,7 +23,6 @@ export const requestGoogleLogin = (userId, successCallback) => {
 
   eventSource.onmessage = function (event) {
     const data = JSON.parse(event.data);
-    console.log(data, '무슨 데이터가 들어오니?');
 
     if (data.access_token) {
       localStorage.setItem('access_token', data.access_token);
@@ -33,6 +31,7 @@ export const requestGoogleLogin = (userId, successCallback) => {
         data: {
           member_search: data.member_search,
           member_spaces: data.member_spaces,
+          member_customer_key: data.member_customer_key,
         },
       };
       successCallback(response);
@@ -77,6 +76,20 @@ export const requestCreateSpace = (data, successCallback) => {
     });
 };
 
+export const requestGetSpaceClass = (successCallback) => {
+  const accessToken = localStorage.getItem('access_token');
+  axios
+    .get(`${process.env.DB}/spaces/classes`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      successCallback(response.data);
+    })
+    .catch((error) => {
+      console.error('클래스 목록을 불러오는 데 실패했습니다:', error);
+    });
+};
+
 // export const requestProfile = (successCallback) => {
 //   const accessToken = localStorage.getItem('access_token');
 //   axios
@@ -98,3 +111,33 @@ export const requestCreateSpace = (data, successCallback) => {
 //       console.error('프로필 조회 실패:', error);
 //     });
 // };
+
+export const requestMemberProfile = (data, successCallback) => {
+  const accessToken = localStorage.getItem('access_token');
+  axios
+    .post(`${process.env.DB}/space-members/info`, data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      console.log('스페이스 멤버 정보 조회 성공:', response.data);
+      successCallback(response);
+    })
+    .catch((error) => {
+      console.error('스페이스 멤버 정보 조회 실패:', error);
+    });
+};
+
+export const requestEditUserProfile = (data, successCallback) => {
+  const accessToken = localStorage.getItem('access_token');
+  axios
+    .patch(`${process.env.DB}/users`, data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      console.log('유저 정보 수정 성공:', response);
+      successCallback(response);
+    })
+    .catch((error) => {
+      console.error('유저 정보 수정  실패:', error);
+    });
+};

@@ -12,7 +12,6 @@ export default class UserCard {
     this.container.id = 'video-cam-container';
     document.body.appendChild(this.container);
 
-    // container.style.display = 'none';
     this.container.style.position = 'fixed';
     this.container.style.top = '20%';
     this.container.style.left = '50%';

@@ -1,8 +1,14 @@
 import Phaser from 'phaser';
 import LoginModal from '../elements/loginModal.js';
-import { requestCreateSpace, requestSpaceList } from '../utils/request.js';
-import PlayerData from '../utils/playerData.js';
-import SocketManager from '../managers/socket.js';
+import {
+  requestCreateSpace,
+  requestSpaceList,
+  requestMemberProfile,
+  requestGetSpaceClass,
+} from '../utils/request.js';
+import PlayerData from '../config/playerData.js';
+import playerPayment from '../utils/playerPayment.js';
+import TossPaymentPopup from '../elements/tossPaymentPopup.js';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -12,9 +18,6 @@ export default class MainScene extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.tileSize = 48;
-    this.tileMapWitdh = 40;
-    this.tileMapHeight = 20;
     // 모달
     this.loginModal = new LoginModal();
     this.loginModal.setLoginFunction(this.successLogin.bind(this));
@@ -89,6 +92,76 @@ export default class MainScene extends Phaser.Scene {
     createHeader.innerText = 'CREATE SPACE';
     this.createBox.appendChild(createHeader);
 
+    // 클래스 선택 및 정보를 표시할 Flex 컨테이너 생성
+    const classContainer = document.createElement('div');
+    classContainer.style.display = 'flex';
+    classContainer.style.alignItems = 'center';
+    classContainer.style.justifyContent = 'space-between';
+    this.createBox.appendChild(classContainer);
+
+    // 클래스 선택을 위한 콤보박스 생성
+    const classSelect = document.createElement('select');
+    classSelect.style.minWidth = '50px'; // 콤보박스 크기 조정
+    classSelect.style.minHeight = '25px';
+    classContainer.appendChild(classSelect);
+
+    // 클래스 정보를 표시할 요소들
+    const classInfoContainer = document.createElement('div');
+    classInfoContainer.style.display = 'flex';
+    classInfoContainer.style.flexDirection = 'column';
+    classInfoContainer.style.marginLeft = '20px';
+
+    const classPriceDiv = document.createElement('div');
+    classPriceDiv.classList.add('class-price');
+    classInfoContainer.appendChild(classPriceDiv);
+
+    const classCapacityDiv = document.createElement('div');
+    classCapacityDiv.classList.add('class-capacity');
+    classInfoContainer.appendChild(classCapacityDiv);
+
+    classContainer.appendChild(classInfoContainer);
+
+    // 현재 선택된 클래스 ID
+    let selectedClassId = null;
+
+    // 클래스 목록 요청 및 콤보박스에 추가
+    requestGetSpaceClass((classes) => {
+      // 콤보박스 초기화
+      classSelect.innerHTML = '';
+
+      // 초기 옵션 추가
+      const defaultOption = document.createElement('option');
+      defaultOption.value = '';
+      defaultOption.textContent = '-----';
+      classSelect.appendChild(defaultOption);
+
+      // 클래스 목록 추가
+      classes.forEach((classInfo) => {
+        const option = document.createElement('option');
+        option.value = classInfo.id;
+        option.textContent = classInfo.name;
+        classSelect.appendChild(option);
+      });
+
+      // 콤보박스 변경 이벤트 핸들러
+      classSelect.onchange = () => {
+        const selectedClass = classes.find(
+          (classInfo) => classInfo.id == classSelect.value,
+        );
+
+        if (selectedClass) {
+          selectedClassId = selectedClass.id;
+          classPriceDiv.textContent = `Price: ${selectedClass.price}`;
+          classCapacityDiv.textContent = `Capacity: ${selectedClass.capacity}`;
+        } else {
+          // 초기 옵션("-----")이 선택된 경우
+          selectedClassId = null;
+          classPriceDiv.textContent = '';
+          classCapacityDiv.textContent = '';
+        }
+      };
+    });
+
     const nameGroup = document.createElement('div');
     nameGroup.classList.add('group');
     this.createBox.appendChild(nameGroup);
@@ -101,9 +174,27 @@ export default class MainScene extends Phaser.Scene {
     this.nameInput.type = 'text';
     nameGroup.appendChild(this.nameInput);
 
+    // TossPaymentPopup 인스턴스 생성
+
     const createButton = document.createElement('button');
     createButton.textContent = 'Create';
-    createButton.onclick = this.reqCreateSpace.bind(this);
+    // createButton.onclick = this.tossPaymentPopup.openPaymentPopup.bind(
+    //   this.tossPaymentPopup,
+    // );
+    createButton.onclick = () => {
+      if (selectedClassId) {
+        this.tossPaymentPopup = new TossPaymentPopup(
+          selectedClassId,
+          this.nameInput.value,
+          PlayerData.email,
+          playerPayment.customer_key,
+        );
+        this.tossPaymentPopup.openPaymentPopup();
+      } else {
+        alert('워크스페이스 타입을 선택해주세요.');
+      }
+    };
+    // this.reqCreateSpace.bind(this);
     createButton.style.width = '100%';
     this.createBox.appendChild(createButton);
 
@@ -141,6 +232,7 @@ export default class MainScene extends Phaser.Scene {
 
   successLogin(response) {
     // 유저 정보
+    window.console.log('내가 원하는 respone:', response);
     PlayerData.email = response.data.member_search.email;
     PlayerData.nickName = response.data.member_search.nick_name;
     PlayerData.skin = response.data.member_search.skin;
@@ -149,6 +241,8 @@ export default class MainScene extends Phaser.Scene {
     PlayerData.clothes = response.data.member_search.clothes;
     PlayerData.hair_color = response.data.member_search.hair_color;
     PlayerData.clothes_color = response.data.member_search.clothes_color;
+    PlayerData.userId = response.data.member_search.id;
+    playerPayment.customer_key = response.data.member_customer_key.customer_key;
 
     // 모달 닫기
     this.loginModal.closeModal();
@@ -254,19 +348,24 @@ export default class MainScene extends Phaser.Scene {
     // );
   }
 
-  enterSpace(spaceId) {
+  enterSpace() {
     // this.createBox.style.display = 'none';
     // this.detailBox.style.display = 'block';
     // requestProfile(
     //   this.successProfile.bind(this, this.spaceId),
     // );
-    PlayerData.spaceId = spaceId;
+    PlayerData.spaceId = this.spaceId;
     // 현재 씬 멈춤
     this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
     this.loginModal.closeModal();
     this.title.style.display = 'none';
     this.container.style.display = 'none';
+
+    requestMemberProfile(
+      { spaceId: this.spaceId },
+      this.successMemberProfile.bind(this),
+    );
 
     // 스페이스 씬 시작
     this.scene.start('SpaceScene');
@@ -286,6 +385,11 @@ export default class MainScene extends Phaser.Scene {
 
   successSpaceList(response) {
     this.createSpaceList(response.data);
+  }
+
+  successMemberProfile(response) {
+    PlayerData.role = response.data.role;
+    PlayerData.memberId = response.data.id;
   }
 
   update() {}
