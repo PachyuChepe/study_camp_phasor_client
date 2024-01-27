@@ -141,3 +141,45 @@ export const requestEditUserProfile = (data, successCallback) => {
       console.error('유저 정보 수정  실패:', error);
     });
 };
+
+export const requestSendVerificationCode = (
+  email,
+  successCallback,
+  errorCallback,
+) => {
+  axios
+    .post(`${process.env.DB}/auth/send-verification`, { email })
+    .then((response) => {
+      console.log('인증번호 전송 성공:', response.data);
+      successCallback(response);
+    })
+    .catch((error) => {
+      console.error('인증번호 전송 실패:', error);
+      errorCallback(error);
+    });
+};
+
+export const requestVerifyEmail = (
+  email,
+  code,
+  successCallback,
+  errorCallback,
+) => {
+  axios
+    .post(`${process.env.DB}/auth/verify-email`, { email, code })
+    .then((response) => {
+      console.log('이메일 인증 성공:', response.data);
+      successCallback(response);
+    })
+    .catch((error) => {
+      console.error('이메일 인증 실패:', error);
+      errorCallback(error);
+    });
+};
+
+export const requestSignup = (data, successCallback, errorCallback) => {
+  axios
+    .post(`${process.env.DB}/users`, data)
+    .then(successCallback)
+    .catch(errorCallback);
+};

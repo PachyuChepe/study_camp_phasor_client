@@ -1,4 +1,5 @@
 import { requestLogin, requestGoogleLogin } from '../utils/request';
+import SignupModal from './signupModal';
 
 export default class LoginModal {
   constructor() {
@@ -15,11 +16,11 @@ export default class LoginModal {
     this.loginModal.appendChild(modalContent);
 
     // Create the close button span
-    const closeButton = document.createElement('span');
-    closeButton.classList.add('modal-close');
-    closeButton.innerHTML = '&times;';
-    closeButton.onclick = this.closeModal.bind(this);
-    modalContent.appendChild(closeButton);
+    // const closeButton = document.createElement('span');
+    // closeButton.classList.add('modal-close');
+    // closeButton.innerHTML = '&times;';
+    // closeButton.onclick = this.closeModal.bind(this);
+    // modalContent.appendChild(closeButton);
 
     const emailGroup = document.createElement('div');
     emailGroup.classList.add('group');
@@ -74,6 +75,13 @@ export default class LoginModal {
     // scene.input.on('pointerdown', function (pointer) {
     //   self.openModal();
     // });
+
+    // 회원가입 버튼 생성
+    const signupButton = document.createElement('button');
+    signupButton.textContent = 'Sign Up';
+    signupButton.onclick = this.openSignupModal.bind(this);
+    signupButton.style.width = '100%';
+    modalContent.appendChild(signupButton);
   }
 
   setLoginFunction(successLoginFunc) {
@@ -126,5 +134,11 @@ export default class LoginModal {
   destroy() {
     this.loginModal.innerHTML = '';
     document.body.removeChild(this.loginModal);
+  }
+
+  openSignupModal() {
+    this.closeModal(); // 로그인 모달 닫기
+    const signupModal = new SignupModal(); // 회원가입 모달 생성
+    signupModal.openModal(); // 회원가입 모달 열기
   }
 }
