@@ -223,14 +223,16 @@ export default class MainScene extends Phaser.Scene {
     //
     const detailButton = document.createElement('button');
     detailButton.textContent = 'Enter';
-    detailButton.onclick = this.enterSpace.bind(this);
+    detailButton.onclick = () => {
+      this.enterSpace(this.spaceId);
+    };
     detailButton.style.width = '100%';
     this.detailBox.appendChild(detailButton);
   }
 
   successLogin(response) {
     // 유저 정보
-    window.console.log("내가 원하는 respone:", response)
+    window.console.log('내가 원하는 respone:', response);
     PlayerData.email = response.data.member_search.email;
     PlayerData.nickName = response.data.member_search.nick_name;
     PlayerData.skin = response.data.member_search.skin;
@@ -241,7 +243,6 @@ export default class MainScene extends Phaser.Scene {
     PlayerData.clothes_color = response.data.member_search.clothes_color;
     PlayerData.userId = response.data.member_search.id;
     playerPayment.customer_key = response.data.member_customer_key.customer_key;
-
 
     // 모달 닫기
     this.loginModal.closeModal();
