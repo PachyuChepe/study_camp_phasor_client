@@ -1,6 +1,7 @@
 import io from 'socket.io-client';
 import PlayerData from '../config/playerData';
 import UserCard from '../elements/userCard';
+import SidebarOut from '../elements/sidebarOut';
 
 export default class SocketManager {
   constructor() {
@@ -314,6 +315,8 @@ export default class SocketManager {
     };
 
     this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    this.stream.getVideoTracks().forEach((track) => (track.enabled = false));
+    this.stream.getAudioTracks().forEach((track) => (track.enabled = false));
     this.localStream = UserCard.getInstance().createLocalCard();
     this.localStream.srcObject = this.stream;
     this.socket.emit('requestUserList');
