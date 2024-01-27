@@ -22,6 +22,7 @@ export default class Player {
     //   hair_color,
     //   clothes,
     //   clothes_color,
+    //   isSit,
     // };
 
     this.tilePos = { x: data.x, y: data.y };
@@ -36,25 +37,46 @@ export default class Player {
     const clothes =
       'clothes-' + (this.data.clothes * 12 + this.data.clothes_color + 1);
 
+    // // 스프라이트 로드
+    // this.loadSprite('skin', this.data.skin + 1);
+    // this.loadSprite('face', this.data.face + 1);
+    // this.loadSprite('hair', this.data.hair * 12 + this.data.hair_color + 1);
+    // this.loadSprite(
+    //   'clothes',
+    //   this.data.clothes * 12 + this.data.clothes_color + 1,
+    // );
+
     // 스프라이트 생성
-    this.skinSprite = this.scene.physics.add.sprite(0, 0, skin);
-    // this.skinSprite.setDepth(1);
+    this.skinSprite = this.scene.physics.add.sprite(0, 0, 'skin-1');
     this.skinSprite.setOrigin(0, 0);
-    this.faceSprite = this.scene.physics.add.sprite(0, 0, face);
-    // this.faceSprite.setDepth(2);
+    this.faceSprite = this.scene.physics.add.sprite(0, 0, 'face-1');
     this.faceSprite.setOrigin(0, 0);
-    this.clothesSprite = this.scene.physics.add.sprite(0, 0, clothes);
-    // this.clothesSprite.setDepth(3);
+    this.clothesSprite = this.scene.physics.add.sprite(0, 0, 'hair-1');
     this.clothesSprite.setOrigin(0, 0);
-    this.hairSprite = this.scene.physics.add.sprite(0, 0, hair);
-    // this.hairSprite.setDepth(4);
+    this.hairSprite = this.scene.physics.add.sprite(0, 0, 'clothes-1');
     this.hairSprite.setOrigin(0, 0);
+
+    this.nickname = this.scene.add.text(0, 0, data.nickname, {
+      fontSize: '16px',
+      fill: '#ffffff',
+      padding: {
+        x: 0,
+        y: 8,
+      },
+    });
+    this.nickname.setOrigin(0, 0);
 
     // 컨테이너 생성
     this.player = this.scene.add.container(
       this.data.x * MapData.tileSize,
       this.data.y * MapData.tileSize,
-      [this.skinSprite, this.faceSprite, this.hairSprite, this.clothesSprite],
+      [
+        this.skinSprite,
+        this.faceSprite,
+        this.hairSprite,
+        this.clothesSprite,
+        this.nickname,
+      ],
     );
     this.scene.add.existing(this.player);
     this.scene.physics.add.existing(this.player);
@@ -69,24 +91,14 @@ export default class Player {
     //   skin,
     // );
 
-    this.nickname = this.scene.add.text(
-      this.player.x,
-      this.player.y,
-      data.nickname,
-      {
-        fontSize: '16px',
-        fill: '#ffffff',
-        padding: {
-          x: 0,
-          y: 8,
-        },
-      },
-    );
-    this.nickname.setOrigin(0, 1.5);
-    this.nickname.setDepth(11);
-
     this.creatPlayerAnimation();
     this.playAnimation('player_idle_down');
+    // this.updateSkin(this.data);
+    // if (this.data.isSit) {
+    //   this.playAnimation('player_sit_down');
+    // } else {
+    //   this.playAnimation('player_idle_down');
+    // }
   }
 
   getSprite() {
@@ -285,14 +297,35 @@ export default class Player {
   }
 
   updateSkin(data) {
+    if (this.delay) {
+      this.delay.remove();
+    }
     this.data.skin = data.skin;
     this.data.face = data.face;
     this.data.hair = data.hair;
     this.data.hair_color = data.hair_color;
     this.data.clothes = data.clothes;
     this.data.clothes_color = data.clothes_color;
+    this.data.isSit = data.isSit;
+
+    // 스프라이트 로드
+    this.loadSprite('skin', this.data.skin + 1);
+    this.loadSprite('face', this.data.face + 1);
+    this.loadSprite('hair', this.data.hair * 12 + this.data.hair_color + 1);
+    this.loadSprite(
+      'clothes',
+      this.data.clothes * 12 + this.data.clothes_color + 1,
+    );
+
+    this.delay = this.scene.time.addEvent({
+      delay: 5000,
+      callback: this.loadSpirite,
+      callbackScope: this,
+    });
+  }
+  loadSpirite() {
     this.creatPlayerAnimation();
-    if (data.isSit) {
+    if (this.data.isSit) {
       this.playAnimation('player_sit_down');
     } else {
       this.playAnimation('player_idle_down');
@@ -475,5 +508,13 @@ export default class Player {
       },
       -1,
     );
+  }
+
+  loadSprite(type, index) {
+    const img = require(`../assets/sprites/${type}/-${index}.png`).default;
+    this.scene.load.spritesheet(`${type}-${index}`, img, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
   }
 }

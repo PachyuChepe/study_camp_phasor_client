@@ -31,71 +31,87 @@ export default class LoadingScene extends Phaser.Scene {
     this.load.image('beam', beamImg);
     this.load.image('table', tableImg);
 
-    // // SPRITESHEETS
-    // this.load.spritesheet('player', playerImg, {
-    //   frameWidth: 48,
-    //   frameHeight: 64,
+    // // // base
+    const skinbase = require('../assets/sprites/skin/-1.png').default;
+    this.load.spritesheet('skin-1', skinbase, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+    const facebase = require('../assets/sprites/face/-1.png').default;
+    this.load.spritesheet('face-1', facebase, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+    const hairbase = require('../assets/sprites/hair/-1.png').default;
+    this.load.spritesheet('hair-1', hairbase, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+    const clothesbase = require('../assets/sprites/clothes/-1.png').default;
+    this.load.spritesheet('clothes-1', clothesbase, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+
+    // // Player Skin
+    // const skinContext = require.context(
+    //   '../assets/sprites/skin/',
+    //   false,
+    //   /\.(png)$/,
+    // );
+    // const skinKeys = skinContext.keys();
+    // skinKeys.forEach((key) => {
+    //   const name = key.split('/').pop().split('.')[0];
+    //   this.load.spritesheet('skin' + name, skinContext(key).default, {
+    //     frameWidth: 48,
+    //     frameHeight: 64,
+    //   });
     // });
 
-    // Player Skin
-    const skinContext = require.context(
-      '../assets/sprites/skin/',
-      false,
-      /\.(png)$/,
-    );
-    const skinKeys = skinContext.keys();
-    skinKeys.forEach((key) => {
-      const name = key.split('/').pop().split('.')[0];
-      this.load.spritesheet('skin' + name, skinContext(key).default, {
-        frameWidth: 48,
-        frameHeight: 64,
-      });
-    });
+    // // Player Hair
+    // const hairContext = require.context(
+    //   '../assets/sprites/hair/',
+    //   false,
+    //   /\.(png)$/,
+    // );
+    // const hairKeys = hairContext.keys();
+    // hairKeys.forEach((key) => {
+    //   const name = key.split('/').pop().split('.')[0];
+    //   this.load.spritesheet('hair' + name, hairContext(key).default, {
+    //     frameWidth: 48,
+    //     frameHeight: 64,
+    //   });
+    // });
 
-    // Player Hair
-    const hairContext = require.context(
-      '../assets/sprites/hair/',
-      false,
-      /\.(png)$/,
-    );
-    const hairKeys = hairContext.keys();
-    hairKeys.forEach((key) => {
-      const name = key.split('/').pop().split('.')[0];
-      this.load.spritesheet('hair' + name, hairContext(key).default, {
-        frameWidth: 48,
-        frameHeight: 64,
-      });
-    });
+    // // Player Clothes
+    // const clothesContext = require.context(
+    //   '../assets/sprites/clothes/',
+    //   false,
+    //   /\.(png)$/,
+    // );
+    // const clothesKeys = clothesContext.keys();
+    // clothesKeys.forEach((key) => {
+    //   const name = key.split('/').pop().split('.')[0];
+    //   this.load.spritesheet('clothes' + name, clothesContext(key).default, {
+    //     frameWidth: 48,
+    //     frameHeight: 64,
+    //   });
+    // });
 
-    // Player Clothes
-    const clothesContext = require.context(
-      '../assets/sprites/clothes/',
-      false,
-      /\.(png)$/,
-    );
-    const clothesKeys = clothesContext.keys();
-    clothesKeys.forEach((key) => {
-      const name = key.split('/').pop().split('.')[0];
-      this.load.spritesheet('clothes' + name, clothesContext(key).default, {
-        frameWidth: 48,
-        frameHeight: 64,
-      });
-    });
-
-    // Player Face
-    const faceContext = require.context(
-      '../assets/sprites/face/',
-      false,
-      /\.(png)$/,
-    );
-    const faceKeys = faceContext.keys();
-    faceKeys.forEach((key) => {
-      const name = key.split('/').pop().split('.')[0];
-      this.load.spritesheet('face' + name, faceContext(key).default, {
-        frameWidth: 48,
-        frameHeight: 64,
-      });
-    });
+    // // Player Face
+    // const faceContext = require.context(
+    //   '../assets/sprites/face/',
+    //   false,
+    //   /\.(png)$/,
+    // );
+    // const faceKeys = faceContext.keys();
+    // faceKeys.forEach((key) => {
+    //   const name = key.split('/').pop().split('.')[0];
+    //   this.load.spritesheet('face' + name, faceContext(key).default, {
+    //     frameWidth: 48,
+    //     frameHeight: 64,
+    //   });
+    // });
   }
 
   create() {
