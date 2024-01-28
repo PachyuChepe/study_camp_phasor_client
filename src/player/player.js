@@ -3,12 +3,12 @@ import MapData from '../config/mapData';
 
 export default class Player {
   constructor(scene, data) {
+    window.console.log("In player data=>", data);
     this.scene = scene;
     this.data = data;
     this.userId = data.userId;
     this.nickName = data.nickName;
-    //왜 고쳐지는거니?
-    //아무것도 안했는데? 장난해?
+    this.memberId = data.memberId;
     //
     // this.data = {
     //   nickName,
