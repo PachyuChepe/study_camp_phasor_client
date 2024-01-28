@@ -46,6 +46,10 @@ export const requestGoogleLogin = (userId, successCallback) => {
   };
 };
 
+//--------------------wook------------------------------
+
+//------------------------------------------------------
+
 export const requestSpaceList = (successCallback) => {
   const accessToken = localStorage.getItem('access_token');
   axios

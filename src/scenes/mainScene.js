@@ -44,7 +44,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.container = document.createElement('div');
     this.container.style.display = 'none';
-    this.container.style.width = '100%';
+    this.container.style.width = '60%';
     this.container.style.position = 'fixed';
     this.container.style.top = '20%';
     this.container.style.left = '50%';
@@ -52,58 +52,228 @@ export default class MainScene extends Phaser.Scene {
     this.container.style.height = '80%';
     document.body.appendChild(this.container);
 
+    this.leftContainer = document.createElement('div');
+    this.leftContainer.style.borderRadius = '10px';
+    // this.leftContainer.style.border = '2px solid white';
+    // this.leftContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
+    // this.leftContainer.style.display = 'flex';
+    this.leftContainer.style.width = '60%';
+    // this.leftContainer.style.backgroundColor = '#80c6ff';
+    this.leftContainer.style.margin = '0px 20px 0px 0px';
+    // this.leftContainer.style.overflowY = 'auto';
+    // this.leftContainer.style.flexWrap = 'wrap';
+    // this.leftContainer.style.justifyContent = 'flex-start';
+    this.container.appendChild(this.leftContainer);
+
+    this.cardTitle = document.createElement('div');
+    this.cardTitle.innerText = '내 학습 공간';
+    this.cardTitle.style.margin = '0px 0px 20px 0px';
+    this.cardTitle.style.width = '100%';
+    this.cardTitle.style.height = '10%';
+    this.cardTitle.style.color = 'white'; // 텍스트 색상을 흰색으로 설정
+    this.cardTitle.style.fontSize = '2em'; // 글꼴 크기를 2em으로 설정 (조절 가능)
+    this.cardTitle.style.fontWeight = 'bold'; // 글꼴을 굵게 설정
+    this.leftContainer.appendChild(this.cardTitle);
+
     this.cardContainer = document.createElement('div');
     this.cardContainer.style.borderRadius = '5px';
     this.cardContainer.style.border = '2px solid white';
     this.cardContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     this.cardContainer.style.display = 'flex';
-    this.cardContainer.style.width = '60%';
-    this.cardContainer.style.backgroundColor = '#80c6ff';
-    this.cardContainer.style.margin = '0px 5px 20px 20px';
-    this.cardContainer.style.overflowY = 'auto';
-    this.cardContainer.style.display = 'flex';
-    this.cardContainer.style.flexWrap = 'wrap';
-    this.cardContainer.style.justifyContent = 'flex-start';
-    this.container.appendChild(this.cardContainer);
+    this.cardContainer.style.width = '100%';
+    this.cardContainer.style.height = '40%';
+    this.cardContainer.style.backgroundColor = '#F3F2FF';
+    this.cardContainer.style.margin = '0px 0px 20px 0px';
+    // this.cardContainer.style.overflowY = 'auto';
+    // this.cardContainer.style.display = 'flex';
+    // this.cardContainer.style.flexWrap = 'wrap';
+    // this.cardContainer.style.justifyContent = 'flex-start';
+    this.leftContainer.appendChild(this.cardContainer);
+
+    this.middleContainer = document.createElement('div');
+    this.middleContainer.style.display = 'flex';
+    this.middleContainer.style.justifyContent = 'space-between';
+    this.middleContainer.style.height = '5%';
+    this.middleContainer.style.margin = '0px 0px 20px 0px';
+    this.leftContainer.appendChild(this.middleContainer);
+
+    this.searchInput = document.createElement('input');
+    this.searchInput.style.borderRadius = '5px';
+    this.searchInput.placeholder = '학습 공간 검색';
+    this.searchInput.style.width = '70%';
+    this.searchInput.style.height = '100%';
+    this.searchInput.style.margin = '0px 30px 0px 0px';
+    this.middleContainer.appendChild(this.searchInput);
+
+    this.enterCodeBtn = document.createElement('div');
+    this.enterCodeBtn.style.borderRadius = '10px';
+    this.enterCodeBtn.innerHTML = '코드로 입장';
+    this.enterCodeBtn.style.backgroundColor = '#6758ff';
+    this.enterCodeBtn.style.width = '30%';
+    this.enterCodeBtn.style.height = '100%';
+    this.enterCodeBtn.style.textAlign = 'center';
+    this.enterCodeBtn.style.fontWeight = 'bold';
+    this.enterCodeBtn.style.lineHeight = 'normal';
+    this.enterCodeBtn.style.color = '#fff';
+    this.enterCodeBtn.style.display = 'flex';
+    this.enterCodeBtn.style.flexDirection = 'column';
+    this.enterCodeBtn.style.justifyContent = 'center';
+    this.middleContainer.appendChild(this.enterCodeBtn);
+
+    this.enterCodeBtn.onclick = () => {
+      console.log('코드로 입장 클릭!');
+    };
+    this.enterCodeBtn.addEventListener('mouseenter', () => {
+      this.enterCodeBtn.style.backgroundColor = '#8a7fff';
+      this.enterCodeBtn.style.cursor = 'pointer';
+    });
+    this.enterCodeBtn.addEventListener('mouseleave', () => {
+      this.enterCodeBtn.style.backgroundColor = '#6758ff';
+    });
+
+    this.allSpaceList = document.createElement('div');
+    this.allSpaceList.style.borderRadius = '5px';
+    this.allSpaceList.style.border = '2px solid white';
+    this.allSpaceList.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
+    this.allSpaceList.style.display = 'flex';
+    this.allSpaceList.style.width = '100%';
+    this.allSpaceList.style.height = '32%';
+    this.allSpaceList.style.backgroundColor = '#F3F2FF';
+    this.allSpaceList.style.margin = '0px 0px 20px 0px';
+    this.leftContainer.appendChild(this.allSpaceList);
+
+    this.rightContainer = document.createElement('div');
+    this.rightContainer.style.borderRadius = '10px';
+    // this.rightContainer.style.border = '2px solid white';
+    // this.rightContainer.style.boxShadow =
+    //   '0px 0px 10px rgba(74, 138, 255, 0.1)';
+    this.rightContainer.style.width = '40%';
+    this.rightContainer.style.margin = '0px 20px 20px 5px';
+    this.rightContainer.style.flexDirection = 'column';
+    this.container.appendChild(this.rightContainer);
+
+    // 기욱
+    this.addSpaceBtn = document.createElement('div');
+    this.addSpaceBtn.innerText = '스페이스 생성';
+    this.addSpaceBtn.style.borderRadius = '10px';
+    this.addSpaceBtn.style.backgroundColor = '#6758ff';
+    this.addSpaceBtn.style.width = '100%';
+    this.addSpaceBtn.style.height = '10%';
+    this.addSpaceBtn.style.textAlign = 'center';
+    this.addSpaceBtn.style.fontWeight = 'bold';
+    this.addSpaceBtn.style.fontSize = '1.5rem';
+    this.addSpaceBtn.style.lineHeight = 'normal';
+    this.addSpaceBtn.style.margin = '0px 0px 20px 0px';
+    this.addSpaceBtn.style.color = '#fff';
+    this.addSpaceBtn.style.display = 'flex';
+    this.addSpaceBtn.style.flexDirection = 'column';
+    this.addSpaceBtn.style.justifyContent = 'center';
+    this.addSpaceBtn.onclick = () => {
+      this.createBox.style.display = 'flex';
+      this.detailBox.style.display = 'none';
+    };
+    this.rightContainer.appendChild(this.addSpaceBtn);
+    //
+
+    this.addSpaceBtn.addEventListener('mouseenter', () => {
+      this.addSpaceBtn.style.backgroundColor = '#8a7fff';
+      this.addSpaceBtn.style.cursor = 'pointer';
+    });
+
+    this.addSpaceBtn.addEventListener('mouseleave', () => {
+      this.addSpaceBtn.style.backgroundColor = '#6758ff';
+    });
 
     const detailContainer = document.createElement('div');
     detailContainer.style.borderRadius = '5px';
     detailContainer.style.border = '2px solid #80c6ff';
     detailContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     detailContainer.style.display = 'flex';
-    detailContainer.style.width = '40%';
+    detailContainer.style.width = '100%';
+    detailContainer.style.height = '85%';
     detailContainer.style.backgroundColor = 'white';
-    detailContainer.style.margin = '0px 20px 20px 5px';
-    detailContainer.style.padding = '20px';
+    // detailContainer.style.margin = '0px 20px 20px 5px';
+    // detailContainer.style.padding = '20px';
     detailContainer.style.textAlign = 'center';
     detailContainer.style.display = 'flex';
     detailContainer.style.flexDirection = 'column';
     detailContainer.style.justifyContent = 'center';
     detailContainer.style.textAlign = 'center';
-    this.container.appendChild(detailContainer);
+    this.rightContainer.appendChild(detailContainer);
 
+    //----------------------wook------------------------
     // 스페이스 생성
     this.createBox = document.createElement('div');
     this.createBox.style.display = 'none';
+    this.createBox.style.height = '90%';
+    this.createBox.style.flexDirection = 'column';
+    this.createBox.style.justifyContent = 'center';
+    this.createBox.style.alignItems = 'center';
     detailContainer.appendChild(this.createBox);
 
-    const createHeader = document.createElement('div');
-    createHeader.classList.add('modal-header');
-    createHeader.innerText = 'CREATE SPACE';
-    this.createBox.appendChild(createHeader);
+    this.nameInput = document.createElement('input');
+    this.nameInput.placeholder = '이름 입력';
+    this.nameInput.type = 'text';
+    this.nameInput.style.borderRadius = '5px';
+    this.nameInput.style.height = '7%';
+    this.nameInput.style.width = '80%';
+    this.nameInput.style.border = 'none';
+    this.nameInput.style.marginBottom = '20px';
+    this.nameInput.style.backgroundColor = '#F3F2FF';
+    this.createBox.appendChild(this.nameInput);
+
+    this.createImageBox = document.createElement('div');
+    this.createImageBox.style.borderRadius = '5px';
+    this.createImageBox.style.width = '80%';
+    this.createImageBox.style.height = '20%';
+    this.createImageBox.style.marginBottom = '20px';
+    this.createImageBox.style.backgroundColor = '#F3F2FF';
+    this.createBox.appendChild(this.createImageBox);
 
     // 클래스 선택 및 정보를 표시할 Flex 컨테이너 생성
     const classContainer = document.createElement('div');
     classContainer.style.display = 'flex';
     classContainer.style.alignItems = 'center';
     classContainer.style.justifyContent = 'space-between';
+    classContainer.style.marginBottom = '20px';
     this.createBox.appendChild(classContainer);
 
     // 클래스 선택을 위한 콤보박스 생성
     const classSelect = document.createElement('select');
-    classSelect.style.minWidth = '50px'; // 콤보박스 크기 조정
-    classSelect.style.minHeight = '25px';
+    classSelect.style.width = '263px'; // 콤보박스 크기 조정
+    classSelect.style.height = '30px';
+    classSelect.style.border = 'none';
+    classSelect.style.borderRadius = '5px';
+    classSelect.style.backgroundColor = '#F3F2FF';
     classContainer.appendChild(classSelect);
+
+    this.createPassword = document.createElement('input');
+    this.createPassword.type = 'password';
+    this.createPassword.placeholder = '비밀번호 입력창';
+    this.createPassword.style.borderRadius = '5px';
+    this.createPassword.style.width = '80%';
+    this.createPassword.style.height = '7%';
+    this.createPassword.style.border = 'none';
+    this.createPassword.style.marginBottom = '20px';
+    this.createPassword.style.backgroundColor = '#F3F2FF';
+    this.createBox.appendChild(this.createPassword);
+
+    this.createContent = document.createElement('input');
+    this.createContent.type = 'text';
+    this.createContent.placeholder = '내용 입력창';
+    this.createContent.style.borderRadius = '5px';
+    this.createContent.style.width = '80%';
+    this.createContent.style.height = '20%';
+    this.createContent.style.border = 'none';
+    this.createContent.style.marginBottom = '20px';
+    this.createContent.style.backgroundColor = '#F3F2FF';
+    this.createBox.appendChild(this.createContent);
+    //---------------------------------------------------
+
+    // const createHeader = document.createElement('div');
+    // createHeader.classList.add('modal-header');
+    // createHeader.innerText = 'CREATE SPACE';
+    // this.createBox.appendChild(createHeader);
 
     // 클래스 정보를 표시할 요소들
     const classInfoContainer = document.createElement('div');
@@ -166,18 +336,19 @@ export default class MainScene extends Phaser.Scene {
     nameGroup.classList.add('group');
     this.createBox.appendChild(nameGroup);
 
-    const nameLabel = document.createElement('label');
-    nameLabel.textContent = 'Space Name';
-    nameGroup.appendChild(nameLabel);
-
-    this.nameInput = document.createElement('input');
-    this.nameInput.type = 'text';
-    nameGroup.appendChild(this.nameInput);
+    // const nameLabel = document.createElement('label');
+    // nameLabel.textContent = 'Space Name';
+    // nameGroup.appendChild(nameLabel);
 
     // TossPaymentPopup 인스턴스 생성
 
     const createButton = document.createElement('button');
-    createButton.textContent = 'Create';
+    createButton.textContent = '생성 하기';
+    createButton.style.width = '80%';
+    createButton.style.height = '10%';
+    createButton.style.fontWeight = '700';
+    createButton.style.fontSize = '1.5rem';
+    createButton.style.backgroundColor = '#6758ff';
     // createButton.onclick = this.tossPaymentPopup.openPaymentPopup.bind(
     //   this.tossPaymentPopup,
     // );
@@ -195,26 +366,67 @@ export default class MainScene extends Phaser.Scene {
       }
     };
     // this.reqCreateSpace.bind(this);
-    createButton.style.width = '100%';
     this.createBox.appendChild(createButton);
 
     // 스페이스 디테일, 입장
     this.detailBox = document.createElement('div');
     this.detailBox.style.display = 'none';
+    this.detailBox.style.height = '90%';
+    this.detailBox.style.flexDirection = 'column';
+    this.detailBox.style.justifyContent = 'center';
+    this.detailBox.style.alignItems = 'center';
     detailContainer.appendChild(this.detailBox);
 
-    const detailHeader = document.createElement('div');
-    detailHeader.classList.add('modal-header');
-    detailHeader.innerText = 'ENTER SPACE';
-    this.detailBox.appendChild(detailHeader);
+    //------------------ wook -------------------------
+    this.detailHeader = document.createElement('div');
+    this.detailHeader.classList.add('modal-header');
+    this.detailHeader.innerText = '';
+    this.detailBox.appendChild(this.detailHeader);
+
+    this.spaceImageBox = document.createElement('div');
+    this.spaceImageBox.style.borderRadius = '5px';
+    this.spaceImageBox.style.width = '80%';
+    this.spaceImageBox.style.height = '25%';
+    this.spaceImageBox.style.marginBottom = '20px';
+    this.spaceImageBox.style.backgroundColor = '#F3F2FF';
+    this.detailBox.appendChild(this.spaceImageBox);
+
+    this.spaceInfoContainer = document.createElement('div');
+    this.spaceInfoContainer.style.display = 'flex';
+    this.spaceInfoContainer.style.width = '80%';
+    this.spaceInfoContainer.style.flexDirection = 'column';
+    this.spaceInfoContainer.style.justifyContent = 'flex-start';
+    this.spaceInfoContainer.style.alignItems = 'start';
+    this.detailBox.appendChild(this.spaceInfoContainer);
+
+    this.spaceCapacity = document.createElement('div');
+    this.spaceCapacity.innerText = '20명';
+    this.spaceCapacity.style.marginBottom = '20px';
+    this.spaceInfoContainer.appendChild(this.spaceCapacity);
+
+    this.spaceContent = document.createElement('div');
+    this.spaceContent.innerText = '우짜라고';
+    this.spaceContent.style.marginBottom = '20px';
+    this.spaceInfoContainer.appendChild(this.spaceContent);
+
+    this.spacePassword = document.createElement('input');
+    this.spacePassword.style.borderRadius = '5px';
+    this.spacePassword.style.backgroundColor = '#F3F2FF';
+    this.spacePassword.style.width = '80%';
+    this.spacePassword.style.height = '7%';
+    this.spacePassword.style.border = 'none';
+    this.spacePassword.placeholder = '비밀번호 입력';
+    this.detailBox.appendChild(this.spacePassword);
+    //------------------------------------------------
+
     //TODO이거 참고해서 전체 채팅 방 만들어라
     const detailGroup = document.createElement('div');
     detailGroup.classList.add('group');
     this.detailBox.appendChild(detailGroup);
 
-    const detailLabel = document.createElement('label');
-    detailLabel.textContent = 'Space Name';
-    detailGroup.appendChild(detailLabel);
+    // const detailLabel = document.createElement('label');
+    // detailLabel.textContent = 'Space Name';
+    // detailGroup.appendChild(detailLabel);
 
     this.detailText = document.createElement('div');
     this.detailText.classList.add('text');
@@ -222,11 +434,15 @@ export default class MainScene extends Phaser.Scene {
     detailGroup.appendChild(this.detailText);
     //
     const detailButton = document.createElement('button');
-    detailButton.textContent = 'Enter';
+    detailButton.textContent = '생성 하기';
     detailButton.onclick = () => {
       this.enterSpace(this.spaceId);
     };
-    detailButton.style.width = '100%';
+    detailButton.style.width = '80%';
+    detailButton.style.height = '10%';
+    detailButton.style.backgroundColor = '#6758ff';
+    detailButton.style.borderRadius = '10px';
+    detailButton.style.fontWeight = 'bold';
     this.detailBox.appendChild(detailButton);
   }
 
@@ -260,11 +476,11 @@ export default class MainScene extends Phaser.Scene {
     });
 
     const addCard = document.createElement('div');
-    addCard.style.flex = '0 1 calc(50% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
-    addCard.style.width = 'calc(50% - 30px)';
+    addCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
+    addCard.style.width = '200px';
     addCard.style.margin = '10px';
     // addCard.style.width = '300px';
-    addCard.style.height = '200px';
+    addCard.style.height = '50px';
     addCard.style.border = '2px solid white';
     addCard.style.backgroundColor = '#80c6ff';
     addCard.style.color = 'white';
@@ -284,7 +500,7 @@ export default class MainScene extends Phaser.Scene {
       this.createBox.style.display = 'block';
       this.detailBox.style.display = 'none';
     };
-    this.cardContainer.appendChild(addCard);
+    this.detailContainer.appendChild(addCard);
 
     // Add hover effect
     addCard.addEventListener('mouseenter', () => {
@@ -309,11 +525,11 @@ export default class MainScene extends Phaser.Scene {
     // ]
 
     const spaceCard = document.createElement('div');
-    spaceCard.style.flex = '0 1 calc(50% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
-    spaceCard.style.width = 'calc(50% - 30px)';
+    spaceCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
+    spaceCard.style.width = '200px';
     spaceCard.style.margin = '10px';
     // spaceCard.style.width = '300px';
-    spaceCard.style.height = '200px';
+    spaceCard.style.height = '50px';
     spaceCard.style.backgroundColor = 'white';
     spaceCard.style.cursor = 'pointer';
     spaceCard.style.transition = 'transform 0.3s ease-in-out';
@@ -341,8 +557,8 @@ export default class MainScene extends Phaser.Scene {
   detailSpace(spaceId, spcaeName) {
     this.spaceId = spaceId;
     this.createBox.style.display = 'none';
-    this.detailBox.style.display = 'block';
-    this.detailText.textContent = spcaeName;
+    this.detailBox.style.display = 'flex';
+    this.detailHeader.textContent = spcaeName;
     // requestProfile(
     //   this.successProfile.bind(this, spaceId),
     // );
