@@ -213,6 +213,7 @@ export default class SocketManager {
   }
 
   sendJoinSpacePlayer(tileX, tileY) {
+    console.log('플레이어 =====>', PlayerData);
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
