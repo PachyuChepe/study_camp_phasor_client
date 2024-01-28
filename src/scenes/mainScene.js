@@ -5,6 +5,7 @@ import {
   requestSpaceList,
   requestMemberProfile,
   requestGetSpaceClass,
+  requestAllSpaceList,
 } from '../utils/request.js';
 import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
@@ -79,15 +80,13 @@ export default class MainScene extends Phaser.Scene {
     this.cardContainer.style.borderRadius = '5px';
     this.cardContainer.style.border = '2px solid white';
     this.cardContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
-    this.cardContainer.style.display = 'flex';
     this.cardContainer.style.width = '100%';
     this.cardContainer.style.height = '40%';
     this.cardContainer.style.backgroundColor = '#F3F2FF';
     this.cardContainer.style.margin = '0px 0px 20px 0px';
-    // this.cardContainer.style.overflowY = 'auto';
-    // this.cardContainer.style.display = 'flex';
-    // this.cardContainer.style.flexWrap = 'wrap';
-    // this.cardContainer.style.justifyContent = 'flex-start';
+    this.cardContainer.style.display = 'flex';
+    this.cardContainer.style.flexDirection = 'column';
+    this.cardContainer.style.alignItems = 'center';
     this.leftContainer.appendChild(this.cardContainer);
 
     this.middleContainer = document.createElement('div');
@@ -136,6 +135,9 @@ export default class MainScene extends Phaser.Scene {
     this.allSpaceList.style.border = '2px solid white';
     this.allSpaceList.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     this.allSpaceList.style.display = 'flex';
+    this.allSpaceList.style.flexDirection = 'column';
+    this.allSpaceList.style.alignItems = 'center';
+    this.allSpaceList.style.overflowY = 'auto';
     this.allSpaceList.style.width = '100%';
     this.allSpaceList.style.height = '32%';
     this.allSpaceList.style.backgroundColor = '#F3F2FF';
@@ -446,7 +448,7 @@ export default class MainScene extends Phaser.Scene {
     this.detailBox.appendChild(detailButton);
   }
 
-  successLogin(response) {
+  async successLogin(response) {
     // 유저 정보
     window.console.log('내가 원하는 respone:', response);
     PlayerData.email = response.data.member_search.email;
@@ -466,6 +468,46 @@ export default class MainScene extends Phaser.Scene {
     this.container.style.display = 'flex';
     // 스페이스 목록
     this.createSpaceList(response.data.member_spaces);
+    // 전체 스페이스 목록
+    const allSpaceList = await requestAllSpaceList();
+    this.createAllSpaceList(allSpaceList);
+  }
+
+  createAllSpaceList(allSpaceList) {
+    allSpaceList.forEach((data) => {
+      data.space.forEach((space) => {
+        console.log('전체스페이스 목록 하나씩 =>', space);
+
+        const spaceCard = document.createElement('div');
+        // spaceCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
+        spaceCard.style.width = '90%';
+        spaceCard.id = 'choi';
+        spaceCard.style.height = '50px';
+        spaceCard.style.margin = '10px';
+        spaceCard.style.padding = '15px';
+        spaceCard.style.backgroundColor = 'white';
+        spaceCard.style.cursor = 'pointer';
+        spaceCard.style.transition = 'transform 0.3s ease-in-out';
+        spaceCard.style.borderRadius = '5px';
+        spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+        spaceCard.style.textAlign = 'center';
+        spaceCard.style.display = 'flex';
+        spaceCard.style.flexDirection = 'column';
+        spaceCard.style.justifyContent = 'center';
+        spaceCard.style.textAlign = 'center';
+        spaceCard.innerText = space.name;
+        this.allSpaceList.appendChild(spaceCard);
+
+        // Add hover effect
+        spaceCard.addEventListener('mouseenter', () => {
+          spaceCard.style.transform = 'scale(1.03)';
+        });
+
+        spaceCard.addEventListener('mouseleave', () => {
+          spaceCard.style.transform = 'scale(1)';
+        });
+      });
+    });
   }
 
   createSpaceList(spaces) {
@@ -475,43 +517,43 @@ export default class MainScene extends Phaser.Scene {
       this.loadSpaceCard(element.space);
     });
 
-    const addCard = document.createElement('div');
-    addCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
-    addCard.style.width = '200px';
-    addCard.style.margin = '10px';
-    // addCard.style.width = '300px';
-    addCard.style.height = '50px';
-    addCard.style.border = '2px solid white';
-    addCard.style.backgroundColor = '#80c6ff';
-    addCard.style.color = 'white';
-    addCard.style.cursor = 'pointer';
-    addCard.style.transition = 'transform 0.3s ease-in-out';
-    addCard.style.borderRadius = '5px';
-    addCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    addCard.style.textAlign = 'center';
-    addCard.style.display = 'flex';
-    addCard.style.flexDirection = 'column';
-    addCard.style.justifyContent = 'center';
-    addCard.style.textAlign = 'center';
-    addCard.innerHTML = `<span class="material-symbols-outlined">
-    add_circle
-    </span>`;
-    addCard.onclick = () => {
-      this.createBox.style.display = 'block';
-      this.detailBox.style.display = 'none';
-    };
-    this.detailContainer.appendChild(addCard);
+    // const addCard = document.createElement('div');
+    // addCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
+    // addCard.style.width = '200px';
+    // addCard.style.margin = '10px';
+    // // addCard.style.width = '300px';
+    // addCard.style.height = '50px';
+    // addCard.style.border = '2px solid white';
+    // addCard.style.backgroundColor = '#80c6ff';
+    // addCard.style.color = 'white';
+    // addCard.style.cursor = 'pointer';
+    // addCard.style.transition = 'transform 0.3s ease-in-out';
+    // addCard.style.borderRadius = '5px';
+    // addCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
+    // addCard.style.textAlign = 'center';
+    // addCard.style.display = 'flex';
+    // addCard.style.flexDirection = 'column';
+    // addCard.style.justifyContent = 'center';
+    // addCard.style.textAlign = 'center';
+    // addCard.innerHTML = `<span class="material-symbols-outlined">
+    // add_circle
+    // </span>`;
+    // addCard.onclick = () => {
+    //   this.createBox.style.display = 'block';
+    //   this.detailBox.style.display = 'none';
+    // };
+    // // this.detailContainer.appendChild(addCard);
 
-    // Add hover effect
-    addCard.addEventListener('mouseenter', () => {
-      addCard.style.transform = 'scale(1.05)';
-    });
+    // // Add hover effect
+    // addCard.addEventListener('mouseenter', () => {
+    //   addCard.style.transform = 'scale(1.05)';
+    // });
 
-    addCard.addEventListener('mouseleave', () => {
-      addCard.style.transform = 'scale(1)';
-    });
+    // addCard.addEventListener('mouseleave', () => {
+    //   addCard.style.transform = 'scale(1)';
+    // });
 
-    addCard.addEventListener('click', function () {});
+    // addCard.addEventListener('click', function () {});
   }
 
   loadSpaceCard(card) {
@@ -525,20 +567,20 @@ export default class MainScene extends Phaser.Scene {
     // ]
 
     const spaceCard = document.createElement('div');
-    spaceCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
-    spaceCard.style.width = '200px';
+    // spaceCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
+    spaceCard.style.display = 'flex';
+    spaceCard.style.flexDirection = 'column';
+    spaceCard.style.justifyContent = 'center';
+    spaceCard.style.textAlign = 'center';
+    spaceCard.style.padding = '15px';
+    spaceCard.style.width = '90%';
     spaceCard.style.margin = '10px';
-    // spaceCard.style.width = '300px';
-    spaceCard.style.height = '50px';
+    spaceCard.style.height = '21.6px';
     spaceCard.style.backgroundColor = 'white';
     spaceCard.style.cursor = 'pointer';
     spaceCard.style.transition = 'transform 0.3s ease-in-out';
     spaceCard.style.borderRadius = '5px';
     spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    spaceCard.style.textAlign = 'center';
-    spaceCard.style.display = 'flex';
-    spaceCard.style.flexDirection = 'column';
-    spaceCard.style.justifyContent = 'center';
     spaceCard.style.textAlign = 'center';
     spaceCard.onclick = this.detailSpace.bind(this, card.id, card.name);
     spaceCard.innerText = card.name;
@@ -546,7 +588,7 @@ export default class MainScene extends Phaser.Scene {
 
     // Add hover effect
     spaceCard.addEventListener('mouseenter', () => {
-      spaceCard.style.transform = 'scale(1.05)';
+      spaceCard.style.transform = 'scale(1.03)';
     });
 
     spaceCard.addEventListener('mouseleave', () => {

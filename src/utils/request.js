@@ -47,7 +47,19 @@ export const requestGoogleLogin = (userId, successCallback) => {
 };
 
 //--------------------wook------------------------------
-
+export const requestAllSpaceList = async () => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.get(`${process.env.DB}/spaces/all`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    console.log('학습공간 목록 전체 조회 성공', response.data);
+    return response.data; // 응답 데이터만 반환
+  } catch (error) {
+    console.error('학습공간 목록 전체 조회 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
 //------------------------------------------------------
 
 export const requestSpaceList = (successCallback) => {
