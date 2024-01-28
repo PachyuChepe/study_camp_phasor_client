@@ -1,5 +1,6 @@
 import SocketManager from '../managers/socket';
 import MapData from '../config/mapData';
+import ResourceManager from '../managers/resource';
 
 export default class Player {
   constructor(scene, data) {
@@ -11,6 +12,7 @@ export default class Player {
     //아무것도 안했는데? 장난해?
     //
     // this.data = {
+    //   id, // 소캣아이디
     //   nickName,
     //   memberId,
     //   spaceId,
@@ -36,15 +38,6 @@ export default class Player {
     const hair = 'hair-' + (this.data.hair * 12 + this.data.hair_color + 1);
     const clothes =
       'clothes-' + (this.data.clothes * 12 + this.data.clothes_color + 1);
-
-    // // 스프라이트 로드
-    // this.loadSprite('skin', this.data.skin + 1);
-    // this.loadSprite('face', this.data.face + 1);
-    // this.loadSprite('hair', this.data.hair * 12 + this.data.hair_color + 1);
-    // this.loadSprite(
-    //   'clothes',
-    //   this.data.clothes * 12 + this.data.clothes_color + 1,
-    // );
 
     // 스프라이트 생성
     this.skinSprite = this.scene.physics.add.sprite(0, 0, 'skin-1');
@@ -82,23 +75,20 @@ export default class Player {
     this.scene.physics.add.existing(this.player);
     this.player.setDepth(10);
     this.player.setSize(48, 68);
-    // this.player.setOrigin(0, 0);
 
-    // // const skin = 'skin-' + (this.data.skin + 1);
-    // this.player = this.scene.physics.add.sprite(
-    //   this.data.x * MapData.tileSize,
-    //   this.data.y * MapData.tileSize,
-    //   skin,
-    // );
+    this.updateSkin(this.data);
+  }
 
-    this.creatPlayerAnimation();
-    this.playAnimation('player_idle_down');
-    // this.updateSkin(this.data);
-    // if (this.data.isSit) {
-    //   this.playAnimation('player_sit_down');
-    // } else {
-    //   this.playAnimation('player_idle_down');
-    // }
+  destroy() {
+    // 스프라이트 및 텍스트 파괴
+    this.skinSprite.destroy();
+    this.faceSprite.destroy();
+    this.clothesSprite.destroy();
+    this.hairSprite.destroy();
+    this.nickname.destroy();
+
+    // 컨테이너 파괴
+    this.player.destroy();
   }
 
   getSprite() {
@@ -308,22 +298,157 @@ export default class Player {
     this.data.clothes_color = data.clothes_color;
     this.data.isSit = data.isSit;
 
+    const skinIndex = this.data.skin + 1;
+    const faceIndex = this.data.face + 1;
+    const hairIndex = this.data.hair * 12 + this.data.hair_color + 1;
+    const clothesIndex = this.data.clothes * 12 + this.data.clothes_color + 1;
+    ResourceManager.getInstance().pushLoadData(
+      this.id,
+      skinIndex,
+      faceIndex,
+      hairIndex,
+      clothesIndex,
+    );
+    // this.scene.scene.switch('LoadScene');
+    // this.scene.scene.start('LoadScene');
+    // this.loadSprite('skin', this.data.skin + 1);
+    // this.loadSprite('face', this.data.face + 1);
+    // this.loadSprite('hair', this.data.hair * 12 + this.data.hair_color + 1);
+    // this.loadSprite(
+    //   'clothes',
+    //   this.data.clothes * 12 + this.data.clothes_color + 1,
+    // );
+    // Phaser.Loader.LoaderPlugin;
+    let loader = new Phaser.Loader.LoaderPlugin(this.scene);
+    // ask the LoaderPlugin to load the texture
+    // loader.image(name, 'assets/images/demon-large1.png');
+
+    const skin = require(`../assets/sprites/skin/-${skinIndex}.png`).default;
+    loader.spritesheet(`skin-${skinIndex}`, skin, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+
+    const face = require(`../assets/sprites/face/-${faceIndex}.png`).default;
+    loader.spritesheet(`face-${faceIndex}`, face, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+
+    const hair = require(`../assets/sprites/hair/-${hairIndex}.png`).default;
+    loader.spritesheet(`hair-${hairIndex}`, hair, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+
+    const clothes = require(
+      `../assets/sprites/clothes/-${clothesIndex}.png`,
+    ).default;
+    loader.spritesheet(`clothes-${clothesIndex}`, clothes, {
+      frameWidth: 48,
+      frameHeight: 64,
+    });
+
+    loader.once(Phaser.Loader.Events.COMPLETE, this.loadAnimation, this);
+
+    loader.start();
+
     // 스프라이트 로드
-    this.loadSprite('skin', this.data.skin + 1);
-    this.loadSprite('face', this.data.face + 1);
-    this.loadSprite('hair', this.data.hair * 12 + this.data.hair_color + 1);
-    this.loadSprite(
-      'clothes',
-      this.data.clothes * 12 + this.data.clothes_color + 1,
+    // const skin = require(`../assets/sprites/skin/-${skinIndex}.png`).default;
+    //  this.scene.load.spritesheet(`skin-${skinIndex}`, skin, {
+    //   frameWidth: 48,
+    //   frameHeight: 64,
+    // });
+
+    // const face = require(`../assets/sprites/face/-${faceIndex}.png`).default;
+    // this.scene.load.spritesheet(`face-${faceIndex}`, face, {
+    //   frameWidth: 48,
+    //   frameHeight: 64,
+    // });
+
+    // const hair = require(`../assets/sprites/hair/-${hairIndex}.png`).default;
+    // this.scene.load.spritesheet(`hair-${hairIndex}`, hair, {
+    //   frameWidth: 48,
+    //   frameHeight: 64,
+    // });
+
+    // const clothes = require(
+    //   `../assets/sprites/clothes/-${clothesIndex}.png`,
+    // ).default;
+    // this.scene.load.spritesheet(`clothes-${clothesIndex}`, clothes, {
+    //   frameWidth: 48,
+    //   frameHeight: 64,
+    // });
+
+    // this.load.image(cardName, `assets/${cardName}.png`)
+    // this.scene.load.once(
+    //   Phaser.Loader.Events.COMPLETE,
+    //   this.loadAnimation.bind(this),
+    // );
+    // this.scene.load.start();
+
+    // this.delay = this.scene.time.addEvent({
+    //   delay: 5000,
+    //   callback: this.loadAnimation,
+    //   callbackScope: this,
+    // });
+    // 리소스 로드 이벤트 처리
+    // this.scene.load.once('complete', this.loadAnimation, this);
+  }
+
+  // loadSkin() {
+  //   let loader = new Phaser.Loader.LoaderPlugin(this.scene);
+  //   const skin = require(`../assets/sprites/skin/-${skinIndex}.png`).default;
+  //   loader.spritesheet(`skin-${skinIndex}`, skin, {
+  //     frameWidth: 48,
+  //     frameHeight: 64,
+  //   });
+  //   loader.once(
+  //     Phaser.Loader.Events.COMPLETE,
+  //     () => {
+
+  //       this.skinSprite = this.scene.physics.add.sprite(0, 0, 'skin-' + skinIndex);
+  //       this.loadFace();
+  //     },
+  //     this,
+  //   );
+  //   loader.start();
+  // }
+
+  // loadFace() {
+
+  // }
+
+  // loadSprite(type, index) {
+  //   const img = require(`../assets/sprites/${type}/-${index}.png`).default;
+  //   this.scene.load.spritesheet(`${type}-${index}`, img, {
+  //     frameWidth: 48,
+  //     frameHeight: 64,
+  //   });
+  // }
+
+  loadAnimation() {
+    const skinIndex = this.data.skin + 1;
+    const faceIndex = this.data.face + 1;
+    const hairIndex = this.data.hair * 12 + this.data.hair_color + 1;
+    const clothesIndex = this.data.clothes * 12 + this.data.clothes_color + 1;
+
+    this.skinSprite = this.scene.physics.add.sprite(0, 0, 'skin-' + skinIndex);
+    // this.skinSprite.setOrigin(0, 0);
+    this.faceSprite = this.scene.physics.add.sprite(0, 0, 'face-1' + faceIndex);
+    // this.faceSprite.setOrigin(0, 0);
+    this.clothesSprite = this.scene.physics.add.sprite(
+      0,
+      0,
+      'hair-1' + hairIndex,
+    );
+    // this.clothesSprite.setOrigin(0, 0);
+    this.hairSprite = this.scene.physics.add.sprite(
+      0,
+      0,
+      'clothes-1' + clothesIndex,
     );
 
-    this.delay = this.scene.time.addEvent({
-      delay: 5000,
-      callback: this.loadSpirite,
-      callbackScope: this,
-    });
-  }
-  loadSpirite() {
     this.creatPlayerAnimation();
     if (this.data.isSit) {
       this.playAnimation('player_sit_down');
@@ -340,36 +465,48 @@ export default class Player {
   }
 
   createAnimation(playdata, framedata, repeatdata) {
-    const skin = 'skin-' + (this.data.skin + 1);
-    const face = 'face-' + (this.data.face + 1);
-    const hair = 'hair-' + (this.data.hair * 12 + this.data.hair_color + 1);
-    const clothes =
-      'clothes-' + (this.data.clothes * 12 + this.data.clothes_color + 1);
+    // const skin = 'skin-' + (this.data.skin + 1);
+    // const face = 'face-' + (this.data.face + 1);
+    // const hair = 'hair-' + (this.data.hair * 12 + this.data.hair_color + 1);
+    // const clothes =
+    //   'clothes-' + (this.data.clothes * 12 + this.data.clothes_color + 1);
 
     this.scene.anims.create({
       key: this.data.memberId + '_' + playdata + '_skin',
-      frames: this.scene.anims.generateFrameNumbers(skin, framedata),
+      frames: this.scene.anims.generateFrameNumbers(
+        this.skinSprite.texture.key,
+        framedata,
+      ),
       frameRate: 12,
       repeat: repeatdata,
     });
 
     this.scene.anims.create({
       key: this.data.memberId + '_' + playdata + '_face',
-      frames: this.scene.anims.generateFrameNumbers(face, framedata),
+      frames: this.scene.anims.generateFrameNumbers(
+        this.faceSprite.texture.key,
+        framedata,
+      ),
       frameRate: 12,
       repeat: repeatdata,
     });
 
     this.scene.anims.create({
       key: this.data.memberId + '_' + playdata + '_clothes',
-      frames: this.scene.anims.generateFrameNumbers(hair, framedata),
+      frames: this.scene.anims.generateFrameNumbers(
+        this.clothesSprite.texture.key,
+        framedata,
+      ),
       frameRate: 12,
       repeat: repeatdata,
     });
 
     this.scene.anims.create({
       key: this.data.memberId + '_' + playdata + '_hair',
-      frames: this.scene.anims.generateFrameNumbers(clothes, framedata),
+      frames: this.scene.anims.generateFrameNumbers(
+        this.hairSprite.texture.key,
+        framedata,
+      ),
       frameRate: 12,
       repeat: repeatdata,
     });
@@ -508,13 +645,5 @@ export default class Player {
       },
       -1,
     );
-  }
-
-  loadSprite(type, index) {
-    const img = require(`../assets/sprites/${type}/-${index}.png`).default;
-    this.scene.load.spritesheet(`${type}-${index}`, img, {
-      frameWidth: 48,
-      frameHeight: 64,
-    });
   }
 }

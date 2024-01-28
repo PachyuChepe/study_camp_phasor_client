@@ -1,3 +1,4 @@
+import LoadScene from '../scenes/loadScene.js';
 import LoadingScene from '../scenes/loadingScene.js';
 import MainScene from '../scenes/mainScene.js';
 import SpaceScene from '../scenes/spaceScene.js';
@@ -9,7 +10,7 @@ const Config = {
   backgroundColor: 0x94cfff,
 
   // 사용할 scene은 config의 scene 프로퍼티의 배열에 추가해줘야 합니다.
-  scene: [LoadingScene, MainScene, SpaceScene],
+  scene: [LoadingScene, MainScene, SpaceScene, LoadScene],
 
   // pixelArt를 사용할 경우 pixelArt: true로 설정해야 선명하게 보입니다.
   pixelArt: true,

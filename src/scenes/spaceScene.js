@@ -5,6 +5,7 @@ import PlayerData from '../config/playerData.js';
 import MapData from '../config/mapData.js';
 import Sidebar from '../elements/sidebar.js';
 import UserCard from '../elements/userCard.js';
+import ResourceManager from '../managers/resource.js';
 
 export default class SpaceScene extends Phaser.Scene {
   constructor() {
@@ -14,12 +15,20 @@ export default class SpaceScene extends Phaser.Scene {
   preload() {}
 
   create() {
+    // if (ResourceManager.getInstance().isCreateSpace()) {
+    //   return;
+    // } else {
+    //   ResourceManager.getInstance().createSpace();
+    // }
+    // this.scene.launch('LoadingScene');
+
+    this.lu;
     this.tileSize = 48;
     this.tileMapWitdh = 40;
     this.tileMapHeight = 30;
 
     //소켓 통신을 위한 구역 지정 변수
-    this.room = "outLayer"
+    this.room = 'outLayer';
     this.map = this.make.tilemap({
       data: this.createTileMap(MapData.column, MapData.row),
       tileWidth: MapData.tileSize,
@@ -81,6 +90,10 @@ export default class SpaceScene extends Phaser.Scene {
     //   y: 1,
     // }, PlayerData.userId);
     this.player = new Player(this, { ...PlayerData, x: 1, y: 1 });
+    ResourceManager.getInstance(
+      SocketManager.getInstance().getID(),
+      this.player,
+    );
     this.physics.world.setBounds(0, 0, bgWidth, bgHeight);
     this.cameras.main.setBounds(0, 0, bgWidth, bgHeight);
     this.cameras.main.startFollow(this.player.getSprite(), false, 0.5, 0.5);
@@ -179,14 +192,14 @@ export default class SpaceScene extends Phaser.Scene {
             if (otherLayer !== layer) {
               otherLayer.setAlpha(0.9);
               //내부
-              self.room = "inLayer";
+              self.room = 'inLayer';
               window.console.log('내부??????????????????????????????????');
             }
           });
         }
       } else {
         //외부
-        this.room = "outLayer";
+        this.room = 'outLayer';
         window.console.log('외부??????????????????????????????????');
       }
     });
@@ -206,8 +219,14 @@ export default class SpaceScene extends Phaser.Scene {
               //   playerdata.memberId,
               // );
               this.otherPlayers[playerdata.id] = new Player(this, playerdata);
+
+              ResourceManager.getInstance(
+                playerdata.id,
+                this.otherPlayers[playerdata.id],
+              );
               this.mockOtherPlayers[playerdata.id] = {};
-              this.mockOtherPlayers[playerdata.id].nickName = playerdata.nickName;
+              this.mockOtherPlayers[playerdata.id].nickName =
+                playerdata.nickName;
             }
           }
         });
@@ -226,17 +245,18 @@ export default class SpaceScene extends Phaser.Scene {
             //   data.memberId,
             // );
             this.otherPlayers[data.id] = new Player(this, data);
+            ResourceManager.getInstance(data.id, this.otherPlayers[data.id]);
           }
           this.mockOtherPlayers[data.id] = {};
           this.mockOtherPlayers[data.id].nickName = data.nickName;
-          console.log("joinSpacePlayer", data);
+          console.log('joinSpacePlayer', data);
         }
         break;
       case 'leaveSpace':
         if (this.otherPlayers[data.id]) {
           const leavePlayer = this.otherPlayers[data.id];
           // leavePlayer.remove();
-          // leavePlayer.destroy();
+          leavePlayer.destroy();
           this.otherPlayers[data.id] = null;
         }
         break;
