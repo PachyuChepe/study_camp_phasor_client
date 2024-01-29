@@ -285,37 +285,144 @@ export default class Sidebar {
     this.sideEditBox.appendChild(editbutton);
     this.editModal = new EditModal();
 
-    // 입장 코드 생성 버튼
-    const codebutton = document.createElement('button');
-    codebutton.style.padding = '0px';
-    codebutton.style.width = '100%';
-    codebutton.style.backgroundColor = 'white';
-    codebutton.style.border = '2px solid white';
-    codebutton.style.color = '#a2cfff';
-    codebutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 로비로 돌아가기 버튼
+    const loddybutton = document.createElement('button');
+    loddybutton.style.padding = '0px';
+    loddybutton.style.width = '100%';
+    loddybutton.style.backgroundColor = 'white';
+    loddybutton.style.border = '2px solid white';
+    loddybutton.style.color = '#a2cfff';
+    loddybutton.innerHTML = `<p><span class="material-symbols-outlined">
+    door_open
+    </span> 돌아가기</p>`;
+    loddybutton.onclick = () => {
+      // lobby scene
+    };
+    this.sideEditBox.appendChild(loddybutton);
+
+    if (PlayerData.role === 0) {
+      // 입장 코드 생성 버튼
+      const codebutton = document.createElement('button');
+      codebutton.style.padding = '0px';
+      codebutton.style.width = '100%';
+      codebutton.style.backgroundColor = 'white';
+      codebutton.style.border = '2px solid white';
+      codebutton.style.color = '#a2cfff';
+      codebutton.innerHTML = `<p><span class="material-symbols-outlined">
     vpn_key
     </span> 입장 코드 생성</p>`;
-    codebutton.onclick = () => {
-      this.codeModal.openModal();
-    };
-    this.sideEditBox.appendChild(codebutton);
-    // this.codeModal = new CodeModal();
+      codebutton.onclick = () => {
+        this.codeModal.openModal();
+      };
+      this.sideEditBox.appendChild(codebutton);
+      // this.codeModal = new CodeModal();
+    }
 
-    // 멤버 관리 버튼
-    const memberbutton = document.createElement('button');
-    memberbutton.style.padding = '0px';
-    memberbutton.style.width = '100%';
-    memberbutton.style.backgroundColor = 'white';
-    memberbutton.style.border = '2px solid white';
-    memberbutton.style.color = '#a2cfff';
-    memberbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    if (PlayerData.role === 0 || PlayerData.role === 1) {
+      // 멤버 관리 버튼
+      const memberbutton = document.createElement('button');
+      memberbutton.style.padding = '0px';
+      memberbutton.style.width = '100%';
+      memberbutton.style.backgroundColor = 'white';
+      memberbutton.style.border = '2px solid white';
+      memberbutton.style.color = '#a2cfff';
+      memberbutton.innerHTML = `<p><span class="material-symbols-outlined">
     person
     </span> 멤버 관리</p>`;
-    memberbutton.onclick = () => {
-      this.memberModal.openModal();
-    };
-    this.sideEditBox.appendChild(memberbutton);
-    this.memberModal = new ManagerModal();
+      memberbutton.onclick = () => {
+        this.memberModal.openModal();
+      };
+      this.sideEditBox.appendChild(memberbutton);
+      this.memberModal = new ManagerModal();
+    }
+
+    if (PlayerData.role === 0 || PlayerData.role === 1) {
+      // 출석 관리 버튼
+      const logbutton = document.createElement('button');
+      logbutton.style.padding = '0px';
+      logbutton.style.width = '100%';
+      logbutton.style.backgroundColor = 'white';
+      logbutton.style.border = '2px solid white';
+      logbutton.style.color = '#a2cfff';
+      logbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    how_to_reg
+    </span> 출석 관리</p>`;
+      logbutton.onclick = () => {};
+      this.sideEditBox.appendChild(logbutton);
+    }
+
+    if (PlayerData.role === 0 || PlayerData.role === 2) {
+      // 그룹 관리 버튼
+      const groupbutton = document.createElement('button');
+      groupbutton.style.padding = '0px';
+      groupbutton.style.width = '100%';
+      groupbutton.style.backgroundColor = 'white';
+      groupbutton.style.border = '2px solid white';
+      groupbutton.style.color = '#a2cfff';
+      groupbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    groups_3
+    </span> 그룹 관리</p>`;
+      groupbutton.onclick = () => {};
+      this.sideEditBox.appendChild(groupbutton);
+    }
+
+    if (PlayerData.role === 0) {
+      // 강의 관리 버튼
+      const lecturebutton = document.createElement('button');
+      lecturebutton.style.padding = '0px';
+      lecturebutton.style.width = '100%';
+      lecturebutton.style.backgroundColor = 'white';
+      lecturebutton.style.border = '2px solid white';
+      lecturebutton.style.color = '#a2cfff';
+      lecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
+    slideshow
+    </span> 강의 관리</p>`;
+      lecturebutton.onclick = () => {};
+      this.sideEditBox.appendChild(lecturebutton);
+    }
+
+    if (PlayerData.role === 0 || PlayerData.role === 1) {
+      // 브로드캐스트 관리 버튼
+      const brodcastbutton = document.createElement('button');
+      brodcastbutton.style.padding = '0px';
+      brodcastbutton.style.width = '100%';
+      brodcastbutton.style.backgroundColor = 'white';
+      brodcastbutton.style.border = '2px solid white';
+      brodcastbutton.style.color = '#a2cfff';
+      brodcastbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    campaign
+    </span> 브로드캐스트</p>`;
+      brodcastbutton.onclick = () => {};
+      this.sideEditBox.appendChild(brodcastbutton);
+    }
+
+    if (PlayerData.role === 3) {
+      // 내강의 보기
+      const myLecturebutton = document.createElement('button');
+      myLecturebutton.style.padding = '0px';
+      myLecturebutton.style.width = '100%';
+      myLecturebutton.style.backgroundColor = 'white';
+      myLecturebutton.style.border = '2px solid white';
+      myLecturebutton.style.color = '#a2cfff';
+      myLecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
+      slideshow
+    </span> 강의 보기</p>`;
+      myLecturebutton.onclick = () => {};
+      this.sideEditBox.appendChild(myLecturebutton);
+
+      // 내 출석 보기
+      const myLogbutton = document.createElement('button');
+      myLogbutton.style.padding = '0px';
+      myLogbutton.style.width = '100%';
+      myLogbutton.style.backgroundColor = 'white';
+      myLogbutton.style.border = '2px solid white';
+      myLogbutton.style.color = '#a2cfff';
+      myLogbutton.innerHTML = `<p><span class="material-symbols-outlined">
+      how_to_reg
+    </span> 강의 보기</p>`;
+      myLogbutton.onclick = () => {};
+      this.sideEditBox.appendChild(myLogbutton);
+    }
   }
 
   createGroupBox() {
