@@ -129,6 +129,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.enterCodeBtn.onclick = () => {
       console.log('코드로 입장 클릭!');
+      this.openCodeInputModal();
     };
     this.enterCodeBtn.addEventListener('mouseenter', () => {
       this.enterCodeBtn.style.backgroundColor = '#8a7fff';
@@ -447,7 +448,9 @@ export default class MainScene extends Phaser.Scene {
     detailGroup.appendChild(this.detailText);
     //
     const detailButton = document.createElement('button');
-    detailButton.textContent = '생성 하기';
+
+    detailButton.textContent = '입장 하기';
+
     detailButton.onclick = () => {
       this.checkUserBelongSpace(this.spaceId);
     };

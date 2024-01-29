@@ -219,6 +219,7 @@ export default class SocketManager {
       PlayerData.memberId,
     );
     //memberId와 userId가 찍히는게 다르다.
+
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
