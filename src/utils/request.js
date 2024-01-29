@@ -2,6 +2,7 @@ import axios from 'axios';
 
 export const requestLogin = (data, successCallback) => {
   // data = {email,password}
+  //여기서 가져오라면 가져올 수 있지만 
   axios
     .post(`${process.env.DB}/auth/login`, data)
     .then((response) => {
@@ -147,9 +148,10 @@ export const requestGetSpaceClass = (successCallback) => {
 //     });
 // };
 
-export const requestMemberProfile = (data, successCallback) => {
+//1번 이게 먼저 실행되어야 한다.
+export const requestMemberProfile = async (data, successCallback) => {
   const accessToken = localStorage.getItem('access_token');
-  axios
+  await axios
     .post(`${process.env.DB}/space-members/info`, data, {
       headers: { Authorization: `Bearer ${accessToken}` },
     })
