@@ -104,7 +104,10 @@ export default class LoginModal {
         email: this.emailInput.value,
         password: this.passwordInput.value,
       },
-      this.successLogin,
+      (response) => {
+        this.successLogin(response);
+        this.destroy(); // 로그인 성공 후 모달 제거
+      },
     );
   }
 
@@ -124,6 +127,7 @@ export default class LoginModal {
           requestGoogleLogin(
             event.data.data.userId,
             this.successLogin.bind(this),
+            this.destroy(),
           );
         }
       },
@@ -131,14 +135,15 @@ export default class LoginModal {
     );
   }
 
+  openSignupModal() {
+    this.closeModal(); // 로그인 모달 닫기
+    this.destroy();
+    const signupModal = new SignupModal(); // 회원가입 모달 생성
+    signupModal.openModal(); // 회원가입 모달 열기
+  }
+
   destroy() {
     this.loginModal.innerHTML = '';
     document.body.removeChild(this.loginModal);
-  }
-
-  openSignupModal() {
-    this.closeModal(); // 로그인 모달 닫기
-    const signupModal = new SignupModal(); // 회원가입 모달 생성
-    signupModal.openModal(); // 회원가입 모달 열기
   }
 }
