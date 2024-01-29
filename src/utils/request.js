@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const requestLogin = (data, successCallback) => {
   // data = {email,password}
-  //여기서 가져오라면 가져올 수 있지만 
+  //여기서 가져오라면 가져올 수 있지만
   axios
     .post(`${process.env.DB}/auth/login`, data)
     .then((response) => {
@@ -184,4 +184,19 @@ export const requestSignup = (data, successCallback, errorCallback) => {
     .post(`${process.env.DB}/users`, data)
     .then(successCallback)
     .catch(errorCallback);
+};
+
+//스페이스 아이디를 통한 모든 강의 조회
+export const requestAllLecturesBySpaceId = async (spaceId) => {
+  const accessToken = localStorage.getItem('access_token');
+  await axios
+    .get(`${process.env.DB}/lectures/${spaceId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    })
+    .then((response) => {
+      window.console.log('스페이스 아이디를 통한 모든 강의 조회:', response);
+    })
+    .catch((error) => {
+      window.console.error('조회 실패:', error);
+    });
 };

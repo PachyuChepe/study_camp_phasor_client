@@ -2,6 +2,8 @@ import SocketManager from '../managers/socket';
 import SidebarOut from './sidebarOut';
 import PlayerData from '../config/playerData.js';
 import EditModal from './editModal';
+import CreateLecutreModal from './createLectureModal.js';
+import ShowLectureModal from './showLectureModal.js';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
@@ -21,6 +23,10 @@ export default class Sidebar {
       'localStorage access token:',
       localStorage.getItem('access_token'),
     );
+
+    //강의 관리 및 강의 생성 모달 생성
+    this.createLecutreModal = new CreateLecutreModal(this.scene);
+    this.showLectureModal = new ShowLectureModal(this.scene, this.createLecutreModal);
 
     //유저 정보 저장용 배열
     this.spaceUser = [];
@@ -77,6 +83,8 @@ export default class Sidebar {
     </span>`;
     this.insidebuttonbox.appendChild(this.editBtn);
     this.editBtn.onclick = this.showContainers.bind(this, 'edit');
+
+    this.editBtn.addEventListener('click', async () => { await this.showLectureModal.openModal(); this.createLecutreModal.closeModal()});
     this.createEditBox();
 
     //DM버튼
