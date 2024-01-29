@@ -2,8 +2,9 @@ import axios from 'axios';
 import MainScene from '../scenes/mainScene';
 
 export const requestLogin = (data, successCallback) => {
-  // data = {email,password}
+  // data = { email, password };
   //여기서 가져오라면 가져올 수 있지만
+  console.log(data);
   axios
     .post(`${process.env.DB}/auth/login`, data)
     .then((response) => {

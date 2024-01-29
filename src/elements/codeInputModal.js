@@ -26,7 +26,6 @@ export class CodeInputModal {
     // 모달 헤더
     const modalHeader = document.createElement('div');
     modalHeader.classList.add('modal-header');
-    modalHeader.style.color = '#6758ff';
     modalHeader.innerText = '코드 입력';
     this.codeInputModal.appendChild(modalHeader);
 

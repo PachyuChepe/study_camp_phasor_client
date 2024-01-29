@@ -1,3 +1,5 @@
+import GroupAlarmModal from '../elements/groupAlarmModal';
+
 // 그룹관리 창
 export default class GroupModal {
   constructor() {
@@ -60,6 +62,11 @@ export default class GroupModal {
     alarmButton.innerText = '그룹 메세지 보내기';
     alarmButton.style.width = '49%';
     alarmButton.style.backgroundColor = '#6758FF';
+    alarmButton.onclick = () => {
+      this.closeModal();
+      this.groupAlarmModal = new GroupAlarmModal();
+      this.groupAlarmModal.openModal();
+    };
     this.buttonContainer.appendChild(alarmButton);
 
     const lectureButton = document.createElement('button');
@@ -122,4 +129,6 @@ export default class GroupModal {
       grid.appendChild(button);
     }
   }
+
+  groupAlarmModal() {}
 }
