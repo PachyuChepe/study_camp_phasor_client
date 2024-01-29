@@ -129,6 +129,7 @@ export default class MainScene extends Phaser.Scene {
 
     this.enterCodeBtn.onclick = () => {
       console.log('코드로 입장 클릭!');
+      this.openCodeInputModal();
     };
     this.enterCodeBtn.addEventListener('mouseenter', () => {
       this.enterCodeBtn.style.backgroundColor = '#8a7fff';
@@ -448,7 +449,7 @@ export default class MainScene extends Phaser.Scene {
     //
     const detailButton = document.createElement('button');
 
-    detailButton.textContent = '생성 하기';
+    detailButton.textContent = '입장 하기';
 
     detailButton.onclick = () => {
       this.checkUserBelongSpace(this.spaceId);
@@ -461,9 +462,7 @@ export default class MainScene extends Phaser.Scene {
     this.detailBox.appendChild(detailButton);
   }
 
-
   async successLogin(response) {
-
     // 유저 정보
     window.console.log('내가 원하는 respone:', response);
     PlayerData.email = response.data.member_search.email;
@@ -643,7 +642,7 @@ export default class MainScene extends Phaser.Scene {
     );
 
     // 스페이스 씬 시작
-    window.console.log("스페이스 씬 시작");
+    window.console.log('스페이스 씬 시작');
     this.scene.start('SpaceScene');
   }
 
@@ -685,7 +684,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   successMemberProfile(response) {
-    console.log("successMemberProfile  =>", response)
+    console.log('successMemberProfile  =>', response);
     PlayerData.role = response.data.role;
     PlayerData.memberId = response.data.id;
   }
