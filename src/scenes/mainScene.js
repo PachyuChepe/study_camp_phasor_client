@@ -36,7 +36,9 @@ export default class MainScene extends Phaser.Scene {
   create() {
     // 모달
     this.loginModal = new LoginModal();
-    this.loginModal.setLoginFunction(this.successLogin.bind(this));
+    // this.loginModal.setLoginFunction(this.successLogin.bind(this));
+    window.successLogin = this.successLogin.bind(this); // 전역 객체에 함수 추가
+    this.loginModal.setLoginFunction(window.successLogin);
 
     if (true) {
       // 로그인을 안했을경우 토큰이 없을경우 등
