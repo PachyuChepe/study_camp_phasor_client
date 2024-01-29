@@ -20,6 +20,7 @@ export default class MainScene extends Phaser.Scene {
 
   preload() {}
 
+  //3번
   create() {
     // 모달
     this.loginModal = new LoginModal();
@@ -446,7 +447,9 @@ export default class MainScene extends Phaser.Scene {
     detailGroup.appendChild(this.detailText);
     //
     const detailButton = document.createElement('button');
+
     detailButton.textContent = '생성 하기';
+
     detailButton.onclick = () => {
       this.checkUserBelongSpace(this.spaceId);
     };
@@ -458,7 +461,9 @@ export default class MainScene extends Phaser.Scene {
     this.detailBox.appendChild(detailButton);
   }
 
+
   async successLogin(response) {
+
     // 유저 정보
     window.console.log('내가 원하는 respone:', response);
     PlayerData.email = response.data.member_search.email;
@@ -617,7 +622,8 @@ export default class MainScene extends Phaser.Scene {
     // );
   }
 
-  enterSpace() {
+  //2번
+  async enterSpace() {
     // this.createBox.style.display = 'none';
     // this.detailBox.style.display = 'block';
     // requestProfile(
@@ -631,12 +637,13 @@ export default class MainScene extends Phaser.Scene {
     this.title.style.display = 'none';
     this.container.style.display = 'none';
 
-    requestMemberProfile(
+    await requestMemberProfile(
       { spaceId: this.spaceId },
       this.successMemberProfile.bind(this),
     );
 
     // 스페이스 씬 시작
+    window.console.log("스페이스 씬 시작");
     this.scene.start('SpaceScene');
   }
 
@@ -678,6 +685,7 @@ export default class MainScene extends Phaser.Scene {
   }
 
   successMemberProfile(response) {
+    console.log("successMemberProfile  =>", response)
     PlayerData.role = response.data.role;
     PlayerData.memberId = response.data.id;
   }
