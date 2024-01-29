@@ -81,6 +81,7 @@ export default class ManagerModal {
       this.listContainer.appendChild(list);
 
       const grid = document.createElement('div');
+      grid.style.marginTop = '6px';
       grid.style.display = 'grid';
       grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
       grid.style.gridGap = '10px';
@@ -101,14 +102,14 @@ export default class ManagerModal {
       const logbutton = document.createElement('button');
       logbutton.innerText = '접속 기록 보기';
       logbutton.style.backgroundColor = '#6758FF';
-      logbutton.style.margin = '5px 0px 0px 0px';
+      logbutton.style.margin = '0px';
       grid.appendChild(logbutton);
 
       // role 3 인 애들만
       const lecturebutton = document.createElement('button');
       lecturebutton.innerText = '강의 진도 보기';
       lecturebutton.style.backgroundColor = '#6758FF';
-      lecturebutton.style.margin = '5px 0px 0px 0px';
+      lecturebutton.style.margin = '0px';
       grid.appendChild(lecturebutton);
     }
   }
