@@ -14,8 +14,20 @@ import TossPaymentPopup from '../elements/tossPaymentPopup.js';
 import { CodeInputModal } from '../elements/codeInputModal.js';
 
 export default class MainScene extends Phaser.Scene {
+  static instance;
+
   constructor() {
     super('MainScene');
+    if (MainScene.instance) {
+      return MainScene.instance;
+    }
+    MainScene.instance = this;
+  }
+  static getInstance() {
+    if (!MainScene.instance) {
+      MainScene.instance = new MainScene();
+    }
+    return MainScene.instance;
   }
 
   preload() {}

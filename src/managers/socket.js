@@ -1,7 +1,6 @@
 import io from 'socket.io-client';
 import PlayerData from '../config/playerData';
 import UserCard from '../elements/userCard';
-import SidebarOut from '../elements/sidebarOut';
 
 export default class SocketManager {
   constructor() {

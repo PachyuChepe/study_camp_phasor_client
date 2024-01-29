@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const requestLogin = (data, successCallback) => {
   // data = {email,password}
-  //여기서 가져오라면 가져올 수 있지만 
+  //여기서 가져오라면 가져올 수 있지만
   axios
     .post(`${process.env.DB}/auth/login`, data)
     .then((response) => {
@@ -219,4 +219,22 @@ export const requestSignup = (data, successCallback, errorCallback) => {
     .post(`${process.env.DB}/users`, data)
     .then(successCallback)
     .catch(errorCallback);
+};
+
+export const signupInvitingCode = async (code) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.post(
+      `${process.env.DB}/spaces/invitation/check`,
+      { code },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('코드 검증 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
 };

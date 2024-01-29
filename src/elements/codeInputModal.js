@@ -1,3 +1,6 @@
+import MainScene from '../scenes/mainScene';
+import { signupInvitingCode } from '../utils/request';
+
 export class CodeInputModal {
   static instance;
 
@@ -7,9 +10,6 @@ export class CodeInputModal {
     }
 
     CodeInputModal.instance = this;
-
-    // 인풋 값
-    this.inputValues = '';
 
     const style = document.createElement('style');
     style.textContent = `
@@ -85,16 +85,20 @@ export class CodeInputModal {
     }
   };
 
-  submitInputFunc = () => {
+  submitInputFunc = async () => {
+    let inputValues = '';
     for (let i = 0; i < 6; i++) {
       const inputValue = document.getElementById(`input${i}`).value;
       if (!inputValue) {
         alert('모두 입력 해주세요.');
       } else {
-        this.inputValues += inputValue;
+        inputValues += inputValue;
       }
     }
-    console.log(this.inputValues);
-    this.inputValues = '';
+    console.log(inputValues);
+    await signupInvitingCode(inputValues);
+    inputValues = '';
+    MainScene.getInstance().enterSpace();
+    this.codeInputModal.style.display = 'none';
   };
 }
