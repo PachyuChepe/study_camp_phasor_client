@@ -2,10 +2,14 @@ import SocketManager from '../managers/socket';
 import SidebarOut from './sidebarOut';
 import PlayerData from '../config/playerData.js';
 import EditModal from './editModal';
+
+import CreateLecutreModal from './createLectureModal.js';
+import ShowLectureModal from './showLectureModal.js';
 import ManagerModal from './managerModal.js';
 import LogModal from './logModal.js';
 import LogDateModal from './logDateModal.js';
 import GroupModal from './groupModal.js';
+import CodeCreateModal from './codeCreateModal.js';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
@@ -24,6 +28,13 @@ export default class Sidebar {
     window.console.log(
       'localStorage access token:',
       localStorage.getItem('access_token'),
+    );
+
+    //강의 관리 및 강의 생성 모달 생성
+    this.createLecutreModal = new CreateLecutreModal(this.scene);
+    this.showLectureModal = new ShowLectureModal(
+      this.scene,
+      this.createLecutreModal,
     );
 
     //유저 정보 저장용 배열
@@ -143,6 +154,7 @@ export default class Sidebar {
     this.mailBtn.onclick = this.showContainers.bind(this, 'mail');
 
     // 접속자
+    // 들어온 사람만.
     this.usersBtn = document.createElement('button');
     this.usersBtn.style.backgroundColor = 'white';
     this.usersBtn.style.border = '2px solid white';
@@ -315,10 +327,10 @@ export default class Sidebar {
     vpn_key
     </span> 입장 코드 생성</p>`;
       codebutton.onclick = () => {
-        this.codeModal.openModal();
+        this.codeCreateModal.openModal();
       };
       this.sideEditBox.appendChild(codebutton);
-      // this.codeModal = new CodeModal();
+      this.codeCreateModal = new CodeCreateModal();
     }
 
     if (PlayerData.role === 0 || PlayerData.role === 1) {
@@ -386,7 +398,10 @@ export default class Sidebar {
       lecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
     slideshow
     </span> 강의 관리</p>`;
-      lecturebutton.onclick = () => {};
+      lecturebutton.onclick = () => {
+        this.showLectureModal.openModal();
+        this.createLecutreModal.closeModal();
+      };
       this.sideEditBox.appendChild(lecturebutton);
     }
 

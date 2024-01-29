@@ -641,6 +641,8 @@ export default class MainScene extends Phaser.Scene {
     //   this.successProfile.bind(this, this.spaceId),
     // );
     PlayerData.spaceId = this.spaceId;
+
+    console.log(this.spaceId);
     // 현재 씬 멈춤
     this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
@@ -664,12 +666,12 @@ export default class MainScene extends Phaser.Scene {
     });
 
     if (space.data.isUserInSpace) {
-      this.enterSpace(this.spaceId);
+      this.enterSpace();
     } else {
       this.spacePassword.value === space.data.space
-        ? this.enterSpace(this.spaceId)
+        ? this.enterSpace()
         : space.data.space === null
-          ? this.enterSpace(this.spaceId)
+          ? this.enterSpace()
           : alert('비밀번호가 틀립니다');
     }
   }

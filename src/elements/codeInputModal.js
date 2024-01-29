@@ -1,5 +1,5 @@
 import MainScene from '../scenes/mainScene';
-import { signupInvitingCode } from '../utils/request';
+import { signupInviteCode } from '../utils/request';
 
 export class CodeInputModal {
   static instance;
@@ -96,7 +96,7 @@ export class CodeInputModal {
       }
     }
     console.log(inputValues);
-    await signupInvitingCode(inputValues);
+    await signupInviteCode(inputValues);
     inputValues = '';
     MainScene.getInstance().enterSpace();
     this.codeInputModal.style.display = 'none';
