@@ -104,7 +104,7 @@ export default class LoginModal {
         email: this.emailInput.value,
         password: this.passwordInput.value,
       },
-      this.successLogin.bind(this),
+      this.successLogin,
     );
   }
 

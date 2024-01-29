@@ -6,10 +6,12 @@ import {
   requestMemberProfile,
   requestGetSpaceClass,
   requestAllSpaceList,
+  requestSpace,
 } from '../utils/request.js';
 import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
 import TossPaymentPopup from '../elements/tossPaymentPopup.js';
+import { CodeInputModal } from '../elements/codeInputModal.js';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -87,6 +89,7 @@ export default class MainScene extends Phaser.Scene {
     this.cardContainer.style.display = 'flex';
     this.cardContainer.style.flexDirection = 'column';
     this.cardContainer.style.alignItems = 'center';
+    this.cardContainer.style.overflowY = 'auto';
     this.leftContainer.appendChild(this.cardContainer);
 
     this.middleContainer = document.createElement('div');
@@ -103,6 +106,10 @@ export default class MainScene extends Phaser.Scene {
     this.searchInput.style.height = '100%';
     this.searchInput.style.margin = '0px 30px 0px 0px';
     this.middleContainer.appendChild(this.searchInput);
+
+    this.searchInput.addEventListener('keyup', () => {
+      this.searchInputFunc(this.searchInput.value);
+    });
 
     this.enterCodeBtn = document.createElement('div');
     this.enterCodeBtn.style.borderRadius = '10px';
@@ -359,6 +366,8 @@ export default class MainScene extends Phaser.Scene {
         this.tossPaymentPopup = new TossPaymentPopup(
           selectedClassId,
           this.nameInput.value,
+          this.createContent.value,
+          this.createPassword.value,
           PlayerData.email,
           playerPayment.customer_key,
         );
@@ -402,16 +411,17 @@ export default class MainScene extends Phaser.Scene {
     this.detailBox.appendChild(this.spaceInfoContainer);
 
     this.spaceCapacity = document.createElement('div');
-    this.spaceCapacity.innerText = '20명';
+    this.spaceCapacity.innerText = '';
     this.spaceCapacity.style.marginBottom = '20px';
     this.spaceInfoContainer.appendChild(this.spaceCapacity);
 
     this.spaceContent = document.createElement('div');
-    this.spaceContent.innerText = '우짜라고';
+    this.spaceContent.innerText = '';
     this.spaceContent.style.marginBottom = '20px';
     this.spaceInfoContainer.appendChild(this.spaceContent);
 
     this.spacePassword = document.createElement('input');
+    this.spacePassword.type = 'password';
     this.spacePassword.style.borderRadius = '5px';
     this.spacePassword.style.backgroundColor = '#F3F2FF';
     this.spacePassword.style.width = '80%';
@@ -438,7 +448,7 @@ export default class MainScene extends Phaser.Scene {
     const detailButton = document.createElement('button');
     detailButton.textContent = '생성 하기';
     detailButton.onclick = () => {
-      this.enterSpace(this.spaceId);
+      this.checkUserBelongSpace(this.spaceId);
     };
     detailButton.style.width = '80%';
     detailButton.style.height = '10%';
@@ -476,13 +486,9 @@ export default class MainScene extends Phaser.Scene {
   createAllSpaceList(allSpaceList) {
     allSpaceList.forEach((data) => {
       data.space.forEach((space) => {
-        console.log('전체스페이스 목록 하나씩 =>', space);
-
         const spaceCard = document.createElement('div');
-        // spaceCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
         spaceCard.style.width = '90%';
-        spaceCard.id = 'choi';
-        spaceCard.style.height = '50px';
+        spaceCard.id = `${space.id}`;
         spaceCard.style.margin = '10px';
         spaceCard.style.padding = '15px';
         spaceCard.style.backgroundColor = 'white';
@@ -496,6 +502,7 @@ export default class MainScene extends Phaser.Scene {
         spaceCard.style.justifyContent = 'center';
         spaceCard.style.textAlign = 'center';
         spaceCard.innerText = space.name;
+        spaceCard.onclick = this.detailSpace.bind(this, space, data.capacity);
         this.allSpaceList.appendChild(spaceCard);
 
         // Add hover effect
@@ -514,7 +521,8 @@ export default class MainScene extends Phaser.Scene {
     this.cardContainer.innerHTML = ``;
     // 스페이스 목록 조회 성공 시 리스트 그려 줌
     spaces.forEach((element) => {
-      this.loadSpaceCard(element.space);
+      console.log(element.space);
+      this.loadSpaceCard(element.space, element.capacity);
     });
 
     // const addCard = document.createElement('div');
@@ -556,7 +564,7 @@ export default class MainScene extends Phaser.Scene {
     // addCard.addEventListener('click', function () {});
   }
 
-  loadSpaceCard(card) {
+  loadSpaceCard(card, capacity) {
     // [
     //   {
     //     "id": 5,
@@ -582,8 +590,9 @@ export default class MainScene extends Phaser.Scene {
     spaceCard.style.borderRadius = '5px';
     spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     spaceCard.style.textAlign = 'center';
-    spaceCard.onclick = this.detailSpace.bind(this, card.id, card.name);
+    spaceCard.onclick = this.detailSpace.bind(this, card, capacity);
     spaceCard.innerText = card.name;
+
     this.cardContainer.appendChild(spaceCard);
 
     // Add hover effect
@@ -596,11 +605,13 @@ export default class MainScene extends Phaser.Scene {
     });
   }
 
-  detailSpace(spaceId, spcaeName) {
-    this.spaceId = spaceId;
+  detailSpace(space, capacity) {
+    this.spaceId = space.id;
     this.createBox.style.display = 'none';
     this.detailBox.style.display = 'flex';
-    this.detailHeader.textContent = spcaeName;
+    this.detailHeader.textContent = space.name;
+    this.spaceCapacity.textContent = `총 인원 : ${capacity} 명`;
+    this.spaceContent.textContent = space.content;
     // requestProfile(
     //   this.successProfile.bind(this, spaceId),
     // );
@@ -629,10 +640,31 @@ export default class MainScene extends Phaser.Scene {
     this.scene.start('SpaceScene');
   }
 
+  async checkUserBelongSpace(spaceId) {
+    const space = await requestSpace({
+      spaceId: spaceId,
+    });
+
+    if (space.data.isUserInSpace) {
+      this.enterSpace(this.spaceId);
+    } else {
+      this.spacePassword.value === space.data.space
+        ? this.enterSpace(this.spaceId)
+        : space.data.space === null
+          ? this.enterSpace(this.spaceId)
+          : alert('비밀번호가 틀립니다');
+    }
+  }
+
   reqCreateSpace() {
-    // this.detailBox.style.display = 'none';
+    this.detailBox.style.display = 'none';
     requestCreateSpace(
-      { name: this.nameInput.value, classId: 1 },
+      {
+        name: this.nameInput.value,
+        classId: 1,
+        content: this.createContent.value,
+        password: this.createPassword.value,
+      },
       this.successCreateSpace.bind(this),
     );
   }
@@ -663,5 +695,23 @@ export default class MainScene extends Phaser.Scene {
 
     // 호출 슈퍼 클래스의 destroy 메서드 (부모 클래스의 destroy 호출)
     super.destroy();
+  }
+
+  searchInputFunc(inputValue) {
+    const searchPost = this.allSpaceList.childNodes;
+
+    searchPost.forEach((post) => {
+      const postText = post.innerText;
+      if (postText.includes(inputValue)) {
+        post.style.display = 'flex';
+      } else {
+        post.style.display = 'none';
+      }
+    });
+  }
+
+  openCodeInputModal() {
+    const codeInputModal = new CodeInputModal();
+    codeInputModal.openModal();
   }
 }

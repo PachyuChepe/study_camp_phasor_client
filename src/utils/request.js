@@ -60,6 +60,25 @@ export const requestAllSpaceList = async () => {
     throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
   }
 };
+
+export const requestSpace = async (data) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+
+    const response = await axios.post(
+      `${process.env.DB}/spaces/check-user`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log('유저 학습공간 존재 여부 조회 성공', response.data);
+    return response;
+  } catch (error) {
+    console.error('유저 학습공간 존재 여부 조회 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
 //------------------------------------------------------
 
 export const requestSpaceList = (successCallback) => {
