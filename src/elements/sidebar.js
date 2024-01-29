@@ -4,6 +4,7 @@ import PlayerData from '../config/playerData.js';
 import EditModal from './editModal';
 import ManagerModal from './managerModal.js';
 import LogModal from './logModal.js';
+import LogDateModal from './logDateModal.js';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
@@ -348,7 +349,8 @@ export default class Sidebar {
       logbutton.innerHTML = `<p><span class="material-symbols-outlined">
     how_to_reg
     </span> 출석 관리</p>`;
-      logbutton.onclick = () => {};
+      this.logDateModal = new LogDateModal();
+      logbutton.onclick = this.logDateModal.openModal.bind(this.logDateModal);
       this.sideEditBox.appendChild(logbutton);
     }
 

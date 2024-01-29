@@ -1,5 +1,5 @@
-// 출석 보기 창
-export default class LogModal {
+// 출석 관리 창
+export default class LogDateModal {
   constructor() {
     this.modal = document.createElement('div');
     this.modal.classList.add('modal');
@@ -17,12 +17,20 @@ export default class LogModal {
 
     const modalHeader = document.createElement('div');
     modalHeader.classList.add('modal-header');
-    modalHeader.innerText = '출석 보기';
+    modalHeader.innerText = '출석 관리';
     this.modal.appendChild(modalHeader);
+
+    this.select = document.createElement('select');
+    this.select.style.minWidth = '150px'; // 콤보박스 크기 조정
+    this.select.style.minHeight = '25px';
+    this.select.style.margin = '10px';
+    this.select.style.border = '1px solid #6758FF';
+    this.select.style.backgroundColor = '#F3F2FF';
+    this.modal.appendChild(this.select);
 
     this.container = document.createElement('div');
     this.container.style.border = '4px solid #F3F2FF';
-    this.container.style.height = '80%';
+    this.container.style.height = '70%';
     this.container.style.alignItems = 'center';
     this.container.style.justifyContent = 'center';
     this.modal.appendChild(this.container);
@@ -35,11 +43,11 @@ export default class LogModal {
     this.headContainer.style.placeItems = 'center';
     this.container.appendChild(this.headContainer);
 
-    const date = document.createElement('div');
-    date.innerText = '날짜';
-    date.style.textAlign = 'center';
-    date.style.fontWeight = 'bold';
-    this.headContainer.appendChild(date);
+    const name = document.createElement('div');
+    name.innerText = '닉네임';
+    name.style.textAlign = 'center';
+    name.style.fontWeight = 'bold';
+    this.headContainer.appendChild(name);
 
     const start = document.createElement('div');
     start.innerText = '입실';
@@ -61,6 +69,7 @@ export default class LogModal {
     this.listContainer.style.overflowY = 'auto';
     this.container.appendChild(this.listContainer);
 
+    this.createDate();
     this.createList();
   }
 
@@ -70,6 +79,24 @@ export default class LogModal {
 
   closeModal() {
     this.modal.style.display = 'none';
+  }
+
+  createDate() {
+    const datearray = [
+      '2024 - 10 - 10',
+      '2024 - 10 - 10',
+      '2024 - 10 - 10',
+      '2024 - 10 - 10',
+      '2024 - 10 - 10',
+      '2024 - 10 - 10',
+    ];
+    // 클래스 목록 추가
+    datearray.forEach((date, index) => {
+      const option = document.createElement('option');
+      option.value = index;
+      option.textContent = date;
+      this.select.appendChild(option);
+    });
   }
 
   createList() {
@@ -91,9 +118,9 @@ export default class LogModal {
       grid.style.textAlign = 'center';
       list.appendChild(grid);
 
-      const date = document.createElement('div');
-      date.innerText = '2024-01-01';
-      grid.appendChild(date);
+      const name = document.createElement('div');
+      name.innerText = '닉네임';
+      grid.appendChild(name);
 
       const start = document.createElement('div');
       start.innerText = '09:00:00';
