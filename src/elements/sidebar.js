@@ -148,6 +148,7 @@ export default class Sidebar {
     this.mailBtn.onclick = this.showContainers.bind(this, 'mail');
 
     // 접속자
+    // 들어온 사람만.
     this.usersBtn = document.createElement('button');
     this.usersBtn.style.backgroundColor = 'white';
     this.usersBtn.style.border = '2px solid white';
@@ -385,7 +386,7 @@ export default class Sidebar {
       lecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
     slideshow
     </span> 강의 관리</p>`;
-      lecturebutton.onclick = () => {};
+      lecturebutton.onclick = () => {this.showLectureModal.openModal(); this.createLecutreModal.closeModal()};
       this.sideEditBox.appendChild(lecturebutton);
     }
 

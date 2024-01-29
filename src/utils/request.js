@@ -189,14 +189,38 @@ export const requestSignup = (data, successCallback, errorCallback) => {
 //스페이스 아이디를 통한 모든 강의 조회
 export const requestAllLecturesBySpaceId = async (spaceId) => {
   const accessToken = localStorage.getItem('access_token');
-  await axios
-    .get(`${process.env.DB}/lectures/${spaceId}`, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      window.console.log('스페이스 아이디를 통한 모든 강의 조회:', response);
-    })
-    .catch((error) => {
-      window.console.error('조회 실패:', error);
-    });
+  const result =await axios
+  .get(`${process.env.DB}/lectures/${spaceId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  return result;
 };
+
+//강의 영상 추가
+//현재 lectureId를 얻는 방법이 없으므로 상수로 하겠습니다.
+export const requestAddLectureItems = async (spaceId, urls) => {
+  const accessToken = localStorage.getItem('access_token');
+  window.console.log("urls=>",urls);
+
+  const lectureId = (await requestAddLecture(spaceId)).data.lectureId;
+  console.log("requestAddLectureItems=>", lectureId);
+
+  for(let i =0; i<urls.length; i++){
+  await axios
+  .post(`${process.env.DB}/lecture-items`,{lectureId, url: urls[i], title: `강의 영상${i+1}` },  {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+  }
+}
+
+//강의추가
+export const requestAddLecture = async (spaceId) => {
+  const accessToken = localStorage.getItem('access_token');
+  const total = (await requestAllLecturesBySpaceId(spaceId)).data.length;
+
+  const result = await axios
+  .post(`${process.env.DB}/lectures`, {spaceId, title:`강의${total}`},{
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return result;
+}
