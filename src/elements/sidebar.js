@@ -5,6 +5,7 @@ import EditModal from './editModal';
 import ManagerModal from './managerModal.js';
 import LogModal from './logModal.js';
 import LogDateModal from './logDateModal.js';
+import GroupModal from './groupModal.js';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
@@ -354,7 +355,11 @@ export default class Sidebar {
       this.sideEditBox.appendChild(logbutton);
     }
 
-    if (PlayerData.role === 0 || PlayerData.role === 2) {
+    if (
+      PlayerData.role === 0 ||
+      PlayerData.role === 1 ||
+      PlayerData.role === 2
+    ) {
       // 그룹 관리 버튼
       const groupbutton = document.createElement('button');
       groupbutton.style.padding = '0px';
@@ -365,7 +370,8 @@ export default class Sidebar {
       groupbutton.innerHTML = `<p><span class="material-symbols-outlined">
     groups_3
     </span> 그룹 관리</p>`;
-      groupbutton.onclick = () => {};
+      this.groupModal = new GroupModal();
+      groupbutton.onclick = this.groupModal.openModal.bind(this.groupModal);
       this.sideEditBox.appendChild(groupbutton);
     }
 
