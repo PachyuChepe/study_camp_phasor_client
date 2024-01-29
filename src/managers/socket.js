@@ -213,9 +213,12 @@ export default class SocketManager {
   }
 
   sendJoinSpacePlayer(tileX, tileY) {
+    window.console.log("in sendnJoinSpacePlayer, PlayerData=>",PlayerData, PlayerData.memberId);
+    //memberId와 userId가 찍히는게 다르다.
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
+      userId: PlayerData.userId,
       memberId: PlayerData.memberId,
       spaceId: PlayerData.spaceId,
       x: tileX,
@@ -228,6 +231,10 @@ export default class SocketManager {
       clothes: PlayerData.clothes,
       clothes_color: PlayerData.clothes_color,
     });
+    window.console.log("PlayerData=>", PlayerData.memberId);
+    //가설 1. 중간에서 PlayerData가 0이 된다.
+    //가설 2. 애초에 PlayerData가 0이 였다.
+    //가설 2가 맞다고 생각하고 가자.
   }
 
   sendMovePlayer(tileX, tileY) {
@@ -274,6 +281,7 @@ export default class SocketManager {
       getterNickName,
       message,
     );
+    //
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
       getterId,
