@@ -53,7 +53,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.container = document.createElement('div');
     this.container.style.display = 'none';
-    this.container.style.width = '60%';
+    this.container.style.width = '80%';
+    this.container.style.maxWidth = '900px';
     this.container.style.position = 'fixed';
     this.container.style.top = '20%';
     this.container.style.left = '50%';
@@ -76,9 +77,9 @@ export default class MainScene extends Phaser.Scene {
 
     this.cardTitle = document.createElement('div');
     this.cardTitle.innerText = '내 학습 공간';
-    this.cardTitle.style.margin = '0px 0px 20px 0px';
+    this.cardTitle.style.margin = '0px 0px 10px 0px';
     this.cardTitle.style.width = '100%';
-    this.cardTitle.style.height = '10%';
+    this.cardTitle.style.height = '8%';
     this.cardTitle.style.color = 'white'; // 텍스트 색상을 흰색으로 설정
     this.cardTitle.style.fontSize = '2em'; // 글꼴 크기를 2em으로 설정 (조절 가능)
     this.cardTitle.style.fontWeight = 'bold'; // 글꼴을 굵게 설정
@@ -91,26 +92,27 @@ export default class MainScene extends Phaser.Scene {
     this.cardContainer.style.width = '100%';
     this.cardContainer.style.height = '40%';
     this.cardContainer.style.backgroundColor = '#F3F2FF';
-    this.cardContainer.style.margin = '0px 0px 20px 0px';
+    this.cardContainer.style.margin = '0px 0px 10px 0px';
     this.cardContainer.style.display = 'flex';
     this.cardContainer.style.flexDirection = 'column';
     this.cardContainer.style.alignItems = 'center';
     this.cardContainer.style.overflowY = 'auto';
+    this.cardContainer.style.overflowX = 'hidden';
     this.leftContainer.appendChild(this.cardContainer);
 
     this.middleContainer = document.createElement('div');
     this.middleContainer.style.display = 'flex';
     this.middleContainer.style.justifyContent = 'space-between';
     this.middleContainer.style.height = '5%';
-    this.middleContainer.style.margin = '0px 0px 20px 0px';
+    this.middleContainer.style.margin = '0px 0px 10px 0px';
     this.leftContainer.appendChild(this.middleContainer);
 
     this.searchInput = document.createElement('input');
     this.searchInput.style.borderRadius = '5px';
     this.searchInput.placeholder = '학습 공간 검색';
-    this.searchInput.style.width = '70%';
+    this.searchInput.style.width = '69%';
     this.searchInput.style.height = '100%';
-    this.searchInput.style.margin = '0px 30px 0px 0px';
+    // this.searchInput.style.margin = '0px 30px 0px 0px';
     this.middleContainer.appendChild(this.searchInput);
 
     this.searchInput.addEventListener('keyup', () => {
@@ -118,10 +120,10 @@ export default class MainScene extends Phaser.Scene {
     });
 
     this.enterCodeBtn = document.createElement('div');
-    this.enterCodeBtn.style.borderRadius = '10px';
+    this.enterCodeBtn.style.borderRadius = '5px';
     this.enterCodeBtn.innerHTML = '코드로 입장';
     this.enterCodeBtn.style.backgroundColor = '#6758ff';
-    this.enterCodeBtn.style.width = '30%';
+    this.enterCodeBtn.style.width = '29%';
     this.enterCodeBtn.style.height = '100%';
     this.enterCodeBtn.style.textAlign = 'center';
     this.enterCodeBtn.style.fontWeight = 'bold';
@@ -152,6 +154,7 @@ export default class MainScene extends Phaser.Scene {
     this.allSpaceList.style.flexDirection = 'column';
     this.allSpaceList.style.alignItems = 'center';
     this.allSpaceList.style.overflowY = 'auto';
+    this.allSpaceList.style.overflowX = 'hidden';
     this.allSpaceList.style.width = '100%';
     this.allSpaceList.style.height = '32%';
     this.allSpaceList.style.backgroundColor = '#F3F2FF';
@@ -171,15 +174,15 @@ export default class MainScene extends Phaser.Scene {
     // 기욱
     this.addSpaceBtn = document.createElement('div');
     this.addSpaceBtn.innerText = '스페이스 생성';
-    this.addSpaceBtn.style.borderRadius = '10px';
+    this.addSpaceBtn.style.borderRadius = '5px';
     this.addSpaceBtn.style.backgroundColor = '#6758ff';
     this.addSpaceBtn.style.width = '100%';
-    this.addSpaceBtn.style.height = '10%';
+    this.addSpaceBtn.style.height = '8%';
     this.addSpaceBtn.style.textAlign = 'center';
     this.addSpaceBtn.style.fontWeight = 'bold';
-    this.addSpaceBtn.style.fontSize = '1.5rem';
+    this.addSpaceBtn.style.fontSize = '1.2rem';
     this.addSpaceBtn.style.lineHeight = 'normal';
-    this.addSpaceBtn.style.margin = '0px 0px 20px 0px';
+    this.addSpaceBtn.style.margin = '0px 0px 10px 0px';
     this.addSpaceBtn.style.color = '#fff';
     this.addSpaceBtn.style.display = 'flex';
     this.addSpaceBtn.style.flexDirection = 'column';
@@ -206,7 +209,8 @@ export default class MainScene extends Phaser.Scene {
     detailContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     detailContainer.style.display = 'flex';
     detailContainer.style.width = '100%';
-    detailContainer.style.height = '85%';
+    // detailContainer.style.height = '85%';
+    detailContainer.style.height = 'calc(77% + 40px)';
     detailContainer.style.backgroundColor = 'white';
     // detailContainer.style.margin = '0px 20px 20px 5px';
     // detailContainer.style.padding = '20px';
@@ -475,8 +479,12 @@ export default class MainScene extends Phaser.Scene {
 
     this.createSpaceClassList();
     this.createSpaceList(memberSpaceList.data);
-    this.createAllSpaceList(allSpaceList);
+    const filteredSpace = allSpaceList.data.filter(
+      (obj2) => !memberSpaceList.data.some((obj1) => obj1.id === obj2.id),
+    );
+    this.createAllSpaceList(filteredSpace);
     this.container.style.display = 'flex';
+    console.log('filter', filteredSpace);
   }
 
   async successLogin(response) {
@@ -506,7 +514,11 @@ export default class MainScene extends Phaser.Scene {
     this.createSpaceList(memberSpaceList.data);
     // 전체 스페이스 목록
     const allSpaceList = await requestAllSpaceList();
-    this.createAllSpaceList(allSpaceList);
+
+    const filteredSpace = allSpaceList.data.filter(
+      (obj2) => !memberSpaceList.data.some((obj1) => obj1.id === obj2.id),
+    );
+    this.createAllSpaceList(filteredSpace);
   }
 
   createSpaceClassList() {
@@ -550,36 +562,9 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createAllSpaceList(allSpaceList) {
-    allSpaceList.forEach((data) => {
-      data.space.forEach((space) => {
-        const spaceCard = document.createElement('div');
-        spaceCard.style.width = '90%';
-        spaceCard.id = `${space.id}`;
-        spaceCard.style.margin = '10px';
-        spaceCard.style.padding = '15px';
-        spaceCard.style.backgroundColor = 'white';
-        spaceCard.style.cursor = 'pointer';
-        spaceCard.style.transition = 'transform 0.3s ease-in-out';
-        spaceCard.style.borderRadius = '5px';
-        spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-        spaceCard.style.textAlign = 'center';
-        spaceCard.style.display = 'flex';
-        spaceCard.style.flexDirection = 'column';
-        spaceCard.style.justifyContent = 'center';
-        spaceCard.style.textAlign = 'center';
-        spaceCard.innerText = space.name;
-        spaceCard.onclick = this.detailSpace.bind(this, space, data.capacity);
-        this.allSpaceList.appendChild(spaceCard);
-
-        // Add hover effect
-        spaceCard.addEventListener('mouseenter', () => {
-          spaceCard.style.transform = 'scale(1.03)';
-        });
-
-        spaceCard.addEventListener('mouseleave', () => {
-          spaceCard.style.transform = 'scale(1)';
-        });
-      });
+    allSpaceList.forEach((space) => {
+      const spaceCard = this.createSpaceCard(space);
+      this.allSpaceList.appendChild(spaceCard);
     });
   }
 
@@ -587,79 +572,34 @@ export default class MainScene extends Phaser.Scene {
     this.cardContainer.innerHTML = ``;
     // 스페이스 목록 조회 성공 시 리스트 그려 줌
     spaces.forEach((element) => {
-      console.log(element.space);
-      this.loadSpaceCard(element.space, element.capacity);
+      this.loadSpaceCard(element);
     });
-
-    // const addCard = document.createElement('div');
-    // addCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
-    // addCard.style.width = '200px';
-    // addCard.style.margin = '10px';
-    // // addCard.style.width = '300px';
-    // addCard.style.height = '50px';
-    // addCard.style.border = '2px solid white';
-    // addCard.style.backgroundColor = '#80c6ff';
-    // addCard.style.color = 'white';
-    // addCard.style.cursor = 'pointer';
-    // addCard.style.transition = 'transform 0.3s ease-in-out';
-    // addCard.style.borderRadius = '5px';
-    // addCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
-    // addCard.style.textAlign = 'center';
-    // addCard.style.display = 'flex';
-    // addCard.style.flexDirection = 'column';
-    // addCard.style.justifyContent = 'center';
-    // addCard.style.textAlign = 'center';
-    // addCard.innerHTML = `<span class="material-symbols-outlined">
-    // add_circle
-    // </span>`;
-    // addCard.onclick = () => {
-    //   this.createBox.style.display = 'block';
-    //   this.detailBox.style.display = 'none';
-    // };
-    // // this.detailContainer.appendChild(addCard);
-
-    // // Add hover effect
-    // addCard.addEventListener('mouseenter', () => {
-    //   addCard.style.transform = 'scale(1.05)';
-    // });
-
-    // addCard.addEventListener('mouseleave', () => {
-    //   addCard.style.transform = 'scale(1)';
-    // });
-
-    // addCard.addEventListener('click', function () {});
   }
 
-  loadSpaceCard(card, capacity) {
-    // [
-    //   {
-    //     "id": 5,
-    //     "user_id": 1,
-    //     "class_id": 1,
-    //     "name": "testfor"
-    //   }
-    // ]
+  loadSpaceCard(card) {
+    const spaceCard = this.createSpaceCard(card);
+    this.cardContainer.appendChild(spaceCard);
+  }
 
+  createSpaceCard(card) {
     const spaceCard = document.createElement('div');
     // spaceCard.style.flex = '0 1 calc(100% - 22px)'; // 초기 크기를 50%로 설정하고 간격을 뺀 크기로 계산
     spaceCard.style.display = 'flex';
     spaceCard.style.flexDirection = 'column';
     spaceCard.style.justifyContent = 'center';
     spaceCard.style.textAlign = 'center';
-    spaceCard.style.padding = '15px';
-    spaceCard.style.width = '90%';
-    spaceCard.style.margin = '10px';
-    spaceCard.style.height = '21.6px';
+    // spaceCard.style.padding = '15px';
+    spaceCard.style.width = '95%';
+    spaceCard.style.margin = '5px';
+    spaceCard.style.height = '40px';
     spaceCard.style.backgroundColor = 'white';
     spaceCard.style.cursor = 'pointer';
     spaceCard.style.transition = 'transform 0.3s ease-in-out';
     spaceCard.style.borderRadius = '5px';
     spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     spaceCard.style.textAlign = 'center';
-    spaceCard.onclick = this.detailSpace.bind(this, card, capacity);
+    spaceCard.onclick = this.detailSpace.bind(this, card);
     spaceCard.innerText = card.name;
-
-    this.cardContainer.appendChild(spaceCard);
 
     // Add hover effect
     spaceCard.addEventListener('mouseenter', () => {
@@ -669,18 +609,33 @@ export default class MainScene extends Phaser.Scene {
     spaceCard.addEventListener('mouseleave', () => {
       spaceCard.style.transform = 'scale(1)';
     });
+    return spaceCard;
   }
 
-  detailSpace(space, capacity) {
+  detailSpace(space) {
     this.spaceId = space.id;
     this.createBox.style.display = 'none';
     this.detailBox.style.display = 'flex';
     this.detailHeader.textContent = space.name;
-    this.spaceCapacity.textContent = `총 인원 : ${capacity} 명`;
+    this.spaceCapacity.textContent = `총 인원 : ${space.space_class.capacity} 명`;
     this.spaceContent.textContent = space.content;
     // requestProfile(
     //   this.successProfile.bind(this, spaceId),
     // );
+    this.spacePassword.style.display = 'none';
+  }
+
+  detailOtherSpace(space) {
+    this.spaceId = space.id;
+    this.createBox.style.display = 'none';
+    this.detailBox.style.display = 'flex';
+    this.detailHeader.textContent = space.name;
+    this.spaceCapacity.textContent = `총 인원 : ${space.space_class.capacity} 명`;
+    this.spaceContent.textContent = space.content;
+    // requestProfile(
+    //   this.successProfile.bind(this, spaceId),
+    // );
+    this.spacePassword.style.display = 'block';
   }
 
   //2번
