@@ -1,5 +1,6 @@
 import axios from 'axios';
 import MainScene from '../scenes/mainScene';
+import PlayerData from '../config/playerData';
 
 export const requestLogin = (data, successCallback) => {
   // data = { email, password };
@@ -332,7 +333,7 @@ export const signupInviteCode = async (code) => {
 
 export const createInviteCode = async () => {
   try {
-    const spaceId = MainScene.getInstance().spaceId;
+    const spaceId = PlayerData.spaceId;
     const accessToken = localStorage.getItem('access_token');
     const response = await axios.get(
       `${process.env.DB}/spaces/invitation/${spaceId}`,
