@@ -303,3 +303,17 @@ export const createInviteCode = async () => {
     throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
   }
 };
+
+// spaceId에 해당하는 출석 데이터를 가져오는 함수
+export const fetchAttendanceData = async (spaceId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.SOCKET}/attendance/${spaceId}`,
+    );
+    console.log('response.data', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching attendance data:', error);
+    throw error;
+  }
+};
