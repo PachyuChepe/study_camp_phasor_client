@@ -1,7 +1,11 @@
 import axios from 'axios';
+import MainScene from '../scenes/mainScene';
+import PlayerData from '../config/playerData';
 
 export const requestLogin = (data, successCallback) => {
-  // data = {email,password}
+  // data = { email, password };
+  //여기서 가져오라면 가져올 수 있지만
+  console.log(data);
   axios
     .post(`${process.env.DB}/auth/login`, data)
     .then((response) => {
@@ -46,34 +50,101 @@ export const requestGoogleLogin = (userId, successCallback) => {
   };
 };
 
-export const requestSpaceList = (successCallback) => {
+export const requestUserProfile = async () => {
   const accessToken = localStorage.getItem('access_token');
-  axios
-    .get(`${process.env.DB}/spaces`, {
+  try {
+    const response = await axios.get(`${process.env.DB}/users/profile`, {
       headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      console.log('학습공간 목록 조회 성공:', response.data);
-      successCallback(response);
-    })
-    .catch((error) => {
-      console.error('학습공간 목록 조회 실패:', error);
     });
+    return response;
+  } catch (error) {
+    console.error('유저 정보 조회 실패:', error);
+  }
 };
 
-export const requestCreateSpace = (data, successCallback) => {
+export const requestcustomerKey = async () => {
   const accessToken = localStorage.getItem('access_token');
-  axios
-    .post(`${process.env.DB}/spaces`, data, {
+  try {
+    const response = await axios.get(`${process.env.DB}/payment/user-payment`, {
       headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      console.log('학습공간 생성 성공:', response.data);
-      successCallback(response);
-    })
-    .catch((error) => {
-      console.error('학습공간 생성 실패:', error);
     });
+    return response;
+  } catch (error) {
+    console.error('유저 pay 정보 조회 실패:', error);
+  }
+};
+//--------------------wook------------------------------
+export const requestAllSpaceList = async () => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.get(`${process.env.DB}/spaces/all`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    console.log('학습공간 목록 전체 조회 성공', response.data);
+    return response; // 응답 데이터만 반환
+  } catch (error) {
+    console.error('학습공간 목록 전체 조회 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+export const requestSpace = async (data) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+
+    const response = await axios.post(
+      `${process.env.DB}/spaces/check-user`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log('유저 학습공간 존재 여부 조회 성공', response.data);
+    return response;
+  } catch (error) {
+    console.error('유저 학습공간 존재 여부 조회 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+//------------------------------------------------------
+
+export const requestSpaceList = async () => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = axios.get(`${process.env.DB}/spaces`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    console.log('학습공간 목록 조회 성공', response.data);
+    return response;
+  } catch (error) {
+    console.error('학습공간 목록 조회 실패:', error);
+  }
+};
+
+export const requestMemberSpace = async () => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = await axios.get(`${process.env.DB}/spaces`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    console.log('멤버 학습공간 목록 조회 성공', response.data);
+    return response;
+  } catch (error) {
+    console.error('멤버 학습공간 목록 조회 실패', error);
+  }
+};
+
+export const requestCreateSpace = async (data) => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = await axios.post(`${process.env.DB}/spaces`, data, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    console.log('학습공간 생성 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('학습공간 생성 실패:', error);
+  }
 };
 
 export const requestGetSpaceClass = (successCallback) => {
@@ -112,19 +183,32 @@ export const requestGetSpaceClass = (successCallback) => {
 //     });
 // };
 
-export const requestMemberProfile = (data, successCallback) => {
+//1번 이게 먼저 실행되어야 한다.
+export const requestMemberProfile = async (data) => {
   const accessToken = localStorage.getItem('access_token');
-  axios
-    .post(`${process.env.DB}/space-members/info`, data, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      console.log('스페이스 멤버 정보 조회 성공:', response.data);
-      successCallback(response);
-    })
-    .catch((error) => {
-      console.error('스페이스 멤버 정보 조회 실패:', error);
-    });
+  try {
+    const response = await axios.post(
+      `${process.env.DB}/space-members/info`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('스페이스 멤버 정보 조회 실패:', error);
+  }
+  // await axios
+  //   .post(`${process.env.DB}/space-members/info`, data, {
+  //     headers: { Authorization: `Bearer ${accessToken}` },
+  //   })
+  //   .then((response) => {
+  //     console.log('스페이스 멤버 정보 조회 성공:', response.data);
+  //     successCallback(response);
+  //   })
+  //   .catch((error) => {
+  //     console.error('스페이스 멤버 정보 조회 실패:', error);
+  //   });
 };
 
 export const requestEditUserProfile = (data, successCallback) => {
@@ -182,4 +266,99 @@ export const requestSignup = (data, successCallback, errorCallback) => {
     .post(`${process.env.DB}/users`, data)
     .then(successCallback)
     .catch(errorCallback);
+};
+
+//스페이스 아이디를 통한 모든 강의 조회
+export const requestAllLecturesBySpaceId = async (spaceId) => {
+  const accessToken = localStorage.getItem('access_token');
+  const result = await axios.get(`${process.env.DB}/lectures/${spaceId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return result;
+};
+
+//강의 영상 추가
+//현재 lectureId를 얻는 방법이 없으므로 상수로 하겠습니다.
+export const requestAddLectureItems = async (spaceId, urls) => {
+  const accessToken = localStorage.getItem('access_token');
+  window.console.log('urls=>', urls);
+
+  const lectureId = (await requestAddLecture(spaceId)).data.lectureId;
+  console.log('requestAddLectureItems=>', lectureId);
+
+  for (let i = 0; i < urls.length; i++) {
+    await axios.post(
+      `${process.env.DB}/lecture-items`,
+      { lectureId, url: urls[i], title: `강의 영상${i + 1}` },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+  }
+};
+
+//강의추가
+export const requestAddLecture = async (spaceId) => {
+  const accessToken = localStorage.getItem('access_token');
+  const total = (await requestAllLecturesBySpaceId(spaceId)).data.length;
+
+  const result = await axios.post(
+    `${process.env.DB}/lectures`,
+    { spaceId, title: `강의${total}` },
+    {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    },
+  );
+  return result;
+};
+
+// 초대 코드 검증
+export const signupInviteCode = async (code) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.post(
+      `${process.env.DB}/spaces/invitation/check`,
+      { code },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('코드 검증 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+export const createInviteCode = async () => {
+  try {
+    const spaceId = PlayerData.spaceId;
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.get(
+      `${process.env.DB}/spaces/invitation/${spaceId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log(response);
+    return response;
+  } catch (error) {
+    console.error('코드 생성 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+// spaceId에 해당하는 출석 데이터를 가져오는 함수
+export const fetchAttendanceData = async (spaceId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.SOCKET}/attendance/${spaceId}`,
+    );
+    console.log('response.data', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching attendance data:', error);
+    throw error;
+  }
 };

@@ -3,12 +3,12 @@ import MapData from '../config/mapData';
 
 export default class Player {
   constructor(scene, data) {
+    window.console.log('In player data=>', data);
     this.scene = scene;
     this.data = data;
     this.userId = data.userId;
     this.nickName = data.nickName;
-    //왜 고쳐지는거니?
-    //아무것도 안했는데? 장난해?
+    this.memberId = data.memberId;
     //
     // this.data = {
     //   nickName,
@@ -38,28 +38,44 @@ export default class Player {
 
     // 스프라이트 생성
     this.skinSprite = this.scene.physics.add.sprite(0, 0, skin);
-    // this.skinSprite.setDepth(1);
     this.skinSprite.setOrigin(0, 0);
+
     this.faceSprite = this.scene.physics.add.sprite(0, 0, face);
-    // this.faceSprite.setDepth(2);
     this.faceSprite.setOrigin(0, 0);
+
     this.clothesSprite = this.scene.physics.add.sprite(0, 0, clothes);
-    // this.clothesSprite.setDepth(3);
     this.clothesSprite.setOrigin(0, 0);
+
     this.hairSprite = this.scene.physics.add.sprite(0, 0, hair);
-    // this.hairSprite.setDepth(4);
     this.hairSprite.setOrigin(0, 0);
+
+    this.nicknameText = this.scene.add.text(0, 0, this.nickName, {
+      fontSize: '16px',
+      fill: '#ffffff',
+      // backgroundColor: '#000000',
+      padding: {
+        x: 0,
+        y: 8,
+      },
+    });
+    this.nicknameText.setOrigin(0, 0.5);
 
     // 컨테이너 생성
     this.player = this.scene.add.container(
       this.data.x * MapData.tileSize,
       this.data.y * MapData.tileSize,
-      [this.skinSprite, this.faceSprite, this.hairSprite, this.clothesSprite],
+      [
+        this.skinSprite,
+        this.faceSprite,
+        this.hairSprite,
+        this.clothesSprite,
+        this.nicknameText,
+      ],
     );
     this.scene.add.existing(this.player);
     this.scene.physics.add.existing(this.player);
     this.player.setDepth(10);
-    this.player.setSize(48, 68);
+    this.player.setSize(48, 64);
     // this.player.setOrigin(0, 0);
 
     // // const skin = 'skin-' + (this.data.skin + 1);
@@ -69,24 +85,20 @@ export default class Player {
     //   skin,
     // );
 
-    this.nickname = this.scene.add.text(
-      this.player.x,
-      this.player.y,
-      data.nickname,
-      {
-        fontSize: '16px',
-        fill: '#ffffff',
-        padding: {
-          x: 0,
-          y: 8,
-        },
-      },
-    );
-    this.nickname.setOrigin(0, 1.5);
-    this.nickname.setDepth(11);
-
     this.creatPlayerAnimation();
     this.playAnimation('player_idle_down');
+  }
+
+  destroy() {
+    // 스프라이트와 텍스트 파괴
+    this.skinSprite.destroy();
+    this.faceSprite.destroy();
+    this.clothesSprite.destroy();
+    this.hairSprite.destroy();
+    this.nicknameText.destroy();
+
+    // 컨테이너 파괴
+    this.player.destroy();
   }
 
   getSprite() {
@@ -233,7 +245,7 @@ export default class Player {
 
     const self = this;
     this.tween = this.scene.tweens.add({
-      targets: [this.player, this.nicknameText],
+      targets: [this.player],
       x: this.tilePos.x * MapData.tileSize + 1,
       y: this.tilePos.y * MapData.tileSize + 1,
       duration: 300,
@@ -262,7 +274,7 @@ export default class Player {
 
     const self = this;
     this.otherTween = this.scene.tweens.add({
-      targets: [this.player, this.nicknameText],
+      targets: [this.player],
       x: this.tilePos.x * MapData.tileSize + 1,
       y: this.tilePos.y * MapData.tileSize + 1,
       duration: 300,

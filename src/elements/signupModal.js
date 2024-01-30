@@ -4,9 +4,11 @@ import {
   requestVerifyEmail,
   requestSignup,
 } from '../utils/request';
+import Singleton from '../utils/Singleton';
 
-export default class SignupModal {
+export default class SignupModal extends Singleton {
   constructor() {
+    super();
     // JavaScript 내에서 <style> 태그 생성 및 추가
     const style = document.createElement('style');
     style.textContent = `
@@ -66,11 +68,11 @@ export default class SignupModal {
     this.signupModal.appendChild(modalContent);
 
     // 닫기 버튼
-    const closeButton = document.createElement('span');
-    closeButton.classList.add('modal-close');
-    closeButton.innerHTML = '&times;';
-    closeButton.onclick = this.closeModal.bind(this);
-    modalContent.appendChild(closeButton);
+    // const closeButton = document.createElement('span');
+    // closeButton.classList.add('modal-close');
+    // closeButton.innerHTML = '&times;';
+    // closeButton.onclick = this.closeModal.bind(this);
+    // modalContent.appendChild(closeButton);
 
     // 이메일 입력 그룹
     const emailGroup = document.createElement('div');
@@ -192,12 +194,6 @@ export default class SignupModal {
     this.signupModal.style.display = 'none';
   }
 
-  openLoginModal() {
-    this.closeModal(); // 회원가입 모달 닫기
-    const loginModal = new LoginModal(); // 로그인 모달 생성
-    loginModal.openModal(); // 로그인 모달 열기
-  }
-
   sendVerificationCode() {
     const email = this.emailInput.value;
     this.showLoadingAnimation();
@@ -293,15 +289,11 @@ export default class SignupModal {
       (response) => {
         alert(response.data.message);
         // 성공 후 처리 로직 (예: 로그인 페이지로 이동)
-        this.closeModal(); // 현재 모달 닫기
-        const loginModal = new LoginModal(); // 로그인 모달 생성
-        loginModal.openModal(); // 로그인 모달 열기
+        this.openLoginModal();
       },
       (error) => {
         alert(error.response.data.message);
-        this.closeModal(); // 현재 모달 닫기
-        const loginModal = new LoginModal(); // 로그인 모달 생성
-        loginModal.openModal(); // 로그인 모달 열기
+        this.openLoginModal();
         // 실패 후 처리 로직
       },
     );
@@ -315,5 +307,10 @@ export default class SignupModal {
   // 로딩 애니메이션 숨기기
   hideLoadingAnimation() {
     this.loadingOverlay.style.display = 'none';
+  }
+
+  openLoginModal() {
+    this.closeModal(); // 회원가입 모달 닫기
+    LoginModal.getInstance().openModal(); // 로그인 모달 열기
   }
 }

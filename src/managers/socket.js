@@ -1,21 +1,14 @@
 import io from 'socket.io-client';
 import PlayerData from '../config/playerData';
 import UserCard from '../elements/userCard';
+import Singleton from '../utils/Singleton';
 
-export default class SocketManager {
+export default class SocketManager extends Singleton {
   constructor() {
-    if (SocketManager.instance) {
-      return SocketManager.instance;
-    }
+    super();
     console.log('SocketManager 생성');
 
     this.socket = io(process.env.SOCKET);
-
-    SocketManager.instance = this;
-    // window.addEventListener('beforeunload', () => {
-    //   // 소켓 연결 해제
-    //   this.socket.disconnect();
-    // });
 
     // 변수
     this.stream;
@@ -188,13 +181,6 @@ export default class SocketManager {
     });
   }
 
-  static getInstance() {
-    if (!SocketManager.instance) {
-      SocketManager.instance = new SocketManager();
-    }
-    return SocketManager.instance;
-  }
-
   subscribe(callback) {
     this.callbacks.push(callback);
   }
@@ -212,9 +198,17 @@ export default class SocketManager {
   }
 
   sendJoinSpacePlayer(tileX, tileY) {
+    window.console.log(
+      'in sendnJoinSpacePlayer, PlayerData=>',
+      PlayerData,
+      PlayerData.memberId,
+    );
+    //memberId와 userId가 찍히는게 다르다.
+
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
+      userId: PlayerData.userId,
       memberId: PlayerData.memberId,
       spaceId: PlayerData.spaceId,
       x: tileX,
@@ -227,6 +221,10 @@ export default class SocketManager {
       clothes: PlayerData.clothes,
       clothes_color: PlayerData.clothes_color,
     });
+    window.console.log('PlayerData=>', PlayerData.memberId);
+    //가설 1. 중간에서 PlayerData가 0이 된다.
+    //가설 2. 애초에 PlayerData가 0이 였다.
+    //가설 2가 맞다고 생각하고 가자.
   }
 
   sendMovePlayer(tileX, tileY) {
@@ -273,6 +271,7 @@ export default class SocketManager {
       getterNickName,
       message,
     );
+    //
     this.socket.emit('directMessageToPlayer', {
       senderId: this.socket.id,
       getterId,
@@ -314,6 +313,8 @@ export default class SocketManager {
     };
 
     this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+    this.stream.getVideoTracks().forEach((track) => (track.enabled = false));
+    this.stream.getAudioTracks().forEach((track) => (track.enabled = false));
     this.localStream = UserCard.getInstance().createLocalCard();
     this.localStream.srcObject = this.stream;
     this.socket.emit('requestUserList');

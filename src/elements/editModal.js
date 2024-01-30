@@ -1,3 +1,4 @@
+import loadData from '../config/loadData.js';
 import PlayerData from '../config/playerData.js';
 import SocketManager from '../managers/socket';
 import { requestEditUserProfile } from '../utils/request';
@@ -188,7 +189,7 @@ export default class EditModal {
     this.hairContainer.style.borderRadius = '10px';
     this.hairContent.appendChild(this.hairContainer);
 
-    for (let i = 0; i < 48; i++) {
+    for (let i = 0; i < loadData.hair / loadData.color; i++) {
       const card = document.createElement('div');
       card.style.backgroundColor = 'white';
       card.style.width = '70px';
@@ -246,7 +247,7 @@ export default class EditModal {
     this.clothesContainer.style.borderRadius = '10px';
     this.clothesContent.appendChild(this.clothesContainer);
 
-    for (let i = 0; i < 44; i++) {
+    for (let i = 0; i < loadData.clothes / loadData.color; i++) {
       const card = document.createElement('div');
       card.style.backgroundColor = 'white';
       card.style.width = '70px';
@@ -291,7 +292,7 @@ export default class EditModal {
     this.skinContainer.style.borderRadius = '10px';
     this.skinContent.appendChild(this.skinContainer);
 
-    for (let i = 0; i < 13; i++) {
+    for (let i = 0; i < loadData.skin; i++) {
       const card = document.createElement('div');
       card.style.backgroundColor = 'white';
       card.style.width = '70px';
@@ -335,7 +336,7 @@ export default class EditModal {
     this.faceContainer.style.borderRadius = '10px';
     this.faceContent.appendChild(this.faceContainer);
 
-    for (let i = 0; i < 66; i++) {
+    for (let i = 0; i < loadData.face; i++) {
       const card = document.createElement('div');
       card.style.backgroundColor = 'white';
       card.style.width = '70px';
