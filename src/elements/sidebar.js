@@ -30,13 +30,6 @@ export default class Sidebar {
       localStorage.getItem('access_token'),
     );
 
-    //강의 관리 및 강의 생성 모달 생성
-    this.createLecutreModal = new CreateLecutreModal(this.scene);
-    this.showLectureModal = new ShowLectureModal(
-      this.scene,
-      this.createLecutreModal,
-    );
-
     //유저 정보 저장용 배열
     this.spaceUser = [];
 
@@ -399,8 +392,8 @@ export default class Sidebar {
     slideshow
     </span> 강의 관리</p>`;
       lecturebutton.onclick = () => {
-        this.showLectureModal.openModal();
-        this.createLecutreModal.closeModal();
+        ShowLectureModal.getInstance().openModal();
+        CreateLecutreModal.getInstance().closeModal();
       };
       this.sideEditBox.appendChild(lecturebutton);
     }

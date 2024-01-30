@@ -279,11 +279,11 @@ export const requestAllLecturesBySpaceId = async (spaceId) => {
 
 //강의 영상 추가
 //현재 lectureId를 얻는 방법이 없으므로 상수로 하겠습니다.
-export const requestAddLectureItems = async (spaceId, urls) => {
+export const requestAddLectureItems = async (spaceId, title, urls) => {
   const accessToken = localStorage.getItem('access_token');
   window.console.log('urls=>', urls);
 
-  const lectureId = (await requestAddLecture(spaceId)).data.lectureId;
+  const lectureId = (await requestAddLecture(spaceId, title)).data.lectureId;
   console.log('requestAddLectureItems=>', lectureId);
 
   for (let i = 0; i < urls.length; i++) {
@@ -298,13 +298,13 @@ export const requestAddLectureItems = async (spaceId, urls) => {
 };
 
 //강의추가
-export const requestAddLecture = async (spaceId) => {
+export const requestAddLecture = async (spaceId, title) => {
   const accessToken = localStorage.getItem('access_token');
   const total = (await requestAllLecturesBySpaceId(spaceId)).data.length;
 
   const result = await axios.post(
     `${process.env.DB}/lectures`,
-    { spaceId, title: `강의${total}` },
+    { spaceId, title },
     {
       headers: { Authorization: `Bearer ${accessToken}` },
     },
