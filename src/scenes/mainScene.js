@@ -7,6 +7,7 @@ import {
   requestGetSpaceClass,
   requestAllSpaceList,
   requestSpace,
+  requestMemberSpace,
 } from '../utils/request.js';
 import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
@@ -18,33 +19,21 @@ export default class MainScene extends Phaser.Scene {
 
   constructor() {
     super('MainScene');
-    if (MainScene.instance) {
-      return MainScene.instance;
-    }
-    MainScene.instance = this;
-  }
-  static getInstance() {
-    if (!MainScene.instance) {
-      MainScene.instance = new MainScene();
-    }
-    return MainScene.instance;
   }
 
   preload() {}
 
   //3번
   create() {
-    // 모달
-    this.loginModal = new LoginModal();
-    // this.loginModal.setLoginFunction(this.successLogin.bind(this));
-    window.successLogin = this.successLogin.bind(this); // 전역 객체에 함수 추가
-    this.loginModal.setLoginFunction(window.successLogin);
+    this.createDom();
 
-    if (true) {
-      // 로그인을 안했을경우 토큰이 없을경우 등
-      this.loginModal.openModal();
+    if (!this.checkLogin()) {
+      // 로그인을 안했을경우 토큰이 없을 경우, 만료 등
+      LoginModal.getInstance().openModal(this.successLogin.bind(this));
     }
+  }
 
+  createDom() {
     this.title = document.createElement('header');
     this.title.innerHTML = '<h1>STUDY CAMP</h1>';
     this.title.style.width = '100%';
@@ -476,6 +465,29 @@ export default class MainScene extends Phaser.Scene {
     this.detailBox.appendChild(detailButton);
   }
 
+  async checkLogin() {
+    const accessToken = localStorage.getItem('access_token');
+    if (!accessToken) {
+      return false;
+    }
+
+    const memberSpaceList = await requestMemberSpace();
+    if (!memberSpaceList) {
+      return false;
+    }
+
+    const allSpaceList = await requestAllSpaceList();
+
+    if (!allSpaceList) {
+      return false;
+    }
+
+    this.createSpaceList(memberSpaceList.data);
+    this.createAllSpaceList(allSpaceList);
+    this.container.style.display = 'flex';
+    return true;
+  }
+
   async successLogin(response) {
     // 유저 정보
     window.console.log('내가 원하는 respone:', response);
@@ -491,11 +503,14 @@ export default class MainScene extends Phaser.Scene {
     playerPayment.customer_key = response.data.member_customer_key.customer_key;
 
     // 모달 닫기
-    this.loginModal.closeModal();
+    LoginModal.getInstance().closeModal();
     // 스페이스 공간 컨테이너 보여주기
     this.container.style.display = 'flex';
     // 스페이스 목록
-    this.createSpaceList(response.data.member_spaces);
+    // this.createSpaceList(response.data.member_spaces);
+
+    const memberSpaceList = await requestMemberSpace();
+    this.createSpaceList(memberSpaceList.data);
     // 전체 스페이스 목록
     const allSpaceList = await requestAllSpaceList();
     this.createAllSpaceList(allSpaceList);
@@ -648,7 +663,7 @@ export default class MainScene extends Phaser.Scene {
     // 현재 씬 멈춤
     this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
-    this.loginModal.closeModal();
+    LoginModal.getInstance().closeModal();
     this.title.style.display = 'none';
     this.container.style.display = 'none';
 
@@ -708,16 +723,10 @@ export default class MainScene extends Phaser.Scene {
   update() {}
 
   destroy() {
-    this.loginModal.destroy();
-    this.loginModal = null;
-
     this.title.innerHTML = '';
     document.body.removeChild(this.title);
     this.container.innerHTML = '';
     document.body.removeChild(this.container);
-
-    // 호출 슈퍼 클래스의 destroy 메서드 (부모 클래스의 destroy 호출)
-    super.destroy();
   }
 
   searchInputFunc(inputValue) {
@@ -734,7 +743,6 @@ export default class MainScene extends Phaser.Scene {
   }
 
   openCodeInputModal() {
-    const codeInputModal = new CodeInputModal();
-    codeInputModal.openModal();
+    CodeInputModal.getInstance().openModal(this.enterSpace.bind(this));
   }
 }

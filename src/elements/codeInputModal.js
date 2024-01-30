@@ -1,16 +1,10 @@
 import MainScene from '../scenes/mainScene';
+import Singletion from '../utils/Singleton';
 import { signupInviteCode } from '../utils/request';
 
-export class CodeInputModal {
-  static instance;
-
+export class CodeInputModal extends Singletion {
   constructor() {
-    if (CodeInputModal.instance) {
-      return CodeInputModal.instance;
-    }
-
-    CodeInputModal.instance = this;
-
+    super();
     const style = document.createElement('style');
     style.textContent = `
 
@@ -69,8 +63,9 @@ export class CodeInputModal {
     this.codeInputModal.appendChild(closeButton);
   }
 
-  openModal = () => {
+  openModal = (enterSpacefun) => {
     this.codeInputModal.style.display = 'block';
+    this.enterSpaceFunc = enterSpacefun;
   };
 
   closeModal = () => {
@@ -97,7 +92,7 @@ export class CodeInputModal {
     console.log(inputValues);
     await signupInviteCode(inputValues);
     inputValues = '';
-    MainScene.getInstance().enterSpace();
+    this.enterSpaceFunc();
     this.codeInputModal.style.display = 'none';
   };
 }

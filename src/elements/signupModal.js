@@ -4,9 +4,11 @@ import {
   requestVerifyEmail,
   requestSignup,
 } from '../utils/request';
+import Singletion from '../utils/Singleton';
 
-export default class SignupModal {
+export default class SignupModal extends Singletion {
   constructor() {
+    super();
     // JavaScript 내에서 <style> 태그 생성 및 추가
     const style = document.createElement('style');
     style.textContent = `
@@ -309,15 +311,6 @@ export default class SignupModal {
 
   openLoginModal() {
     this.closeModal(); // 회원가입 모달 닫기
-    this.destroy();
-    const loginModal = new LoginModal(); // 로그인 모달 생성
-    loginModal.setLoginFunction(window.successLogin); // 전역 함수 사용
-    loginModal.openModal(); // 로그인 모달 열기
-  }
-
-  destroy() {
-    this.signupModal.innerHTML = '';
-    document.body.removeChild(this.loadingOverlay);
-    document.body.removeChild(this.signupModal);
+    LoginModal.getInstance().openModal(); // 로그인 모달 열기
   }
 }

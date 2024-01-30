@@ -99,6 +99,19 @@ export const requestSpaceList = (successCallback) => {
     });
 };
 
+export const requestMemberSpace = async () => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = await axios.get(`${process.env.DB}/spaces`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response;
+  } catch (error) {
+    console.error('멤버 학습공간 목록 조회 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
 export const requestCreateSpace = (data, successCallback) => {
   const accessToken = localStorage.getItem('access_token');
   axios
