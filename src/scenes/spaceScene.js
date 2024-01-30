@@ -237,7 +237,7 @@ export default class SpaceScene extends Phaser.Scene {
         if (this.otherPlayers[data.id]) {
           const leavePlayer = this.otherPlayers[data.id];
           // leavePlayer.remove();
-          // leavePlayer.destroy();
+          leavePlayer.destroy();
           this.otherPlayers[data.id] = null;
         }
         break;

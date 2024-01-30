@@ -1,9 +1,9 @@
 import io from 'socket.io-client';
 import PlayerData from '../config/playerData';
 import UserCard from '../elements/userCard';
-import Singletion from '../utils/Singleton';
+import Singleton from '../utils/Singleton';
 
-export default class SocketManager extends Singletion {
+export default class SocketManager extends Singleton {
   constructor() {
     super();
     console.log('SocketManager 생성');

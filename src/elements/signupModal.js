@@ -4,9 +4,9 @@ import {
   requestVerifyEmail,
   requestSignup,
 } from '../utils/request';
-import Singletion from '../utils/Singleton';
+import Singleton from '../utils/Singleton';
 
-export default class SignupModal extends Singletion {
+export default class SignupModal extends Singleton {
   constructor() {
     super();
     // JavaScript 내에서 <style> 태그 생성 및 추가

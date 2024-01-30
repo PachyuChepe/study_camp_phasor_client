@@ -1,8 +1,7 @@
-import MainScene from '../scenes/mainScene';
-import Singletion from '../utils/Singleton';
+import Singleton from '../utils/Singleton';
 import { signupInviteCode } from '../utils/request';
 
-export class CodeInputModal extends Singletion {
+export class CodeInputModal extends Singleton {
   constructor() {
     super();
     const style = document.createElement('style');

@@ -1,4 +1,4 @@
-export default class Singletion {
+export default class Singleton {
   constructor() {
     if (this.instance) {
       return this.instance;

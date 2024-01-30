@@ -1,8 +1,8 @@
-import Singletion from '../utils/Singleton';
+import Singleton from '../utils/Singleton';
 import { requestLogin, requestGoogleLogin } from '../utils/request';
 import SignupModal from './signupModal';
 
-export default class LoginModal extends Singletion {
+export default class LoginModal extends Singleton {
   constructor() {
     super();
 
@@ -87,9 +87,12 @@ export default class LoginModal extends Singletion {
     modalContent.appendChild(signupButton);
   }
 
-  openModal(successLoginFunc) {
-    this.loginModal.style.display = 'block';
+  setSuccessFunc(successLoginFunc) {
     this.successLogin = successLoginFunc;
+  }
+
+  openModal() {
+    this.loginModal.style.display = 'block';
   }
 
   closeModal() {

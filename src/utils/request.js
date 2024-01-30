@@ -49,6 +49,29 @@ export const requestGoogleLogin = (userId, successCallback) => {
   };
 };
 
+export const requestUserProfile = async () => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = await axios.get(`${process.env.DB}/users/profile`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response;
+  } catch (error) {
+    console.error('유저 정보 조회 실패:', error);
+  }
+};
+
+export const requestcustomerKey = async () => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = await axios.get(`${process.env.DB}/payment/user-payment`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return response;
+  } catch (error) {
+    console.error('유저 pay 정보 조회 실패:', error);
+  }
+};
 //--------------------wook------------------------------
 export const requestAllSpaceList = async () => {
   try {
@@ -84,19 +107,17 @@ export const requestSpace = async (data) => {
 };
 //------------------------------------------------------
 
-export const requestSpaceList = (successCallback) => {
+export const requestSpaceList = async () => {
   const accessToken = localStorage.getItem('access_token');
-  axios
-    .get(`${process.env.DB}/spaces`, {
+  try {
+    const response = axios.get(`${process.env.DB}/spaces`, {
       headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      console.log('학습공간 목록 조회 성공:', response.data);
-      successCallback(response);
-    })
-    .catch((error) => {
-      console.error('학습공간 목록 조회 실패:', error);
     });
+    console.log('학습공간 목록 조회 성공', response.data);
+    return response;
+  } catch (error) {
+    console.error('학습공간 목록 조회 실패:', error);
+  }
 };
 
 export const requestMemberSpace = async () => {
@@ -105,26 +126,24 @@ export const requestMemberSpace = async () => {
     const response = await axios.get(`${process.env.DB}/spaces`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
+    console.log('멤버 학습공간 목록 조회 성공', response.data);
     return response;
   } catch (error) {
     console.error('멤버 학습공간 목록 조회 실패', error);
-    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
   }
 };
 
-export const requestCreateSpace = (data, successCallback) => {
+export const requestCreateSpace = async (data) => {
   const accessToken = localStorage.getItem('access_token');
-  axios
-    .post(`${process.env.DB}/spaces`, data, {
+  try {
+    const response = await axios.post(`${process.env.DB}/spaces`, data, {
       headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      console.log('학습공간 생성 성공:', response.data);
-      successCallback(response);
-    })
-    .catch((error) => {
-      console.error('학습공간 생성 실패:', error);
     });
+    console.log('학습공간 생성 성공:', response.data);
+    return response;
+  } catch (error) {
+    console.error('학습공간 생성 실패:', error);
+  }
 };
 
 export const requestGetSpaceClass = (successCallback) => {
@@ -164,19 +183,31 @@ export const requestGetSpaceClass = (successCallback) => {
 // };
 
 //1번 이게 먼저 실행되어야 한다.
-export const requestMemberProfile = async (data, successCallback) => {
+export const requestMemberProfile = async (data) => {
   const accessToken = localStorage.getItem('access_token');
-  await axios
-    .post(`${process.env.DB}/space-members/info`, data, {
-      headers: { Authorization: `Bearer ${accessToken}` },
-    })
-    .then((response) => {
-      console.log('스페이스 멤버 정보 조회 성공:', response.data);
-      successCallback(response);
-    })
-    .catch((error) => {
-      console.error('스페이스 멤버 정보 조회 실패:', error);
-    });
+  try {
+    const response = await axios.post(
+      `${process.env.DB}/space-members/info`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('스페이스 멤버 정보 조회 실패:', error);
+  }
+  // await axios
+  //   .post(`${process.env.DB}/space-members/info`, data, {
+  //     headers: { Authorization: `Bearer ${accessToken}` },
+  //   })
+  //   .then((response) => {
+  //     console.log('스페이스 멤버 정보 조회 성공:', response.data);
+  //     successCallback(response);
+  //   })
+  //   .catch((error) => {
+  //     console.error('스페이스 멤버 정보 조회 실패:', error);
+  //   });
 };
 
 export const requestEditUserProfile = (data, successCallback) => {
