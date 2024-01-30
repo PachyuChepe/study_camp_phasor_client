@@ -89,6 +89,18 @@ export default class Player {
     this.playAnimation('player_idle_down');
   }
 
+  destroy() {
+    // 스프라이트와 텍스트 파괴
+    this.skinSprite.destroy();
+    this.faceSprite.destroy();
+    this.clothesSprite.destroy();
+    this.hairSprite.destroy();
+    this.nicknameText.destroy();
+
+    // 컨테이너 파괴
+    this.player.destroy();
+  }
+
   getSprite() {
     return this.player;
   }

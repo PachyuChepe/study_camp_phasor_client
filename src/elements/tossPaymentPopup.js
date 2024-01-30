@@ -1,18 +1,26 @@
+import Singleton from '../utils/Singleton';
+
 // TossPaymentPopup.js
-export default class TossPaymentPopup {
-  constructor(
-    classId,
-    spaceName,
-    spaceContent,
-    spacePassword,
-    email,
-    customerKey,
-  ) {
+export default class TossPaymentPopup extends Singleton {
+  constructor() {
+    super();
+
+    this.loadTossPaymentsSDK();
+  }
+
+  request(classId, spaceName, spaceContent, spacePassword, email, customerKey) {
+    console.log(
+      classId,
+      spaceName,
+      spaceContent,
+      spacePassword,
+      email,
+      customerKey,
+    );
     this.successUrl = `${process.env.DB}/payment/successpage?classId=${encodeURIComponent(classId)}&spaceName=${encodeURIComponent(spaceName)}&spaceContent=${encodeURIComponent(spaceContent)}&spacePassword=${encodeURIComponent(spacePassword)}&email=${encodeURIComponent(email)}`;
     this.failUrl = 'https://my-store.com/fail';
     this.clientKey = process.env.TOSS_CLIENT_KEY;
     this.customerKey = customerKey;
-    this.loadTossPaymentsSDK();
   }
 
   loadTossPaymentsSDK() {

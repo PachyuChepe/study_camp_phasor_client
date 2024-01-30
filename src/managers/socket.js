@@ -1,21 +1,14 @@
 import io from 'socket.io-client';
 import PlayerData from '../config/playerData';
 import UserCard from '../elements/userCard';
+import Singleton from '../utils/Singleton';
 
-export default class SocketManager {
+export default class SocketManager extends Singleton {
   constructor() {
-    if (SocketManager.instance) {
-      return SocketManager.instance;
-    }
+    super();
     console.log('SocketManager 생성');
 
     this.socket = io(process.env.SOCKET);
-
-    SocketManager.instance = this;
-    // window.addEventListener('beforeunload', () => {
-    //   // 소켓 연결 해제
-    //   this.socket.disconnect();
-    // });
 
     // 변수
     this.stream;
@@ -186,13 +179,6 @@ export default class SocketManager {
         console.error(error);
       }
     });
-  }
-
-  static getInstance() {
-    if (!SocketManager.instance) {
-      SocketManager.instance = new SocketManager();
-    }
-    return SocketManager.instance;
   }
 
   subscribe(callback) {
