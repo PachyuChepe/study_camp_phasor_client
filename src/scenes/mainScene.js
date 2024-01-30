@@ -564,7 +564,7 @@ export default class MainScene extends Phaser.Scene {
   createAllSpaceList(allSpaceList) {
     allSpaceList.forEach((space) => {
       const spaceCard = this.createSpaceCard(space);
-      spaceCard.onclick = this.detailSpace.bind(this, card);
+      spaceCard.onclick = this.detailSpace.bind(this, space);
       this.allSpaceList.appendChild(spaceCard);
     });
   }
