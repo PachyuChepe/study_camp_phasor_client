@@ -564,6 +564,7 @@ export default class MainScene extends Phaser.Scene {
   createAllSpaceList(allSpaceList) {
     allSpaceList.forEach((space) => {
       const spaceCard = this.createSpaceCard(space);
+      spaceCard.onclick = this.detailSpace.bind(this, card);
       this.allSpaceList.appendChild(spaceCard);
     });
   }
@@ -578,6 +579,7 @@ export default class MainScene extends Phaser.Scene {
 
   loadSpaceCard(card) {
     const spaceCard = this.createSpaceCard(card);
+    spaceCard.onclick = this.detailOtherSpace.bind(this, card);
     this.cardContainer.appendChild(spaceCard);
   }
 
@@ -598,7 +600,6 @@ export default class MainScene extends Phaser.Scene {
     spaceCard.style.borderRadius = '5px';
     spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     spaceCard.style.textAlign = 'center';
-    spaceCard.onclick = this.detailSpace.bind(this, card);
     spaceCard.innerText = card.name;
 
     // Add hover effect
