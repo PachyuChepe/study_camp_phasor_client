@@ -99,7 +99,7 @@ export default class LoadingScene extends Phaser.Scene {
   }
 
   create() {
-    this.scene.start('MainScene');
+    this.scene.start('LoddyScene');
     // PLAYERS
     // this.creatPlayerAnimation('player');
   }

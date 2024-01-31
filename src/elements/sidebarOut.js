@@ -1,14 +1,13 @@
 import SocketManager from '../managers/socket';
+import Singleton from '../utils/Singleton';
+import UserCard from './userCard';
 
-export default class SidebarOut {
+export default class SidebarOut extends Singleton {
   static instance;
 
-  constructor(sidebar) {
-    if (SidebarOut.instance) {
-      return SidebarOut.instance;
-    }
+  constructor() {
+    super();
     console.log('SidebarOut 생성');
-    SidebarOut.instance = this;
 
     this.sidebar = sidebar;
 
@@ -21,7 +20,7 @@ export default class SidebarOut {
     this.buttonbox.style.justifyContent = 'center';
     this.buttonbox.style.gap = '5px';
     this.buttonbox.style.left = '-180px';
-    this.sidebar.appendChild(this.buttonbox);
+    document.getElementById('sidebar').appendChild(this.buttonbox);
 
     this.isActiveMic = false;
     this.micBtn = document.createElement('button');
@@ -73,19 +72,8 @@ export default class SidebarOut {
     this.buttonbox.appendChild(this.sidebarBtn);
   }
 
-  static getInstance() {
-    if (!SidebarOut.instance) {
-      SidebarOut.instance = new SidebarOut();
-    }
-    return SidebarOut.instance;
-  }
-
   // UserCard 와 이벤트 연결 된 부분
   // MainScene -> Sidebar -> 여기로 연결
-  setCamFunc(onCamFunc, offCamFunc) {
-    this.onCamFunc = onCamFunc;
-    this.offCamFunc = offCamFunc;
-  }
 
   clickSidebar() {
     if (this.isOpenSidebar) {
@@ -93,11 +81,13 @@ export default class SidebarOut {
       this.sidebarBtn.innerHTML = `<span class="material-symbols-outlined">
       keyboard_double_arrow_left
     </span>`;
+      UserCard.getInstance().closeSidebar();
     } else {
       this.sidebar.style.right = '0px';
       this.sidebarBtn.innerHTML = `<span class="material-symbols-outlined">
       keyboard_double_arrow_right
       </span>`;
+      UserCard.getInstance().openSidebar();
     }
     this.isOpenSidebar = !this.isOpenSidebar;
   }
@@ -124,12 +114,10 @@ export default class SidebarOut {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam_off
       </span>`;
-      this.offCamFunc();
     } else {
       this.camBtn.innerHTML = `<span class="material-symbols-outlined">
       videocam
     </span>`;
-      this.onCamFunc();
     }
     this.isActiveCam = !this.isActiveCam;
   }
