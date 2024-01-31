@@ -7,8 +7,12 @@ import CreateLecutreModal from './createLectureModal.js';
 import ShowLectureModal from './showLectureModal.js';
 import ManagerModal from './managerModal.js';
 
-import {requestAllMemeberIdBySpaceId} from '../utils/request.js';
+import { requestAllMemeberIdBySpaceId } from '../utils/request.js';
 
+import LogModal from './logModal.js';
+import LogDateModal from './logDateModal.js';
+import GroupModal from './groupModal.js';
+import CodeCreateModal from './codeCreateModal.js';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
@@ -27,13 +31,6 @@ export default class Sidebar {
     window.console.log(
       'localStorage access token:',
       localStorage.getItem('access_token'),
-    );
-
-    //강의 관리 및 강의 생성 모달 생성
-    this.createLecutreModal = new CreateLecutreModal(this.scene);
-    this.showLectureModal = new ShowLectureModal(
-      this.scene,
-      this.createLecutreModal,
     );
 
     //유저 정보 저장용 배열
@@ -72,12 +69,15 @@ export default class Sidebar {
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
   }
 
-  async mockingOtherPlayers(){
-    const result = await requestAllMemeberIdBySpaceId(this.scene.player.data.spaceId);
-    console.log("mockingOtherPlayers=>", result);
-    for(let i =0; i<result.data.spaceMembers.length; i++){
+  async mockingOtherPlayers() {
+    const result = await requestAllMemeberIdBySpaceId(
+      this.scene.player.data.spaceId,
+    );
+    console.log('mockingOtherPlayers=>', result);
+    for (let i = 0; i < result.data.spaceMembers.length; i++) {
       this.scene.mockOtherPlayers[result.data.spaceMembers[i].id] = {};
-      this.scene.mockOtherPlayers[result.data.spaceMembers[i].id].nickName = result.data.spaceMembers[i].user.nick_name;
+      this.scene.mockOtherPlayers[result.data.spaceMembers[i].id].nickName =
+        result.data.spaceMembers[i].user.nick_name;
     }
   }
 
@@ -349,10 +349,10 @@ export default class Sidebar {
     vpn_key
     </span> 입장 코드 생성</p>`;
       codebutton.onclick = () => {
-        this.codeModal.openModal();
+        this.codeCreateModal.openModal();
       };
       this.sideEditBox.appendChild(codebutton);
-      // this.codeModal = new CodeModal();
+      this.codeCreateModal = new CodeCreateModal();
     }
 
     if (PlayerData.role === 0 || PlayerData.role === 1) {
@@ -384,11 +384,16 @@ export default class Sidebar {
       logbutton.innerHTML = `<p><span class="material-symbols-outlined">
     how_to_reg
     </span> 출석 관리</p>`;
-      logbutton.onclick = () => {};
+      this.logDateModal = new LogDateModal();
+      logbutton.onclick = this.logDateModal.openModal.bind(this.logDateModal);
       this.sideEditBox.appendChild(logbutton);
     }
 
-    if (PlayerData.role === 0 || PlayerData.role === 2) {
+    if (
+      PlayerData.role === 0 ||
+      PlayerData.role === 1 ||
+      PlayerData.role === 2
+    ) {
       // 그룹 관리 버튼
       const groupbutton = document.createElement('button');
       groupbutton.style.padding = '0px';
@@ -399,7 +404,8 @@ export default class Sidebar {
       groupbutton.innerHTML = `<p><span class="material-symbols-outlined">
     groups_3
     </span> 그룹 관리</p>`;
-      groupbutton.onclick = () => {};
+      this.groupModal = new GroupModal();
+      groupbutton.onclick = this.groupModal.openModal.bind(this.groupModal);
       this.sideEditBox.appendChild(groupbutton);
     }
 
@@ -415,8 +421,8 @@ export default class Sidebar {
     slideshow
     </span> 강의 관리</p>`;
       lecturebutton.onclick = () => {
-        this.showLectureModal.openModal();
-        this.createLecutreModal.closeModal();
+        ShowLectureModal.getInstance().openModal();
+        CreateLecutreModal.getInstance().closeModal();
       };
       this.sideEditBox.appendChild(lecturebutton);
     }
@@ -459,8 +465,9 @@ export default class Sidebar {
       myLogbutton.style.color = '#a2cfff';
       myLogbutton.innerHTML = `<p><span class="material-symbols-outlined">
       how_to_reg
-    </span> 강의 보기</p>`;
-      myLogbutton.onclick = () => {};
+    </span> 출석 보기</p>`;
+      this.logModal = new LogModal();
+      myLogbutton.onclick = this.logModal.openModal.bind(this.logModal);
       this.sideEditBox.appendChild(myLogbutton);
     }
   }
@@ -1035,7 +1042,8 @@ export default class Sidebar {
     this.directMessageRoomContainer[otherPlayerMemberId].chatBox.appendChild(
       item,
     );
-    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop = this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop =
+      this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
   }
 
   addAllChatHistory(data) {
@@ -1086,7 +1094,8 @@ export default class Sidebar {
     this.directMessageRoomContainer[otherPlayerMemberId].chatBox.appendChild(
       item,
     );
-    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop = this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop =
+      this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
   }
   //DM히스토리를 통해 각 멤버에 대한 DirectMessageRoom을 만듭니다.
   createDirectMessageRoomByDMHistory(
@@ -1097,12 +1106,12 @@ export default class Sidebar {
   ) {
     let otherPlayerMemberId = getterId;
     let otherPlayerNickName = getterNick;
-    window.console.log("otherPlayerMemberId before=>", otherPlayerMemberId)
+    window.console.log('otherPlayerMemberId before=>', otherPlayerMemberId);
     if (getterId == this.scene.player.data.memberId) {
       otherPlayerMemberId = senderId;
       otherPlayerNickName = senderNick;
     }
-    window.console.log("otherPlayerMemberId after=>", otherPlayerMemberId)
+    window.console.log('otherPlayerMemberId after=>', otherPlayerMemberId);
 
     if (this.directMessageRoomContainer[otherPlayerMemberId]) {
       return;
@@ -1171,6 +1180,24 @@ export default class Sidebar {
       otherPlayerMemberId
     ].chatInput.addEventListener('keydown', (event) => {
       if (
+        !this.scene.otherPlayers[
+          this.directMessageRoomContainer[otherPlayerMemberId]
+            .otherPlayerSocketId
+        ]
+      ) {
+        const placeholderText =
+          '미접속자에게 DM은 불가합니다.';
+        event.preventDefault(); // 입력 방지
+        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.disabled = true; // 입력 비활성화
+        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.value = '';
+        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.placeholder = placeholderText;
+
+        setTimeout(() => {
+            this.directMessageRoomContainer[otherPlayerMemberId].chatInput.disabled = false; // 입력 다시 활성화
+            this.directMessageRoomContainer[otherPlayerMemberId].chatInput.placeholder = '';
+        }, 5000);
+      }
+      if (
         event.key === 'Enter' &&
         event.target.value &&
         this.scene.otherPlayers[
@@ -1184,7 +1211,10 @@ export default class Sidebar {
         this.directMessageRoomContainer[
           otherPlayerMemberId
         ].chatBox.appendChild(item);
-        this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop = this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
+        this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop =
+          this.directMessageRoomContainer[
+            otherPlayerMemberId
+          ].chatBox.scrollHeight;
         console.log(
           'SocketManager.getInstance().sendDirectMessageToPlayer()',
           this.directMessageRoomContainer[otherPlayerMemberId]
@@ -1230,17 +1260,19 @@ export default class Sidebar {
             this.scene.player.data.memberId,
           );
           this.isGettingAllDM = true;
-          if(!this.isMockingOtherPlayers){
+          if (!this.isMockingOtherPlayers) {
             //모킹 로직
             await this.mockingOtherPlayers();
             this.isMockingOtherPlayers = true;
           }
         }
-        console.log("spaceUsers eventcallback:", data);
-        for(let i=0; i<data.length; i++){
+        console.log('spaceUsers eventcallback:', data);
+        for (let i = 0; i < data.length; i++) {
           // console.log("this.directMessageRoomContainer[data[i].memberId]:", this.directMessageRoomContainer[data[i].memberId], data[i].id)
-          if(this.directMessageRoomContainer[data[i].memberId]){
-            this.directMessageRoomContainer[data[i].memberId].otherPlayerSocketId = data[i].id;
+          if (this.directMessageRoomContainer[data[i].memberId]) {
+            this.directMessageRoomContainer[
+              data[i].memberId
+            ].otherPlayerSocketId = data[i].id;
           }
         }
         break;
@@ -1269,7 +1301,7 @@ export default class Sidebar {
         this.addAllChatHistory(data);
         break;
       case 'AllDMHistory':
-        console.log("addALLDMHistory");
+        console.log('addALLDMHistory');
         this.addAllDMHistory(data);
         break;
     }

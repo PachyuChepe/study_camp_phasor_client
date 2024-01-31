@@ -1,8 +1,11 @@
+import Singleton from '../utils/Singleton';
 import { requestLogin, requestGoogleLogin } from '../utils/request';
 import SignupModal from './signupModal';
 
-export default class LoginModal {
+export default class LoginModal extends Singleton {
   constructor() {
+    super();
+
     this.loginModal = document.createElement('div');
     this.loginModal.classList.add('modal');
     document.body.appendChild(this.loginModal);
@@ -84,7 +87,7 @@ export default class LoginModal {
     modalContent.appendChild(signupButton);
   }
 
-  setLoginFunction(successLoginFunc) {
+  setSuccessFunc(successLoginFunc) {
     this.successLogin = successLoginFunc;
   }
 
@@ -104,7 +107,9 @@ export default class LoginModal {
         email: this.emailInput.value,
         password: this.passwordInput.value,
       },
-      this.successLogin.bind(this),
+      (response) => {
+        this.successLogin(response);
+      },
     );
   }
 
@@ -121,24 +126,15 @@ export default class LoginModal {
       'message',
       (event) => {
         if (event.data.type === 'auth-complete') {
-          requestGoogleLogin(
-            event.data.data.userId,
-            this.successLogin.bind(this),
-          );
+          requestGoogleLogin(event.data.data.userId, this.successLogin);
         }
       },
       false,
     );
   }
 
-  destroy() {
-    this.loginModal.innerHTML = '';
-    document.body.removeChild(this.loginModal);
-  }
-
   openSignupModal() {
-    this.closeModal(); // 로그인 모달 닫기
-    const signupModal = new SignupModal(); // 회원가입 모달 생성
-    signupModal.openModal(); // 회원가입 모달 열기
+    this.closeModal(); // 로그인 모달 닫기\
+    SignupModal.getInstance().openModal(); // 회원가입 모달 열기
   }
 }

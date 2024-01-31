@@ -19,7 +19,7 @@ export default class SpaceScene extends Phaser.Scene {
     this.tileMapHeight = 30;
 
     //소켓 통신을 위한 구역 지정 변수
-    this.room = "outLayer"
+    this.room = 'outLayer';
     this.map = this.make.tilemap({
       data: this.createTileMap(MapData.column, MapData.row),
       tileWidth: MapData.tileSize,
@@ -179,14 +179,14 @@ export default class SpaceScene extends Phaser.Scene {
             if (otherLayer !== layer) {
               otherLayer.setAlpha(0.9);
               //내부
-              self.room = "inLayer";
+              self.room = 'inLayer';
               window.console.log('내부??????????????????????????????????');
             }
           });
         }
       } else {
         //외부
-        this.room = "outLayer";
+        this.room = 'outLayer';
         window.console.log('외부??????????????????????????????????');
       }
     });
@@ -236,7 +236,7 @@ export default class SpaceScene extends Phaser.Scene {
         if (this.otherPlayers[data.id]) {
           const leavePlayer = this.otherPlayers[data.id];
           // leavePlayer.remove();
-          // leavePlayer.destroy();
+          leavePlayer.destroy();
           this.otherPlayers[data.id] = null;
         }
         break;

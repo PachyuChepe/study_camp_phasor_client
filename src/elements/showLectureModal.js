@@ -1,81 +1,67 @@
+import PlayerData from '../config/playerData';
+import Singleton from '../utils/Singleton';
 import { requestAllLecturesBySpaceId } from '../utils/request';
+import CreateLecutreModal from './createLectureModal';
 
-export default class ShowLectureModal {
-  constructor(scene, createLectureModal) {
-    this.scene = scene;
-    // this.spaceId = this.scene.player.data.spaceId;
-
-    //강의생성 모달창입니다.
-    this.createLectureModal = createLectureModal;
-
+export default class ShowLectureModal extends Singleton {
+  constructor() {
+    super();
     //모달 창 본체입니다.
     this.showLectureModal = document.createElement('div');
-    this.showLectureModal.classList.add('show-lecture-modal');
-    this.showLectureModal.style.display = 'none';
-    this.showLectureModal.style.position = 'fixed';
-    this.showLectureModal.style.top = '50%';
-    this.showLectureModal.style.left = '50%';
-    this.showLectureModal.style.transform = 'translate(-50%, -50%)';
-    this.showLectureModal.style.backgroundColor = '#ffffff';
+    this.showLectureModal.classList.add('modal');
+    this.showLectureModal.style.height = '50%';
+    this.showLectureModal.style.width = '50%';
+    this.showLectureModal.style.maxWidth = '500px';
     document.body.appendChild(this.showLectureModal);
-    this.showLectureModal.style.width = '50vw';
 
-    //모달을 닫기 위한 버튼을 만듭니다.
-    this.closeBtn = document.createElement('button');
-    this.closeBtn.textContent = 'X';
-    this.closeBtn.style.position = 'relative';
-    this.closeBtn.style.float = 'right';
-    this.closeBtn.style.border = 'none';
-    this.closeBtn.style.fontWeight = 'bold';
-    this.closeBtn.addEventListener('click', () => {
-      this.closeModal();
-    });
-    this.showLectureModal.appendChild(this.closeBtn);
+    // 모달 이름
+    const modalHeader = document.createElement('div');
+    modalHeader.classList.add('modal-header');
+    modalHeader.innerText = '강의 관리';
+    this.showLectureModal.appendChild(modalHeader);
 
-    //모달에 강의 관리라는 타이틀을 답니다.
-    this.showLectureModalTitle = document.createElement('div');
-    this.showLectureModalTitle.textContent = '강의 관리';
-    this.showLectureModalTitle.style.fontSize = '1.5rem';
-    this.showLectureModalTitle.style.fontWeight = 'bold';
-    this.showLectureModalTitle.style.textAlign = 'center';
-    this.showLectureModal.appendChild(this.showLectureModalTitle);
+    // 닫기 버튼
+    const closeButton = document.createElement('span');
+    closeButton.classList.add('modal-close');
+    closeButton.innerHTML = '&times;';
+    closeButton.onclick = this.closeModal.bind(this);
+    this.showLectureModal.appendChild(closeButton);
 
     //강의 선택 콤보박스와 강의 생성 버튼을 담는 div컨테이너입니다.
     this.divContainer = document.createElement('div');
     this.divContainer.style.display = 'flex';
     this.divContainer.style.justifyContent = 'space-between';
+    this.divContainer.style.margin = '10px 0px 20px 0px';
+    this.divContainer.style.alignItems = 'center';
     this.showLectureModal.appendChild(this.divContainer);
 
     //강의를 선택하는 콤보박스를 만듭니다.
     this.selectBox = document.createElement('select');
-    this.selectBox.name = 'lecture';
-    this.selectBox.id = 'lecture_select_box';
-    this.selectBox.style.marginLeft = '5%';
-    this.selectBox.addEventListener('change', function(event) {
+    this.selectBox.style.minWidth = '100px';
+    this.selectBox.style.height = '30px';
+    this.selectBox.style.border = '1px solid #6758FF';
+    this.selectBox.style.backgroundColor = '#F3F2FF';
+    this.selectBox.addEventListener('change', function (event) {
       const selectedOption = event.target.value;
       const childElements = this.children;
-  
+
       for (let i = 0; i < childElements.length; i++) {
-          const childElementId = childElements[i].value;
-  
-          if (childElementId === selectedOption) {
-              document.getElementById(childElementId).style.display = 'block';
-          } else {
-              document.getElementById(childElementId).style.display = 'none';
-          }
+        const childElementId = childElements[i].value;
+
+        if (childElementId === selectedOption) {
+          document.getElementById(childElementId).style.display = 'block';
+        } else {
+          document.getElementById(childElementId).style.display = 'none';
+        }
       }
-  });
+    });
     this.divContainer.appendChild(this.selectBox);
 
     //강의를 선택하는 콤보박스에 옵션을 넣습니다.
     this.showLectureBtn = document.createElement('button');
     this.showLectureBtn.textContent = '강의 생성';
-    this.showLectureBtn.style.backgroundColor = 'blue';
-    this.showLectureBtn.style.border = 'none';
-    this.showLectureBtn.style.borderRadius = '10px'; // 둥근 테두리
-    this.showLectureBtn.style.color = 'white';
-    this.showLectureBtn.style.fontWeight = 'bold';
-    this.showLectureBtn.style.marginRight = '5%';
+    this.showLectureBtn.style.backgroundColor = '#6758FF';
+    this.showLectureBtn.style.margin = '0px';
     this.showLectureBtn.addEventListener('click', () => {
       this.openCreateLectureModal();
     });
@@ -83,17 +69,17 @@ export default class ShowLectureModal {
 
     //강의 아이템을 보여주는 리스트 박스입니다.
     this.lectureItemListBox = document.createElement('div');
-    this.lectureItemListBox.style.border = '1px solid black';
-    this.lectureItemListBox.style.width = '90%';
-    this.lectureItemListBox.style.height = '70vh';
-    this.lectureItemListBox.style.marginLeft = '5%';
-    this.lectureItemListBox.style.marginTop = '5%';
+    this.lectureItemListBox.style.border = '4px solid #F3F2FF';
+    this.lectureItemListBox.style.alignItems = 'center';
+    this.lectureItemListBox.style.justifyContent = 'center';
+    this.lectureItemListBox.style.height = '70%';
+    this.lectureItemListBox.style.overflowY = 'auto';
     this.showLectureModal.appendChild(this.lectureItemListBox);
   }
 
   //모달창을 엽니다.
   async openModal() {
-    this.spaceId = this.scene.player.data.spaceId;
+    this.spaceId = PlayerData.spaceId;
     while (this.selectBox.firstChild) {
       this.selectBox.removeChild(this.selectBox.firstChild);
     }
@@ -112,15 +98,25 @@ export default class ShowLectureModal {
     for (let i = 0; i < results.data.length; i++) {
       const optionBox = new Option(
         `${results.data[i].title}`,
-        `${results.data[i].title}`,
+        `lectureItemList ${i}`,
       );
       this.selectBox.appendChild(optionBox);
       const lectureItemList = document.createElement('div');
-      lectureItemList.id = `${results.data[i].title}`;
+      lectureItemList.id = `lectureItemList ${i}`;
 
       for (let j = 0; j < results.data[i].lecture_items.length; j++) {
         const lectureItem = document.createElement('div');
         lectureItem.textContent = results.data[i].lecture_items[j].title;
+        lectureItem.style.backgroundColor = '#F3F2FF';
+        lectureItem.style.margin = '10px';
+        lectureItem.style.borderRadius = '5px';
+        lectureItem.style.border = '1px solid #6758FF';
+        lectureItem.style.height = '50px';
+        lectureItem.style.textAlign = 'center';
+        lectureItem.style.fontWeight = 'bold';
+        lectureItem.style.alignItems = 'center';
+        lectureItem.style.justifyContent = 'center';
+        lectureItem.style.display = 'flex';
         lectureItemList.appendChild(lectureItem);
       }
       lectureItemList.style.display = 'none';
@@ -138,7 +134,7 @@ export default class ShowLectureModal {
 
   //강의 생성 모달 열기
   openCreateLectureModal() {
+    CreateLecutreModal.getInstance().openModal();
     this.closeModal();
-    this.createLectureModal.openModal();
   }
 }
