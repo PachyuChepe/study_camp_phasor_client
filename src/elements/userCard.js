@@ -1,46 +1,38 @@
-export default class UserCard {
+import Singleton from '../utils/Singleton';
+
+export default class UserCard extends Singleton {
   static instance;
 
   constructor() {
-    if (UserCard.instance) {
-      return UserCard.instance;
-    }
+    super();
     console.log('UserCard 생성');
-    UserCard.instance = this;
 
     this.container = document.createElement('div');
     this.container.id = 'video-cam-container';
     document.body.appendChild(this.container);
 
     this.container.style.position = 'fixed';
-    this.container.style.top = '20%';
-    this.container.style.left = '50%';
-    this.container.style.transform = 'translate(-50%, -50%)';
+    this.container.style.top = '70px';
+    this.container.style.left = '2%';
+    this.container.style.height = '150px';
     this.container.style.padding = '20px';
-    // this.container.style.backgroundColor = '#fff';
-    // this.container.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     this.container.style.zIndex = '1';
-    // this.container.style.borderRadius = '5px';
     this.container.style.alignItems = 'center';
     this.container.style.justifyContent = 'center';
     this.container.style.width = '90%';
     this.container.style.maxWidth = '90%';
     this.container.style.display = 'flex';
     this.container.style.overflowX = 'auto';
+    this.container.style.overflowY = 'hidden';
+    this.container.style.transition = 'width 0.3s ease-in-out';
     this.cardList = [];
-  }
-  static getInstance() {
-    if (!UserCard.instance) {
-      UserCard.instance = new UserCard();
-    }
-    return UserCard.instance;
   }
 
   createLocalCard() {
     const localCard = document.createElement('video');
     localCard.id = 'local-video';
     localCard.autoplay = true;
-    localCard.style.margin = '10px';
+    localCard.style.margin = '0px 5px 0px 5px';
     localCard.style.width = '200px';
     localCard.style.height = '150px';
     localCard.style.backgroundColor = 'white';
@@ -57,14 +49,13 @@ export default class UserCard {
     this.container.appendChild(localCard);
     this.cardList.push(localCard);
     return localCard;
-    // cam.onclick =
   }
 
   createRemoteCard(socketId) {
     const RemoteCard = document.createElement('video');
     RemoteCard.id = `remote-video-${socketId}`;
     RemoteCard.autoplay = true;
-    RemoteCard.style.margin = '10px';
+    RemoteCard.style.margin = '0px 5px 0px 5px';
     RemoteCard.style.width = '200px';
     RemoteCard.style.height = '150px';
     RemoteCard.style.backgroundColor = 'white';
@@ -81,15 +72,13 @@ export default class UserCard {
     this.container.appendChild(RemoteCard);
     this.cardList.push(RemoteCard);
     return RemoteCard;
-    // cam.onclick =
   }
 
-  // MainScene -> Sidebar -> SidebarOut과 연결 된 함수
-  onCam() {
-    console.log('cam on');
+  openSidebar() {
+    this.container.style.width = 'calc(90% - 260px)';
   }
 
-  offCam() {
-    console.log('cam off');
+  closeSidebar() {
+    this.container.style.width = '90%';
   }
 }
