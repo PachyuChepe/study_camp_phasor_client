@@ -120,6 +120,10 @@ export default class CreateLecutreModal {
       }
       this.spaceId = this.scene.player.data.spaceId
       requestAddLectureItems(this.spaceId, inputValues);
+      inputElements.forEach((inputElement) => {
+        this.lectureItemListBox.removeChild(inputElement)
+      })
+      alert("성공적으로 강의를 등록하셨습니다.");
     });
     this.createLectureModal.appendChild(this.addLectureBtn);
   }

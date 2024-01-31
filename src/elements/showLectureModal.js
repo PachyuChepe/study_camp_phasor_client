@@ -108,7 +108,7 @@ export default class ShowLectureModal {
       return;
     }
     console.log('showlectureitemlist openmodal:', results);
-
+    
     for (let i = 0; i < results.data.length; i++) {
       const optionBox = new Option(
         `${results.data[i].title}`,

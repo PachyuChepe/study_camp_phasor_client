@@ -7,6 +7,8 @@ import CreateLecutreModal from './createLectureModal.js';
 import ShowLectureModal from './showLectureModal.js';
 import ManagerModal from './managerModal.js';
 
+import {requestAllMemeberIdBySpaceId} from '../utils/request.js';
+
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
@@ -29,13 +31,25 @@ export default class Sidebar {
 
     //강의 관리 및 강의 생성 모달 생성
     this.createLecutreModal = new CreateLecutreModal(this.scene);
-    this.showLectureModal = new ShowLectureModal(this.scene, this.createLecutreModal);
+    this.showLectureModal = new ShowLectureModal(
+      this.scene,
+      this.createLecutreModal,
+    );
 
     //유저 정보 저장용 배열
     this.spaceUser = [];
 
     //DM검색 자동완성에서 이미 focused되었는지 확인하는 용도
     this.isDMInputfocused = false;
+    //유저검색 자동완성에시 이미 focuesed되었는지 확인하는 용도
+    this.isUserSearchInputFocused = false;
+    //유저가 들어왔을때 몽고디비에서 전체채팅을 가져왔는지 확인하는 용도
+    this.isGettingAllChat = false;
+    //유저가 들어왔을때 몽고디비에서 DM을 가져왔는지 확인하는 용도
+    this.isGettingAllDM = false;
+    //현재 스페이스에 속한 유저 정보를 모킹해주는 용도
+    this.isMockingOtherPlayers = false;
+
     //DM메세지 방 만들기용 객체
     this.directMessageRoomContainer = {};
 
@@ -56,6 +70,15 @@ export default class Sidebar {
     this.outsideButtons = new SidebarOut(this.sidebar);
     this.createInSideButtons();
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
+  }
+
+  async mockingOtherPlayers(){
+    const result = await requestAllMemeberIdBySpaceId(this.scene.player.data.spaceId);
+    console.log("mockingOtherPlayers=>", result);
+    for(let i =0; i<result.data.spaceMembers.length; i++){
+      this.scene.mockOtherPlayers[result.data.spaceMembers[i].id] = {};
+      this.scene.mockOtherPlayers[result.data.spaceMembers[i].id].nickName = result.data.spaceMembers[i].user.nick_name;
+    }
   }
 
   setCamFunc(onCamFunc, offCamFunc) {
@@ -158,6 +181,7 @@ export default class Sidebar {
     person_search
     </span>`;
     this.insidebuttonbox.appendChild(this.usersBtn);
+    this.createUserSearchBox();
     this.usersBtn.onclick = this.showContainers.bind(this, 'users');
   }
   ////////////////////////////////////////////////////////
@@ -169,6 +193,7 @@ export default class Sidebar {
     this.directMessageContainer.style.display = 'none';
     this.directMessageListContainer.style.display = 'none';
     this.groupChatContainer.style.display = 'none';
+    this.userSearchContainer.style.display = 'none';
     //TODO socketId -> memberId
     for (const otherPlayerMemberId in this.directMessageRoomContainer) {
       this.directMessageRoomContainer[otherPlayerMemberId].style.display =
@@ -199,11 +224,7 @@ export default class Sidebar {
         nameDiv.style.fontWeight = 'bold';
         //TODO 문제 발생 지점
         nameDiv.innerHTML =
-          this.scene.mockOtherPlayers[
-            this.directMessageRoomContainer[
-              otherPlayerMemberId
-            ].otherPlayerSocketId
-          ].nickName;
+          this.scene.mockOtherPlayers[otherPlayerMemberId].nickName;
         const messageDiv = document.createElement('div');
         messageDiv.style.color = 'white';
         messageDiv.style.fontSize = '0.8rem';
@@ -226,7 +247,7 @@ export default class Sidebar {
   }
   //end: 기존의 모든 DM을 가져옵니다. 이때 가장 최근 메세지를 같이 보여줍니다.
 
-  showContainers(typestr) {
+  async showContainers(typestr) {
     this.hideContainers();
     switch (typestr) {
       case 'edit':
@@ -240,16 +261,23 @@ export default class Sidebar {
         this.directMessageContainer.style.display = 'flex';
         break;
       case 'dmlist':
-        //#TODO 누르면 여태 대화했던 DM메세지 목록들도 다 가져와야 한다.
         this.getAllDirectMessage();
         this.directMessageListContainer.style.display = 'flex';
         break;
       case 'chat':
+        if (!this.isGettingAllChat) {
+          //전채채팅 가져오는 로직
+          SocketManager.getInstance().requestAllChat(
+            this.scene.player.data.spaceId,
+          );
+          this.isGettingAllChat = true;
+        }
         this.chatContainer.style.display = 'flex';
         break;
       case 'mail':
         break;
       case 'users':
+        this.userSearchContainer.style.display = 'flex';
         break;
     }
   }
@@ -386,7 +414,10 @@ export default class Sidebar {
       lecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
     slideshow
     </span> 강의 관리</p>`;
-      lecturebutton.onclick = () => {this.showLectureModal.openModal(); this.createLecutreModal.closeModal()};
+      lecturebutton.onclick = () => {
+        this.showLectureModal.openModal();
+        this.createLecutreModal.closeModal();
+      };
       this.sideEditBox.appendChild(lecturebutton);
     }
 
@@ -511,10 +542,13 @@ export default class Sidebar {
     this.sideChatInput.style.backgroundColor = 'transparent';
     this.sideChatInput.style.marginTop = '10px';
     this.sideChatInput.style.color = 'white';
-    this.sideChatInput.addEventListener('keydown', function (event) {
+    this.sideChatInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' && event.target.value) {
-        SocketManager.getInstance().sendChatMessage(this.value);
-        this.value = '';
+        SocketManager.getInstance().sendChatMessage(
+          event.target.value,
+          this.scene.player.data.spaceId,
+        );
+        event.target.value = '';
       }
     });
     this.chatContainer.appendChild(this.sideChatInput);
@@ -767,7 +801,6 @@ export default class Sidebar {
     this.directMessageRoomContainer[otherPlayerMemberId].chatInput.style.color =
       'white';
 
-    //TODO 문제 발생지점
     this.directMessageRoomContainer[
       otherPlayerMemberId
     ].chatInput.addEventListener('keydown', (event) => {
@@ -797,10 +830,7 @@ export default class Sidebar {
           this.directMessageRoomContainer[otherPlayerMemberId]
             .otherPlayerSocketId,
           this.scene.player.nickName,
-          this.scene.mockOtherPlayers[
-            this.directMessageRoomContainer[otherPlayerMemberId]
-              .otherPlayerSocketId
-          ].nickName,
+          this.scene.mockOtherPlayers[otherPlayerMemberId].nickName,
           event.target.value,
         );
         //이 부분을 고쳐야 한다.
@@ -808,10 +838,7 @@ export default class Sidebar {
           this.directMessageRoomContainer[otherPlayerMemberId]
             .otherPlayerSocketId,
           this.scene.player.nickName,
-          this.scene.mockOtherPlayers[
-            this.directMessageRoomContainer[otherPlayerMemberId]
-              .otherPlayerSocketId
-          ].nickName,
+          this.scene.mockOtherPlayers[otherPlayerMemberId].nickName,
           event.target.value,
         );
         //여기 추가해야 하나 나한테도 올라와야 하니
@@ -823,6 +850,142 @@ export default class Sidebar {
     this.directMessageRoomContainer[otherPlayerMemberId].appendChild(
       this.directMessageRoomContainer[otherPlayerMemberId].chatInput,
     );
+  }
+
+  //유저 검색 박스를 만듭니다.
+  createUserSearchBox() {
+    this.userSearchContainer = document.createElement('div');
+    this.userSearchContainer.style.width = '95%';
+    this.userSearchContainer.style.height = '98%';
+    this.userSearchContainer.style.alignItems = 'center';
+    this.userSearchContainer.style.display = 'none';
+    this.userSearchContainer.style.flexDirection = 'column';
+    this.userSearchContainer.style.padding = '5px';
+    this.sidebar.appendChild(this.userSearchContainer);
+
+    this.userSearchInput = document.createElement('input');
+    this.userSearchInput.setAttribute('placeholder', 'Search user');
+    this.userSearchInput.style.border = '1px solid white';
+    this.userSearchInput.style.borderRadius = '5px';
+
+    this.userSearchInput.style.width = '70%';
+    this.userSearchInput.style.backgroundColor = 'transparent';
+    this.userSearchInput.style.marginTop = '10px';
+    this.userSearchInput.style.color = 'white';
+    //blur이벤트 넣음
+    this.userSearchInput.addEventListener('blur', () => {
+      //이 방법보다 좋은 방법을 찾으면 좋겠다.
+      setTimeout(() => {
+        this.userSearchInput.value = '';
+        this.userSearchBox.style.display = 'none';
+        while (this.userSearchBox.firstChild) {
+          this.userSearchBox.removeChild(this.userSearchBox.firstChild);
+        }
+        this.isUserSearchInputFocused = false;
+      }, 100);
+    });
+
+    //start: 자동완성 기능 넣어줌
+    this.userSearchInput.addEventListener('keyup', () => {
+      const inputValue = this.userSearchInput.value.toLowerCase();
+
+      for (const userArray of this.spaceUser) {
+        const userId = userArray[0];
+        const divElement = document.getElementById(userId);
+        if (divElement) {
+          divElement.style.display = 'none';
+        }
+      }
+      //end: 자동완성 기능 넣어줌.
+      //////////////////////////////////////////////////////////////////////////////////////
+      //start: 현재 접속한 인원의 아이디와 닉네임을 userArray에 넣음.
+      for (const userArray of this.spaceUser) {
+        const userId = userArray[0];
+        const nickname = userArray[1].toLowerCase(); // 닉네임을 소문자로 변환
+        const divElement = document.getElementById(userId);
+
+        if (divElement && nickname.startsWith(inputValue)) {
+          divElement.style.display = 'block';
+        }
+      }
+    });
+    //end: 현재 접속한 인원의 아이디와 닉네임을 userArray에 넣음.
+
+    //start: directMessageInput은 to 다음에 나오는 검색창이다.
+    //추가정보: 이미 포커스를 받은 상태라면 새로 갱신해줄 이유가 없어 return하는 것이다.
+    this.userSearchInput.addEventListener('focus', () => {
+      if (this.isUserSearchInputFocused) {
+        return;
+      }
+      this.isUserSearchInputFocused = true;
+
+      while (this.userSearchBox.firstChild) {
+        this.userSearchBox.removeChild(this.userSearchBox.firstChild);
+      }
+      this.userSearchBox.style.display = 'block';
+
+      //start: spaceUser에 현재 유저소켓아이디와 유저 닉네임을 넣는다.
+      //TODO socketID에서 유저ID로 교체
+      this.spaceUser = [];
+      for (const user in this.scene.otherPlayers) {
+        if (this.scene.otherPlayers[user]) {
+          //DONE socketID to userId
+          this.spaceUser.push([
+            this.scene.otherPlayers[user].memberId,
+            this.scene.otherPlayers[user].nickName,
+            user,
+          ]);
+          //this.spaceUser.push([user, this.scene.otherPlayers[user].nickName]);
+        }
+      }
+      //end: spaceUser에 현재 유저소켓아이디와 유저 닉네임을 넣는다.
+
+      //start: DM메세지를 보낼 수 있는 유저들을 가져온 뒤 DMBOX에 넣는다.
+      for (const userArray of this.spaceUser) {
+        const memberId = userArray[0];
+        const nickname = userArray[1];
+        //div안에 유저 이름과 속성으로 id를 줄 것이다.
+        const divElement = document.createElement('div');
+        //TODO socketID에서 유저ID로 교체
+        divElement.setAttribute('id', memberId);
+        divElement.innerHTML = `${nickname}`;
+
+        divElement.style.width = 'auto';
+        divElement.style.backgroundColor = 'transparent';
+        divElement.style.marginTop = '5px';
+        divElement.style.marginBottom = '5px';
+        divElement.style.marginLeft = '5px';
+        divElement.style.color = 'white';
+        divElement.addEventListener('click', () => {});
+
+        this.userSearchBox.appendChild(divElement);
+      }
+      //end: DM메세지를 보낼 수 있는 유저들을 가져온 뒤 DMBOX에 넣는다.
+    });
+    this.searchContainer = document.createElement('div');
+
+    const toText = document.createElement('span');
+    toText.textContent = 'Search: ';
+    toText.style.color = 'white';
+
+    this.searchContainer.appendChild(toText);
+    this.searchContainer.appendChild(this.userSearchInput);
+
+    this.userSearchContainer.appendChild(this.searchContainer);
+
+    //여길 꾸며줘야 한다.
+    this.userSearchBox = document.createElement('div');
+    this.userSearchBox.style.height = '100%';
+    this.userSearchBox.style.width = '100%';
+    // this.userSearchBox.style.borderRadius = '10px';
+    // 왼쪽 여백 추가
+    this.userSearchBox.style.overflowY = 'auto';
+    this.userSearchBox.style.transition = 'transform 0.3s ease-in-out';
+    this.userSearchBox.style.boxShadow = 'inset 0 0 10px rgba(0, 0, 0, 0.1)';
+    this.userSearchBox.style.display = 'none';
+    this.userSearchBox.style.border = '1px solid white';
+    this.userSearchBox.style.backgroundColor = 'transparent';
+    this.userSearchContainer.appendChild(this.userSearchBox);
   }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////
   //#
@@ -865,21 +1028,221 @@ export default class Sidebar {
       divElement.style.color = 'white';
       this.createDirectMessageRoom(divElement.id, otherPlayerSocketId);
     } else {
+      this.hideContainers();
       this.directMessageRoomContainer[otherPlayerMemberId].style.display =
         'flex';
     }
     this.directMessageRoomContainer[otherPlayerMemberId].chatBox.appendChild(
       item,
     );
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop = this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
   }
 
-  eventscallback(namespace, data) {
+  addAllChatHistory(data) {
+    window.console.log('addAllChatHistory', data.chats);
+    for (let i = 0; i < data.chats.length; i++) {
+      this.chatMessage(data.chats[i].nick_name, data.chats[i].message);
+    }
+  }
+
+  addAllDMHistory(data) {
+    window.console.log('addAllDMHistory', data);
+    for (let i = 0; i < data.directMessages.length; i++) {
+      this.createDirectMessageRoomByDMHistory(
+        data.directMessages[i].getter_id,
+        data.directMessages[i].getter_nick,
+        data.directMessages[i].sender_id,
+        data.directMessages[i].sender_nick,
+      );
+    }
+    for (let i = 0; i < data.directMessages.length; i++) {
+      this.addDirectMessageByDMHistory(
+        data.directMessages[i].getter_id,
+        data.directMessages[i].getter_nick,
+        data.directMessages[i].sender_id,
+        data.directMessages[i].sender_nick,
+        data.directMessages[i].message,
+      );
+    }
+  }
+
+  addDirectMessageByDMHistory(
+    getterId,
+    getterNick,
+    senderId,
+    senderNick,
+    message,
+  ) {
+    let otherPlayerMemberId = getterId;
+    let nickName = '나';
+    if (getterId == this.scene.player.data.memberId) {
+      otherPlayerMemberId = senderId;
+      nickName = senderNick;
+    }
+    const item = document.createElement('div');
+    item.innerHTML = `${nickName}<br>${message}`;
+    item.style.color = 'white';
+
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.appendChild(
+      item,
+    );
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop = this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
+  }
+  //DM히스토리를 통해 각 멤버에 대한 DirectMessageRoom을 만듭니다.
+  createDirectMessageRoomByDMHistory(
+    getterId,
+    getterNick,
+    senderId,
+    senderNick,
+  ) {
+    let otherPlayerMemberId = getterId;
+    let otherPlayerNickName = getterNick;
+    window.console.log("otherPlayerMemberId before=>", otherPlayerMemberId)
+    if (getterId == this.scene.player.data.memberId) {
+      otherPlayerMemberId = senderId;
+      otherPlayerNickName = senderNick;
+    }
+    window.console.log("otherPlayerMemberId after=>", otherPlayerMemberId)
+
+    if (this.directMessageRoomContainer[otherPlayerMemberId]) {
+      return;
+    }
+
+    this.directMessageRoomContainer[otherPlayerMemberId] =
+      document.createElement('div');
+    this.directMessageRoomContainer[otherPlayerMemberId].classList.add(
+      'directMessageRoom',
+    );
+    this.directMessageRoomContainer[otherPlayerMemberId].otherPlayerSocketId =
+      undefined;
+    this.directMessageRoomContainer[otherPlayerMemberId].style.width = '95%';
+    this.directMessageRoomContainer[otherPlayerMemberId].style.height = '98%';
+    this.directMessageRoomContainer[otherPlayerMemberId].style.alignItems =
+      'center';
+    this.directMessageRoomContainer[otherPlayerMemberId].style.justifyContent =
+      'center';
+    this.directMessageRoomContainer[otherPlayerMemberId].style.display = 'none';
+    this.directMessageRoomContainer[otherPlayerMemberId].style.flexDirection =
+      'column';
+    this.directMessageRoomContainer[otherPlayerMemberId].style.padding = '5px';
+    this.sidebar.appendChild(
+      this.directMessageRoomContainer[otherPlayerMemberId],
+    );
+
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox =
+      document.createElement('div');
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.style.height =
+      '80vh';
+    this.directMessageRoomContainer[otherPlayerMemberId].chatBox.style.width =
+      '100%';
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatBox.style.overflowY = 'auto';
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatBox.style.transition = 'transform 0.3s ease-in-out';
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatBox.style.boxShadow = 'inset 0 0 10px rgba(0, 0, 0, 0.1)';
+    this.directMessageRoomContainer[otherPlayerMemberId].appendChild(
+      this.directMessageRoomContainer[otherPlayerMemberId].chatBox,
+    );
+
+    this.directMessageRoomContainer[otherPlayerMemberId].chatInput =
+      document.createElement('input');
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.style.border = '1px solid white';
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.style.borderRadius = '5px';
+    this.directMessageRoomContainer[otherPlayerMemberId].chatInput.style.width =
+      '100%';
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.style.backgroundColor = 'transparent';
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.style.marginTop = '10px';
+    this.directMessageRoomContainer[otherPlayerMemberId].chatInput.style.color =
+      'white';
+
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Enter' &&
+        event.target.value &&
+        this.scene.otherPlayers[
+          this.directMessageRoomContainer[otherPlayerMemberId]
+            .otherPlayerSocketId
+        ]
+      ) {
+        const item = document.createElement('div');
+        item.innerHTML = `나<br>${event.target.value}`;
+        item.style.color = 'white';
+        this.directMessageRoomContainer[
+          otherPlayerMemberId
+        ].chatBox.appendChild(item);
+        this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollTop = this.directMessageRoomContainer[otherPlayerMemberId].chatBox.scrollHeight;
+        console.log(
+          'SocketManager.getInstance().sendDirectMessageToPlayer()',
+          this.directMessageRoomContainer[otherPlayerMemberId]
+            .otherPlayerSocketId,
+          this.scene.player.nickName,
+          otherPlayerNickName,
+          event.target.value,
+        );
+        SocketManager.getInstance().sendDirectMessageToPlayer(
+          this.directMessageRoomContainer[otherPlayerMemberId]
+            .otherPlayerSocketId,
+          this.scene.player.nickName,
+          otherPlayerNickName,
+          event.target.value,
+        );
+        event.target.value = '';
+      }
+    });
+    this.directMessageRoomContainer[otherPlayerMemberId].appendChild(
+      this.directMessageRoomContainer[otherPlayerMemberId].chatInput,
+    );
+  }
+  /////////////////////////////////////////////////////////////////////////////
+  async eventscallback(namespace, data) {
+    window.console.log('eventscallback in sidebar=>', namespace);
     switch (namespace) {
       case 'updateSpaceUsers':
         // 유저 목록 조회
         // data.forEach((playerdata) => {
 
         // });
+        break;
+      case 'spaceUsers':
+        if (!this.isGettingAllChat) {
+          //전채채팅 가져오는 로직
+          SocketManager.getInstance().requestAllChat(
+            this.scene.player.data.spaceId,
+          );
+          this.isGettingAllChat = true;
+        }
+        if (!this.isGettingAllDM) {
+          SocketManager.getInstance().requestAllDM(
+            this.scene.player.data.memberId,
+          );
+          this.isGettingAllDM = true;
+          if(!this.isMockingOtherPlayers){
+            //모킹 로직
+            await this.mockingOtherPlayers();
+            this.isMockingOtherPlayers = true;
+          }
+        }
+        console.log("spaceUsers eventcallback:", data);
+        for(let i=0; i<data.length; i++){
+          // console.log("this.directMessageRoomContainer[data[i].memberId]:", this.directMessageRoomContainer[data[i].memberId], data[i].id)
+          if(this.directMessageRoomContainer[data[i].memberId]){
+            this.directMessageRoomContainer[data[i].memberId].otherPlayerSocketId = data[i].id;
+          }
+        }
         break;
       case 'joinSpacePlayer':
         if (this.directMessageRoomContainer[data.memberId]) {
@@ -892,6 +1255,7 @@ export default class Sidebar {
         //함수부터 만들어야지
         // data.senderId,
         // message: data.message,
+        window.console.log('directMessage=>', data);
         this.directMessage(data.senderId, data.message);
         break;
       case 'chatPlayer':
@@ -900,6 +1264,13 @@ export default class Sidebar {
       case 'chatInGroup':
         console.log('chatInGrout:', data);
         this.chatInGroup(data.senderNickName, data.message);
+        break;
+      case 'AllChatHistory':
+        this.addAllChatHistory(data);
+        break;
+      case 'AllDMHistory':
+        console.log("addALLDMHistory");
+        this.addAllDMHistory(data);
         break;
     }
   }

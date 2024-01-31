@@ -75,6 +75,14 @@ export default class SocketManager {
       console.log('chatInGroup', data);
       this.publish('chatInGroup', data);
     });
+    this.socket.on('AllChatHistory', (data) => {
+      console.log('AllChatHistory', data);
+      this.publish('AllChatHistory', data);
+    });
+    this.socket.on('AllDMHistory', (data) => {
+      console.log('AllDMHistory', data);
+      this.publish('AllDMHistory', data);
+    })
     this.socket.on('updateSkinPlayer', (data) => {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
@@ -264,11 +272,12 @@ export default class SocketManager {
     });
   }
 
-  sendChatMessage(message) {
+  sendChatMessage(message, spaceId) {
     this.socket.emit('chat', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
       message: message,
+      spaceId
     });
   }
 
@@ -441,4 +450,13 @@ export default class SocketManager {
       audioTrack.enabled = !audioTrack.enabled;
     }
   };
+
+  requestAllChat = async (spaceId) => {
+    this.socket.emit('AllChatHistory',{spaceId});
+  }
+
+  requestAllDM = async (memberId) => {
+    window.console.log("requestAllDMHistory");
+    this.socket.emit('AllDMHistory', {memberId})
+  }
 }

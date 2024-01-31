@@ -224,3 +224,13 @@ export const requestAddLecture = async (spaceId) => {
   });
   return result;
 }
+
+//해당 스페이스 내의 모든 멤버 정보 가져오기
+export const requestAllMemeberIdBySpaceId = async (spaceId) => {
+  const accessToken = localStorage.getItem('access_token');
+  const result = await axios
+  .get(`${process.env.DB}/spaces/${spaceId}`,{
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return result;
+}
