@@ -188,6 +188,11 @@ export default class SignupModal extends Singleton {
 
   openModal() {
     this.signupModal.style.display = 'block';
+    this.emailInput.value = '';
+    this.verificationCodeInput.value = '';
+    this.passwordInput.value = '';
+    this.confirmPasswordInput.value = '';
+    this.nicknameInput.value = '';
   }
 
   closeModal() {

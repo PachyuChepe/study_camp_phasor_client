@@ -93,6 +93,8 @@ export default class LoginModal extends Singleton {
 
   openModal() {
     this.loginModal.style.display = 'block';
+    this.emailInput.value = '';
+    this.passwordInput.value = '';
   }
 
   closeModal() {

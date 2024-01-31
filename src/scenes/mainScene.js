@@ -10,6 +10,7 @@ import {
   requestMemberSpace,
   requestUserProfile,
   requestcustomerKey,
+  requestLogout,
 } from '../utils/request.js';
 import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
@@ -64,26 +65,45 @@ export default class MainScene extends Phaser.Scene {
 
     this.leftContainer = document.createElement('div');
     this.leftContainer.style.borderRadius = '10px';
-    // this.leftContainer.style.border = '2px solid white';
-    // this.leftContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
-    // this.leftContainer.style.display = 'flex';
     this.leftContainer.style.width = '60%';
-    // this.leftContainer.style.backgroundColor = '#80c6ff';
     this.leftContainer.style.margin = '0px 20px 0px 0px';
-    // this.leftContainer.style.overflowY = 'auto';
-    // this.leftContainer.style.flexWrap = 'wrap';
-    // this.leftContainer.style.justifyContent = 'flex-start';
     this.container.appendChild(this.leftContainer);
 
     this.cardTitle = document.createElement('div');
-    this.cardTitle.innerText = '내 학습 공간';
     this.cardTitle.style.margin = '0px 0px 10px 0px';
     this.cardTitle.style.width = '100%';
     this.cardTitle.style.height = '8%';
-    this.cardTitle.style.color = 'white'; // 텍스트 색상을 흰색으로 설정
-    this.cardTitle.style.fontSize = '2em'; // 글꼴 크기를 2em으로 설정 (조절 가능)
-    this.cardTitle.style.fontWeight = 'bold'; // 글꼴을 굵게 설정
+    this.cardTitle.style.display = 'flex';
+    this.cardTitle.style.alignItems = 'center';
     this.leftContainer.appendChild(this.cardTitle);
+
+    const title = document.createElement('div');
+    title.innerText = '내 학습 공간';
+    title.style.color = 'white';
+    title.style.fontSize = '40px';
+    title.style.fontWeight = 'bold';
+    title.style.marginRight = '20px';
+    this.cardTitle.appendChild(title);
+
+    const logoutbutton = document.createElement('button');
+    logoutbutton.innerText = '로그아웃';
+    logoutbutton.style.borderRadius = '5px';
+    logoutbutton.style.backgroundColor = '#F3F2FF';
+    logoutbutton.style.border = '1px solid #6758ff';
+    logoutbutton.style.color = '#6758ff';
+    logoutbutton.style.height = '90%';
+    logoutbutton.style.maxHeight = '35px';
+    logoutbutton.style.lineHeight = 'normal';
+    logoutbutton.style.display = 'flex';
+    logoutbutton.style.textAlign = 'center';
+    logoutbutton.style.flexDirection = 'column';
+    logoutbutton.style.justifyContent = 'center';
+    this.cardTitle.appendChild(logoutbutton);
+    logoutbutton.onclick = () => {
+      requestLogout();
+      this.container.style.display = 'none';
+      LoginModal.getInstance().openModal();
+    };
 
     this.cardContainer = document.createElement('div');
     this.cardContainer.style.borderRadius = '5px';
@@ -103,7 +123,7 @@ export default class MainScene extends Phaser.Scene {
     this.middleContainer = document.createElement('div');
     this.middleContainer.style.display = 'flex';
     this.middleContainer.style.justifyContent = 'space-between';
-    this.middleContainer.style.height = '5%';
+    this.middleContainer.style.height = '35px';
     this.middleContainer.style.margin = '0px 0px 10px 0px';
     this.leftContainer.appendChild(this.middleContainer);
 
@@ -210,7 +230,7 @@ export default class MainScene extends Phaser.Scene {
     detailContainer.style.display = 'flex';
     detailContainer.style.width = '100%';
     // detailContainer.style.height = '85%';
-    detailContainer.style.height = 'calc(77% + 40px)';
+    detailContainer.style.height = 'calc(72% + 75px)';
     detailContainer.style.backgroundColor = 'white';
     // detailContainer.style.margin = '0px 20px 20px 5px';
     // detailContainer.style.padding = '20px';
@@ -328,9 +348,10 @@ export default class MainScene extends Phaser.Scene {
     createButton.textContent = '생성 하기';
     createButton.style.width = '80%';
     createButton.style.height = '10%';
-    createButton.style.fontWeight = '700';
-    createButton.style.fontSize = '1.5rem';
     createButton.style.backgroundColor = '#6758ff';
+    createButton.style.borderRadius = '5px';
+    createButton.style.fontWeight = 'bold';
+    createButton.style.lineHeight = 'normal';
     // createButton.onclick = this.tossPaymentPopup.openPaymentPopup.bind(
     //   this.tossPaymentPopup,
     // );
@@ -420,17 +441,17 @@ export default class MainScene extends Phaser.Scene {
     detailGroup.appendChild(this.detailText);
     //
     const detailButton = document.createElement('button');
-
     detailButton.textContent = '입장 하기';
+    detailButton.style.width = '80%';
+    detailButton.style.height = '10%';
+    detailButton.style.backgroundColor = '#6758ff';
+    detailButton.style.borderRadius = '5px';
+    detailButton.style.fontWeight = 'bold';
+    detailButton.style.lineHeight = 'normal';
 
     detailButton.onclick = () => {
       this.checkUserBelongSpace(this.spaceId);
     };
-    detailButton.style.width = '80%';
-    detailButton.style.height = '10%';
-    detailButton.style.backgroundColor = '#6758ff';
-    detailButton.style.borderRadius = '10px';
-    detailButton.style.fontWeight = 'bold';
     this.detailBox.appendChild(detailButton);
   }
 

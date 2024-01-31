@@ -50,6 +50,19 @@ export const requestGoogleLogin = (userId, successCallback) => {
   };
 };
 
+export const requestLogout = async () => {
+  const accessToken = localStorage.getItem('access_token');
+  try {
+    const response = await axios.get(`${process.env.DB}/auth/logout`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    localStorage.removeItem('access_token');
+    return response;
+  } catch (error) {
+    console.error('유저 정보 조회 실패:', error);
+  }
+};
+
 export const requestUserProfile = async () => {
   const accessToken = localStorage.getItem('access_token');
   try {
