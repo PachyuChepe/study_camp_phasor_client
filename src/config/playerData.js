@@ -1,5 +1,5 @@
 const PlayerData = {
-  role: 3,
+  role: '3',
   memberId: 0,
   email: '',
   nickName: '',

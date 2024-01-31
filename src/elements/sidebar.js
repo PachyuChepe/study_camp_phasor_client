@@ -347,7 +347,7 @@ export default class Sidebar extends Singleton {
     };
     this.sideEditBox.appendChild(loddybutton);
 
-    if (PlayerData.role === 0) {
+    if (PlayerData.role === '0') {
       // 입장 코드 생성 버튼
       const codebutton = document.createElement('button');
       codebutton.style.padding = '0px';
@@ -365,7 +365,7 @@ export default class Sidebar extends Singleton {
       this.codeCreateModal = new CodeCreateModal();
     }
 
-    if (PlayerData.role === 0 || PlayerData.role === 1) {
+    if (PlayerData.role === '0' || PlayerData.role === '1') {
       // 멤버 관리 버튼
       const memberbutton = document.createElement('button');
       memberbutton.style.padding = '0px';
@@ -383,7 +383,7 @@ export default class Sidebar extends Singleton {
       this.memberModal = new ManagerModal();
     }
 
-    if (PlayerData.role === 0 || PlayerData.role === 1) {
+    if (PlayerData.role === '0' || PlayerData.role === '1') {
       // 출석 관리 버튼
       const logbutton = document.createElement('button');
       logbutton.style.padding = '0px';
@@ -400,9 +400,9 @@ export default class Sidebar extends Singleton {
     }
 
     if (
-      PlayerData.role === 0 ||
-      PlayerData.role === 1 ||
-      PlayerData.role === 2
+      PlayerData.role === '0' ||
+      PlayerData.role === '1' ||
+      PlayerData.role === '2'
     ) {
       // 그룹 관리 버튼
       const groupbutton = document.createElement('button');
@@ -415,11 +415,13 @@ export default class Sidebar extends Singleton {
     groups_3
     </span> 그룹 관리</p>`;
       this.groupModal = new GroupModal();
-      groupbutton.onclick = this.groupModal.openModal.bind(this.groupModal);
+      groupbutton.onclick = async () => {
+        this.groupModal.openModal();
+      };
       this.sideEditBox.appendChild(groupbutton);
     }
 
-    if (PlayerData.role === 0) {
+    if (PlayerData.role === '0') {
       // 강의 관리 버튼
       const lecturebutton = document.createElement('button');
       lecturebutton.style.padding = '0px';
@@ -437,7 +439,7 @@ export default class Sidebar extends Singleton {
       this.sideEditBox.appendChild(lecturebutton);
     }
 
-    if (PlayerData.role === 0 || PlayerData.role === 1) {
+    if (PlayerData.role === '0' || PlayerData.role === '1') {
       // 브로드캐스트 관리 버튼
       const brodcastbutton = document.createElement('button');
       brodcastbutton.style.padding = '0px';
@@ -452,7 +454,7 @@ export default class Sidebar extends Singleton {
       this.sideEditBox.appendChild(brodcastbutton);
     }
 
-    if (PlayerData.role === 3) {
+    if (PlayerData.role === '3') {
       // 내강의 보기
       const myLecturebutton = document.createElement('button');
       myLecturebutton.style.padding = '0px';
