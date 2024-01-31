@@ -1,6 +1,7 @@
 import axios from 'axios';
 import MainScene from '../scenes/mainScene';
 import PlayerData from '../config/playerData';
+import { unique } from 'webpack-merge';
 
 export const requestLogin = (data, successCallback) => {
   // data = { email, password };
@@ -346,5 +347,65 @@ export const createInviteCode = async () => {
   } catch (error) {
     console.error('코드 생성 실패', error);
     throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+// 그룹 관리
+export const requestGroupData = async () => {
+  try {
+    const spaceId = PlayerData.spaceId;
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.get(
+      `${process.env.DB}/group-members/${spaceId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error('그룹 데이터 요청 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+export const deleteGroupMember = async (memberId, groupId) => {
+  console.log(memberId, groupId);
+  const data = {
+    groupId,
+    memberId,
+  };
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    await axios.delete(`${process.env.DB}/group-members`, {
+      data,
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    return alert('삭제 완료!');
+  } catch (error) {
+    console.error('그룹 멤버 삭제 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+export const sendMessageToGroupMember = async (groupId, message) => {
+  console.log(groupId, message);
+  const data = {
+    groupId,
+    message,
+  };
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.post(
+      `${process.env.DB}/mails/group-message`,
+      data,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return response;
+  } catch (error) {
+    console.error('그룹 메세지 전송 실패', error);
+    throw error; // 오류를 다시
   }
 };
