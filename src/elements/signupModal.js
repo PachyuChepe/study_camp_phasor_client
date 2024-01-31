@@ -179,10 +179,20 @@ export default class SignupModal extends Singleton {
     this.nicknameInput.onchange = this.checkInputs.bind(this);
 
     // 로그인 모달로 돌아가는 버튼
-    const goToLoginButton = document.createElement('button');
-    goToLoginButton.textContent = 'Back to Login';
+    // const goToLoginButton = document.createElement('button');
+    // goToLoginButton.textContent = 'Back to Login';
+    // goToLoginButton.onclick = this.openLoginModal.bind(this);
+    // goToLoginButton.style.width = '100%';
+    // modalContent.appendChild(goToLoginButton);
+
+    const goToLoginButton = document.createElement('div');
+    goToLoginButton.innerText = '로그인으로 이동';
+    goToLoginButton.style.cursor = 'pointer';
+    goToLoginButton.style.margin = '10px';
+    goToLoginButton.style.color = '#226699';
+    goToLoginButton.style.textAlign = 'center';
+    // goToLoginButton.style.textDecoration = 'underline';
     goToLoginButton.onclick = this.openLoginModal.bind(this);
-    goToLoginButton.style.width = '100%';
     modalContent.appendChild(goToLoginButton);
   }
 

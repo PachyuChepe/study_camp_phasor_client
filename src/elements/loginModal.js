@@ -62,12 +62,16 @@ export default class LoginModal extends Singleton {
     const googleLoginButton = document.createElement('button');
     googleLoginButton.style.backgroundImage =
       "url('https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FNnEFT%2FbtsDNKKUzIm%2Fz6dDZz9KaQ5Qvk6qSSfTeK%2Fimg.png')";
-    googleLoginButton.style.backgroundSize = 'cover'; // 이미지가 버튼을 가득 채우도록 설정
+    googleLoginButton.style.backgroundSize = 'contain';
+    // googleLoginButton.style.backgroundSize = 'cover'; // 이미지가 버튼을 가득 채우도록 설정
     googleLoginButton.style.backgroundPosition = 'center'; // 이미지 위치를 중앙으로 설정
     googleLoginButton.style.backgroundRepeat = 'no-repeat'; // 이미지 반복 없음
     googleLoginButton.style.width = '300px'; // 버튼의 너비 설정
     googleLoginButton.style.height = '35px'; // 버튼의 높이 설정
-    googleLoginButton.style.border = 'none'; // 버튼 테두리 제거
+    // googleLoginButton.style.padding = '5px';
+    // googleLoginButton.style.border = 'none'; // 버튼 테두리 제거
+    googleLoginButton.style.border = '1px solid #50b0ff';
+    googleLoginButton.style.backgroundColor = 'white';
     googleLoginButton.style.cursor = 'pointer'; // 커서를 포인터로 설정
     // 클라이언트 측: Google 로그인 버튼 핸들러
     googleLoginButton.onclick = this.googleLogin.bind(this);
@@ -80,10 +84,20 @@ export default class LoginModal extends Singleton {
     // });
 
     // 회원가입 버튼 생성
-    const signupButton = document.createElement('button');
-    signupButton.textContent = 'Sign Up';
+    // const signupButton = document.createElement('button');
+    // signupButton.textContent = 'Sign Up';
+    // signupButton.onclick = this.openSignupModal.bind(this);
+    // signupButton.style.width = '100%';
+    // modalContent.appendChild(signupButton);
+
+    const signupButton = document.createElement('div');
+    signupButton.innerText = '회원가입으로 이동';
+    signupButton.style.cursor = 'pointer';
+    signupButton.style.margin = '10px';
+    signupButton.style.color = '#226699';
+    signupButton.style.textAlign = 'center';
+    // signupButton.style.textDecoration = 'underline';
     signupButton.onclick = this.openSignupModal.bind(this);
-    signupButton.style.width = '100%';
     modalContent.appendChild(signupButton);
   }
 
