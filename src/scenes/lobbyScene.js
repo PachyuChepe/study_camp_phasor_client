@@ -32,6 +32,7 @@ export default class LoddyScene extends Phaser.Scene {
     if (!document.getElementById('lobby')) {
       this.createDom();
     }
+    this.lobby.style.display = 'block';
     //init
     TossPaymentPopup.getInstance();
 
@@ -727,8 +728,10 @@ export default class LoddyScene extends Phaser.Scene {
     this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
     LoginModal.getInstance().closeModal();
-    this.title.style.display = 'none';
-    this.container.style.display = 'none';
+    // this.title.style.display = 'none';
+    // this.container.style.display = 'none';
+    // this.logoutbutton.style.display = 'none';
+    this.lobby.style.display = 'none';
 
     // await requestMemberProfile(
     //   { spaceId: this.spaceId },
