@@ -62,6 +62,7 @@ export default class CreateLecutreModal extends Singleton {
     this.addLectureBtn.textContent = '강의 등록';
     this.addLectureBtn.style.backgroundColor = '#6758FF';
     this.addLectureBtn.style.width = '100%';
+    //#TODO
     this.addLectureBtn.addEventListener('click', () => {
       const inputElements =
         this.lectureItemListBox.querySelectorAll('input[type="text"]');
@@ -78,6 +79,11 @@ export default class CreateLecutreModal extends Singleton {
       }
       const title = this.createLectureModalSubTitle.value;
       requestAddLectureItems(PlayerData.spaceId, title, inputValues);
+      inputElements.forEach((inputElement) => {
+        this.lectureItemListBox.removeChild(inputElement)
+        })
+      this.createLectureModalSubTitle.value = '';
+      alert("성공적으로 강의를 등록하셨습니다.");
     });
     this.createLectureModal.appendChild(this.addLectureBtn);
   }

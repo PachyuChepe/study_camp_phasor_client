@@ -206,9 +206,8 @@ export default class SpaceScene extends Phaser.Scene {
               //   playerdata.memberId,
               // );
               this.otherPlayers[playerdata.id] = new Player(this, playerdata);
-              this.mockOtherPlayers[playerdata.id] = {};
-              this.mockOtherPlayers[playerdata.id].nickName =
-                playerdata.nickName;
+              this.mockOtherPlayers[playerdata.memberId] = {};
+              this.mockOtherPlayers[playerdata.memberId].nickName = playerdata.nickName;
             }
           }
         });
@@ -228,9 +227,9 @@ export default class SpaceScene extends Phaser.Scene {
             // );
             this.otherPlayers[data.id] = new Player(this, data);
           }
-          this.mockOtherPlayers[data.id] = {};
-          this.mockOtherPlayers[data.id].nickName = data.nickName;
-          console.log('joinSpacePlayer', data);
+          this.mockOtherPlayers[data.memberId] = {};
+          this.mockOtherPlayers[data.memberId].nickName = data.nickName;
+          console.log("joinSpacePlayer", data);
         }
         break;
       case 'leaveSpace':

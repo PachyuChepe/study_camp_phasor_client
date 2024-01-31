@@ -94,15 +94,15 @@ export default class ShowLectureModal extends Singleton {
       return;
     }
     console.log('showlectureitemlist openmodal:', results);
-
+    
     for (let i = 0; i < results.data.length; i++) {
       const optionBox = new Option(
         `${results.data[i].title}`,
-        `${results.data[i].title}`,
+        `lectureItemList ${i}`,
       );
       this.selectBox.appendChild(optionBox);
       const lectureItemList = document.createElement('div');
-      lectureItemList.id = `${results.data[i].title}`;
+      lectureItemList.id = `lectureItemList ${i}`;
 
       for (let j = 0; j < results.data[i].lecture_items.length; j++) {
         const lectureItem = document.createElement('div');

@@ -323,7 +323,17 @@ export const requestAddLecture = async (spaceId, title) => {
     },
   );
   return result;
-};
+}
+
+//해당 스페이스 내의 모든 멤버 정보 가져오기
+export const requestAllMemeberIdBySpaceId = async (spaceId) => {
+  const accessToken = localStorage.getItem('access_token');
+  const result = await axios
+  .get(`${process.env.DB}/spaces/${spaceId}`,{
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  return result;
+}
 
 // 초대 코드 검증
 export const signupInviteCode = async (code) => {
@@ -361,3 +371,4 @@ export const createInviteCode = async () => {
     throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
   }
 };
+
