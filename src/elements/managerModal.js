@@ -1,3 +1,7 @@
+import { fetchMembers, changeMemberRole } from '../utils/request';
+import LogModal from './logModal';
+import PlayerData from '../config/playerData';
+
 // 멤버 관리 창
 export default class ManagerModal {
   constructor() {
@@ -55,23 +59,27 @@ export default class ManagerModal {
     this.listContainer.style.overflowY = 'auto';
     this.container.appendChild(this.listContainer);
 
-    this.createList();
+    // this.createList();
     this.isRoleACS = false;
     this.isNameACS = false;
     this.sortList('name');
     this.sortList('role');
   }
 
-  openModal() {
+  async openModal() {
     this.modal.style.display = 'block';
+    const members = await fetchMembers();
+    this.createList(members);
   }
 
   closeModal() {
     this.modal.style.display = 'none';
   }
 
-  createList() {
-    for (let i = 0; i < 10; i++) {
+  createList(members) {
+    this.listContainer.innerHTML = '';
+
+    members.forEach((member, i) => {
       const list = document.createElement('div');
       list.style.backgroundColor = '#F3F2FF';
       list.style.margin = '10px';
@@ -88,14 +96,60 @@ export default class ManagerModal {
       grid.style.placeItems = 'center';
       list.appendChild(grid);
 
-      // 콤보박스로 역할 수정 반영 시켜줘야 할듯
-      const role = document.createElement('div');
-      role.innerText = '역할' + i;
-      role.style.fontWeight = 'bold';
-      grid.appendChild(role);
+      // 콤보박스 생성
+      const roleSelect = document.createElement('select');
+      roleSelect.style.fontWeight = 'bold';
+      const roles = ['관리자', '매니저', '멘토', '멘티'];
+
+      // 현재 사용자의 role에 따라 콤보박스 옵션 설정
+      if (PlayerData.role === 0) {
+        // 관리자: 모든 옵션 추가
+        roles.forEach((roleName, index) => {
+          const option = document.createElement('option');
+          option.value = index;
+          option.text = roleName;
+          roleSelect.appendChild(option);
+        });
+      } else if (
+        PlayerData.role === 1 &&
+        (member.role === 2 || member.role === 3)
+      ) {
+        // 매니저: 멘토와 멘티 옵션만 추가
+        roles.slice(2).forEach((roleName, index) => {
+          const option = document.createElement('option');
+          option.value = index + 2;
+          option.text = roleName;
+          roleSelect.appendChild(option);
+        });
+      } else {
+        // 다른 경우: 콤보박스 비활성화
+        const option = document.createElement('option');
+        option.value = member.role;
+        option.text = roles[member.role];
+        roleSelect.appendChild(option);
+        roleSelect.disabled = true;
+      }
+
+      roleSelect.value = member.role;
+      grid.appendChild(roleSelect);
+
+      // 콤보박스 이벤트 핸들러 추가
+      roleSelect.addEventListener('change', async (event) => {
+        try {
+          await changeMemberRole(
+            member.user_id,
+            member.space_id,
+            parseInt(event.target.value),
+          );
+          alert('역할이 변경되었습니다.');
+        } catch (error) {
+          alert('역할 변경에 실패했습니다.');
+          console.error(error);
+        }
+      });
 
       const name = document.createElement('div');
-      name.innerText = '이름' + i;
+      name.innerText = member.user.nick_name;
       name.style.fontWeight = 'bold';
       grid.appendChild(name);
 
@@ -103,15 +157,20 @@ export default class ManagerModal {
       logbutton.innerText = '접속 기록 보기';
       logbutton.style.backgroundColor = '#6758FF';
       logbutton.style.margin = '0px';
+      logbutton.dataset.userId = member.user_id;
+      logbutton.dataset.spaceId = member.space_id;
+      logbutton.onclick = () => this.showUserAttendance(member.user_id);
       grid.appendChild(logbutton);
 
-      // role 3 인 애들만
-      const lecturebutton = document.createElement('button');
-      lecturebutton.innerText = '강의 진도 보기';
-      lecturebutton.style.backgroundColor = '#6758FF';
-      lecturebutton.style.margin = '0px';
-      grid.appendChild(lecturebutton);
-    }
+      // '강의 진도 보기' 버튼은 role 3 (멘티)에게만 표시
+      if (member.role === 3) {
+        const lecturebutton = document.createElement('button');
+        lecturebutton.innerText = '강의 진도 보기';
+        lecturebutton.style.backgroundColor = '#6758FF';
+        lecturebutton.style.margin = '0px';
+        grid.appendChild(lecturebutton);
+      }
+    });
   }
 
   sortList(type) {
@@ -155,5 +214,11 @@ export default class ManagerModal {
       this.isNameACS = !this.isNameACS;
       this.nameSort.innerText = `이름 순 ${this.isNameACS ? '▼' : '▲'}`;
     }
+  }
+  showUserAttendance(userId) {
+    // LogModal 인스턴스 생성 및 사용자 ID 전달
+    this.logModal = new LogModal(userId);
+    // this.logModal.openModal.bind(this.logModal);
+    this.logModal.openModal();
   }
 }
