@@ -13,16 +13,18 @@ import LogModal from './logModal.js';
 import LogDateModal from './logDateModal.js';
 import GroupModal from './groupModal.js';
 import CodeCreateModal from './codeCreateModal.js';
+import Singleton from '../utils/Singleton.js';
 
 //https://app.gather.town/app/oizIaPbTdxnYzsKW/nbcamp_9_node
 //TODO 다른 플레이어의 memberId와 userId가 제대로 안찍힌다.
 //this.scene.otherPlayers[user].userId
 //memberId에 제대로 된 값 저장하기
 //socketId를 memberId로 바꾸기
-export default class Sidebar {
-  constructor(scene) {
-    this.scene = scene;
+export default class Sidebar extends Singleton {
+  constructor() {
+    super();
     this.sidebar = document.createElement('div');
+    this.sidebar.id = 'sidebar';
     // this.sidebar.classList.add('sidebar');
     document.body.appendChild(this.sidebar);
 
@@ -64,25 +66,33 @@ export default class Sidebar {
     this.sidebar.style.borderBottom = '12px solid white';
     this.sidebar.style.borderLeft = '4px solid white';
 
-    this.outsideButtons = new SidebarOut(this.sidebar);
+    SidebarOut.getInstance();
     this.createInSideButtons();
+
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
   }
 
+  setScene(scene) {
+    this.scene = scene;
+    this.showSidebar();
+  }
+
+  hideSidebar() {
+    this.sidebar.style.display = 'none';
+  }
+
+  showSidebar() {
+    this.sidebar.style.display = 'block';
+  }
+
   async mockingOtherPlayers() {
-    const result = await requestAllMemeberIdBySpaceId(
-      this.scene.player.data.spaceId,
-    );
+    const result = await requestAllMemeberIdBySpaceId(PlayerData.spaceId);
     console.log('mockingOtherPlayers=>', result);
     for (let i = 0; i < result.data.spaceMembers.length; i++) {
       this.scene.mockOtherPlayers[result.data.spaceMembers[i].id] = {};
       this.scene.mockOtherPlayers[result.data.spaceMembers[i].id].nickName =
         result.data.spaceMembers[i].user.nick_name;
     }
-  }
-
-  setCamFunc(onCamFunc, offCamFunc) {
-    this.outsideButtons.setCamFunc(onCamFunc, offCamFunc);
   }
 
   //인사이드버튼이 전챗관련이다.
@@ -114,7 +124,7 @@ export default class Sidebar {
     //DM버튼
     //start: DM버튼을 만들어서 삽입한다.
     this.dmBtn = document.createElement('button');
-    this.dmBtn.style.backgroundColor = 'black';
+    this.dmBtn.style.backgroundColor = 'white';
     this.dmBtn.style.border = '2px solid white';
     this.dmBtn.style.color = '#a2cfff';
     this.dmBtn.style.padding = '4px';
@@ -267,9 +277,7 @@ export default class Sidebar {
       case 'chat':
         if (!this.isGettingAllChat) {
           //전채채팅 가져오는 로직
-          SocketManager.getInstance().requestAllChat(
-            this.scene.player.data.spaceId,
-          );
+          SocketManager.getInstance().requestAllChat(PlayerData.spaceId);
           this.isGettingAllChat = true;
         }
         this.chatContainer.style.display = 'flex';
@@ -334,6 +342,8 @@ export default class Sidebar {
     </span> 돌아가기</p>`;
     loddybutton.onclick = () => {
       // lobby scene
+      // this.hideSidebar();
+      // this.scene.scene.start('LoddyScene');
     };
     this.sideEditBox.appendChild(loddybutton);
 
@@ -553,7 +563,7 @@ export default class Sidebar {
       if (event.key === 'Enter' && event.target.value) {
         SocketManager.getInstance().sendChatMessage(
           event.target.value,
-          this.scene.player.data.spaceId,
+          PlayerData.spaceId,
         );
         event.target.value = '';
       }
@@ -1083,7 +1093,7 @@ export default class Sidebar {
   ) {
     let otherPlayerMemberId = getterId;
     let nickName = '나';
-    if (getterId == this.scene.player.data.memberId) {
+    if (getterId == PlayerData.memberId) {
       otherPlayerMemberId = senderId;
       nickName = senderNick;
     }
@@ -1107,7 +1117,7 @@ export default class Sidebar {
     let otherPlayerMemberId = getterId;
     let otherPlayerNickName = getterNick;
     window.console.log('otherPlayerMemberId before=>', otherPlayerMemberId);
-    if (getterId == this.scene.player.data.memberId) {
+    if (getterId == PlayerData.memberId) {
       otherPlayerMemberId = senderId;
       otherPlayerNickName = senderNick;
     }
@@ -1185,16 +1195,24 @@ export default class Sidebar {
             .otherPlayerSocketId
         ]
       ) {
-        const placeholderText =
-          '미접속자에게 DM은 불가합니다.';
+        const placeholderText = '미접속자에게 DM은 불가합니다.';
         event.preventDefault(); // 입력 방지
-        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.disabled = true; // 입력 비활성화
-        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.value = '';
-        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.placeholder = placeholderText;
+        this.directMessageRoomContainer[
+          otherPlayerMemberId
+        ].chatInput.disabled = true; // 입력 비활성화
+        this.directMessageRoomContainer[otherPlayerMemberId].chatInput.value =
+          '';
+        this.directMessageRoomContainer[
+          otherPlayerMemberId
+        ].chatInput.placeholder = placeholderText;
 
         setTimeout(() => {
-            this.directMessageRoomContainer[otherPlayerMemberId].chatInput.disabled = false; // 입력 다시 활성화
-            this.directMessageRoomContainer[otherPlayerMemberId].chatInput.placeholder = '';
+          this.directMessageRoomContainer[
+            otherPlayerMemberId
+          ].chatInput.disabled = false; // 입력 다시 활성화
+          this.directMessageRoomContainer[
+            otherPlayerMemberId
+          ].chatInput.placeholder = '';
         }, 5000);
       }
       if (
@@ -1219,14 +1237,14 @@ export default class Sidebar {
           'SocketManager.getInstance().sendDirectMessageToPlayer()',
           this.directMessageRoomContainer[otherPlayerMemberId]
             .otherPlayerSocketId,
-          this.scene.player.nickName,
+          PlayerData.nickName,
           otherPlayerNickName,
           event.target.value,
         );
         SocketManager.getInstance().sendDirectMessageToPlayer(
           this.directMessageRoomContainer[otherPlayerMemberId]
             .otherPlayerSocketId,
-          this.scene.player.nickName,
+          PlayerData.nickName,
           otherPlayerNickName,
           event.target.value,
         );
@@ -1250,15 +1268,11 @@ export default class Sidebar {
       case 'spaceUsers':
         if (!this.isGettingAllChat) {
           //전채채팅 가져오는 로직
-          SocketManager.getInstance().requestAllChat(
-            this.scene.player.data.spaceId,
-          );
+          SocketManager.getInstance().requestAllChat(PlayerData.spaceId);
           this.isGettingAllChat = true;
         }
         if (!this.isGettingAllDM) {
-          SocketManager.getInstance().requestAllDM(
-            this.scene.player.data.memberId,
-          );
+          SocketManager.getInstance().requestAllDM(PlayerData.memberId);
           this.isGettingAllDM = true;
           if (!this.isMockingOtherPlayers) {
             //모킹 로직

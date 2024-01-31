@@ -54,15 +54,6 @@ export default class SpaceScene extends Phaser.Scene {
       )),
     );
 
-    this.userCards = new UserCard();
-    this.sidebar = new Sidebar(this);
-    // userCard함수를 sidebar out 버튼에 연결한 부분
-    this.sidebar.setCamFunc(
-      this.userCards.onCam.bind(this.userCards),
-      this.userCards.offCam.bind(this.userCards),
-    );
-    //TODO사이드바 안에 버튼들 있고
-
     const bgWidth = MapData.tileSize * MapData.column;
     const bgHeight = MapData.tileSize * MapData.row;
 
@@ -118,6 +109,10 @@ export default class SpaceScene extends Phaser.Scene {
     this.otherPlayers = {};
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
     SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
+
+    UserCard.getInstance();
+    Sidebar.getInstance().setScene(this);
+    // this.sidebar = new Sidebar(this);
   }
 
   createTileMap(width, height) {
@@ -207,7 +202,8 @@ export default class SpaceScene extends Phaser.Scene {
               // );
               this.otherPlayers[playerdata.id] = new Player(this, playerdata);
               this.mockOtherPlayers[playerdata.memberId] = {};
-              this.mockOtherPlayers[playerdata.memberId].nickName = playerdata.nickName;
+              this.mockOtherPlayers[playerdata.memberId].nickName =
+                playerdata.nickName;
             }
           }
         });
@@ -229,7 +225,7 @@ export default class SpaceScene extends Phaser.Scene {
           }
           this.mockOtherPlayers[data.memberId] = {};
           this.mockOtherPlayers[data.memberId].nickName = data.nickName;
-          console.log("joinSpacePlayer", data);
+          console.log('joinSpacePlayer', data);
         }
         break;
       case 'leaveSpace':
