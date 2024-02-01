@@ -58,7 +58,6 @@ export default class GroupAlarmModal {
     this.summitButton.style.fontWeight = 'bold';
     this.summitButton.innerText = '알림 보내기';
     this.summitButton.onclick = () => {
-      console.log('굿');
       this.sendMessage(this.groupId, this.message.value);
     };
     this.modal.appendChild(this.summitButton);

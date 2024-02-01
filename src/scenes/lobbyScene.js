@@ -16,19 +16,23 @@ import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
 import TossPaymentPopup from '../elements/tossPaymentPopup.js';
 import { CodeInputModal } from '../elements/codeInputModal.js';
+import titleImage from '../assets/images/title.png';
 
-export default class MainScene extends Phaser.Scene {
+export default class LoddyScene extends Phaser.Scene {
   static instance;
 
   constructor() {
-    super('MainScene');
+    super('LoddyScene');
   }
 
   preload() {}
 
   //3번
   create() {
-    this.createDom();
+    if (!document.getElementById('lobby')) {
+      this.createDom();
+    }
+    this.lobby.style.display = 'block';
     //init
     TossPaymentPopup.getInstance();
 
@@ -37,81 +41,196 @@ export default class MainScene extends Phaser.Scene {
   }
 
   createDom() {
-    this.title = document.createElement('header');
-    this.title.innerHTML = '<h1>STUDY CAMP</h1>';
-    this.title.style.width = '100%';
-    this.title.style.position = 'fixed';
-    this.title.style.top = '10%';
-    this.title.style.left = '50%';
-    this.title.style.transform = 'translate(-50%, -50%)';
-    this.title.style.display = 'flex';
-    this.title.style.alignItems = 'center';
-    this.title.style.justifyContent = 'center';
-    this.title.style.color = 'white'; // 텍스트 색상을 흰색으로 설정
-    this.title.style.fontSize = '2em'; // 글꼴 크기를 2em으로 설정 (조절 가능)
-    this.title.style.fontWeight = 'bold'; // 글꼴을 굵게 설정
-    document.body.appendChild(this.title);
+    this.lobby = document.createElement('div');
+    this.lobby.id = 'lobby';
+    this.lobby.style.width = '100%';
+    this.lobby.style.height = '100%';
+    document.body.appendChild(this.lobby);
 
-    this.container = document.createElement('div');
-    this.container.style.display = 'none';
-    this.container.style.width = '80%';
-    this.container.style.maxWidth = '900px';
-    this.container.style.position = 'fixed';
-    this.container.style.top = '20%';
-    this.container.style.left = '50%';
-    this.container.style.transform = 'translate(-50%, 0%)';
-    this.container.style.height = '80%';
-    document.body.appendChild(this.container);
+    this.header = document.createElement('header');
+    this.header.style.width = '100%';
+    this.header.style.backgroundColor = 'white';
+    this.header.style.position = 'fixed';
+    this.header.style.top = '0%';
+    this.header.style.left = '50%';
+    this.header.style.transform = 'translate(-50%, 0%)';
+    this.header.style.display = 'flex';
+    this.header.style.alignItems = 'center';
+    this.header.style.zIndex = '400';
+    this.lobby.appendChild(this.header);
 
-    this.leftContainer = document.createElement('div');
-    this.leftContainer.style.borderRadius = '10px';
-    this.leftContainer.style.width = '60%';
-    this.leftContainer.style.margin = '0px 20px 0px 0px';
-    this.container.appendChild(this.leftContainer);
+    this.headContainer = document.createElement('div');
+    this.headContainer.style.marginLeft = '10%';
+    this.headContainer.style.marginRight = '10%';
+    this.headContainer.style.height = '100%';
+    this.headContainer.style.width = '100%';
+    this.headContainer.style.display = 'flex';
+    this.headContainer.style.alignItems = 'center';
+    this.headContainer.style.justifyContent = 'space-between';
+    this.header.appendChild(this.headContainer);
 
-    this.cardTitle = document.createElement('div');
-    this.cardTitle.style.margin = '0px 0px 10px 0px';
-    this.cardTitle.style.width = '100%';
-    this.cardTitle.style.height = '8%';
-    this.cardTitle.style.display = 'flex';
-    this.cardTitle.style.alignItems = 'center';
-    this.leftContainer.appendChild(this.cardTitle);
+    this.headLeft = document.createElement('div');
+    this.headLeft.style.display = 'flex';
+    this.headLeft.style.alignItems = 'center';
+    this.headContainer.appendChild(this.headLeft);
 
-    const title = document.createElement('div');
-    title.innerText = '내 학습 공간';
-    title.style.color = 'white';
-    title.style.fontSize = '40px';
-    title.style.fontWeight = 'bold';
-    title.style.marginRight = '20px';
-    this.cardTitle.appendChild(title);
+    const logo = document.createElement('img');
+    logo.src = titleImage;
+    logo.width = 350;
+    logo.height = 60;
+    this.headLeft.appendChild(logo);
 
-    const logoutbutton = document.createElement('button');
-    logoutbutton.innerText = '로그아웃';
-    logoutbutton.style.borderRadius = '5px';
-    logoutbutton.style.backgroundColor = '#F3F2FF';
-    logoutbutton.style.border = '1px solid #6758ff';
-    logoutbutton.style.color = '#6758ff';
-    logoutbutton.style.height = '90%';
-    logoutbutton.style.maxHeight = '35px';
-    logoutbutton.style.lineHeight = 'normal';
-    logoutbutton.style.display = 'flex';
-    logoutbutton.style.textAlign = 'center';
-    logoutbutton.style.flexDirection = 'column';
-    logoutbutton.style.justifyContent = 'center';
-    this.cardTitle.appendChild(logoutbutton);
-    logoutbutton.onclick = () => {
+    const pr = document.createElement('div');
+    pr.innerText = '소개';
+    pr.style.cursor = 'pointer';
+    pr.style.margin = '10px';
+    pr.style.color = '#226699';
+    pr.style.fontWeight = 'bold';
+    this.headLeft.appendChild(pr);
+
+    const price = document.createElement('div');
+    price.innerText = '가격';
+    price.style.cursor = 'pointer';
+    price.style.color = '#226699';
+    price.style.margin = '10px';
+    price.style.fontWeight = 'bold';
+    this.headLeft.appendChild(price);
+
+    this.headLRight = document.createElement('div');
+    this.headLRight.style.display = 'flex';
+    this.headLRight.style.alignItems = 'center';
+    this.headContainer.appendChild(this.headLRight);
+
+    this.logoutbutton = document.createElement('button');
+    this.logoutbutton.style.display = 'none';
+    this.logoutbutton.innerText = '로그아웃';
+    this.logoutbutton.style.borderRadius = '5px';
+    this.logoutbutton.style.backgroundColor = '#edfaff';
+    this.logoutbutton.style.border = '1px solid #226699';
+    this.logoutbutton.style.color = '#226699';
+    this.logoutbutton.style.height = '35px';
+    this.logoutbutton.style.lineHeight = 'normal';
+    // this.logoutbutton.style.display = 'flex';
+    this.logoutbutton.style.textAlign = 'center';
+    this.logoutbutton.style.flexDirection = 'column';
+    this.logoutbutton.style.justifyContent = 'center';
+    this.headLRight.appendChild(this.logoutbutton);
+    this.logoutbutton.onclick = () => {
       requestLogout();
+      this.logoutbutton.style.display = 'none';
       this.container.style.display = 'none';
       LoginModal.getInstance().openModal();
     };
 
+    this.bodyContainer = document.createElement('div');
+    this.bodyContainer.style.width = '100%';
+    this.bodyContainer.style.height = '100%';
+    // this.bodyContainer.style.backgroundColor = 'white';
+    this.bodyContainer.style.position = 'fixed';
+    this.bodyContainer.style.left = '50%';
+    this.bodyContainer.style.top = '60px';
+    this.bodyContainer.style.transform = 'translate(-50%, 0%)';
+    this.bodyContainer.style.display = 'flex';
+    this.lobby.appendChild(this.bodyContainer);
+
+    this.container = document.createElement('div');
+    this.container.style.display = 'none';
+    this.container.style.marginLeft = '10%';
+    this.container.style.marginRight = '10%';
+    this.container.style.width = '80%';
+    this.container.style.position = 'fixed';
+    this.container.style.height = '90%';
+    this.bodyContainer.appendChild(this.container);
+
+    this.tabContainer = document.createElement('div');
+    this.tabContainer.style.width = '100%';
+    this.tabContainer.style.height = '50px';
+    this.tabContainer.style.marginTop = '40px';
+    this.tabContainer.style.marginBottom = '10px';
+    this.tabContainer.style.display = 'flex';
+    this.tabContainer.style.alignItems = 'center';
+    this.tabContainer.style.justifyContent = 'space-between';
+    this.container.appendChild(this.tabContainer);
+
+    this.tabLeft = document.createElement('div');
+    this.tabLeft.style.display = 'flex';
+    this.tabLeft.style.alignItems = 'center';
+    this.tabContainer.appendChild(this.tabLeft);
+
+    const mySpace = document.createElement('div');
+    mySpace.innerText = '내 학습 공간';
+    mySpace.style.fontSize = '20px';
+    mySpace.style.color = 'white';
+    mySpace.style.fontWeight = 'bold';
+    this.tabLeft.appendChild(mySpace);
+
+    this.tabRight = document.createElement('div');
+    this.tabRight.style.display = 'flex';
+    this.tabRight.style.alignItems = 'center';
+    this.tabContainer.appendChild(this.tabRight);
+
+    this.enterCodeBtn = document.createElement('button');
+    this.enterCodeBtn.innerText = '코드로 입장';
+    this.enterCodeBtn.style.borderRadius = '5px';
+    this.enterCodeBtn.style.backgroundColor = '#edfaff';
+    this.enterCodeBtn.style.border = '1px solid #226699';
+    this.enterCodeBtn.style.color = '#226699';
+    this.enterCodeBtn.style.height = '35px';
+    this.enterCodeBtn.style.lineHeight = 'normal';
+    this.enterCodeBtn.style.display = 'flex';
+    this.enterCodeBtn.style.textAlign = 'center';
+    this.enterCodeBtn.style.flexDirection = 'column';
+    this.enterCodeBtn.style.justifyContent = 'center';
+    this.enterCodeBtn.style.margin = '5px';
+    this.enterCodeBtn.style.fontWeight = 'bold';
+    this.enterCodeBtn.style.fontSize = '15px';
+    this.tabRight.appendChild(this.enterCodeBtn);
+
+    this.enterCodeBtn.onclick = () => {
+      console.log('코드로 입장 클릭!');
+      this.openCodeInputModal();
+    };
+
+    this.addSpaceBtn = document.createElement('button');
+    this.addSpaceBtn.innerText = '학습 공간 만들기';
+    this.addSpaceBtn.style.borderRadius = '5px';
+    this.addSpaceBtn.style.backgroundColor = '#297ebd';
+    this.addSpaceBtn.style.border = '1px solid #297ebd';
+    this.addSpaceBtn.style.color = 'white';
+    this.addSpaceBtn.style.height = '35px';
+    this.addSpaceBtn.style.lineHeight = 'normal';
+    this.addSpaceBtn.style.display = 'flex';
+    this.addSpaceBtn.style.textAlign = 'center';
+    this.addSpaceBtn.style.flexDirection = 'column';
+    this.addSpaceBtn.style.justifyContent = 'center';
+    this.addSpaceBtn.style.margin = '5px';
+    this.addSpaceBtn.style.fontWeight = 'bold';
+    this.addSpaceBtn.style.fontSize = '15px';
+    this.tabRight.appendChild(this.addSpaceBtn);
+    this.addSpaceBtn.onclick = () => {
+      this.createBox.style.display = 'flex';
+      this.detailBox.style.display = 'none';
+    };
+
+    this.botContaioner = document.createElement('div');
+    this.botContaioner.style.display = 'flex';
+    this.botContaioner.style.width = '100%';
+    this.botContaioner.style.height = '80%';
+    this.botContaioner.style.justifyContent = 'space-between';
+    this.container.appendChild(this.botContaioner);
+
+    this.leftContainer = document.createElement('div');
+    this.leftContainer.style.borderRadius = '10px';
+    this.leftContainer.style.width = '60%';
+    this.leftContainer.style.height = '100%';
+    this.botContaioner.appendChild(this.leftContainer);
+
     this.cardContainer = document.createElement('div');
     this.cardContainer.style.borderRadius = '5px';
-    this.cardContainer.style.border = '2px solid white';
     this.cardContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     this.cardContainer.style.width = '100%';
-    this.cardContainer.style.height = '40%';
-    this.cardContainer.style.backgroundColor = '#F3F2FF';
+    this.cardContainer.style.height = '45%';
+    this.cardContainer.style.backgroundColor = '#ddf1ff';
     this.cardContainer.style.margin = '0px 0px 10px 0px';
     this.cardContainer.style.display = 'flex';
     this.cardContainer.style.flexDirection = 'column';
@@ -125,50 +244,30 @@ export default class MainScene extends Phaser.Scene {
     this.middleContainer.style.justifyContent = 'space-between';
     this.middleContainer.style.height = '35px';
     this.middleContainer.style.margin = '0px 0px 10px 0px';
+    this.middleContainer.style.display = 'flex';
+    this.middleContainer.style.alignItems = 'center';
     this.leftContainer.appendChild(this.middleContainer);
+
+    const otherSpace = document.createElement('div');
+    otherSpace.innerText = '전체 학습 공간';
+    otherSpace.style.fontSize = '20px';
+    otherSpace.style.color = 'white';
+    otherSpace.style.fontWeight = 'bold';
+    this.middleContainer.appendChild(otherSpace);
 
     this.searchInput = document.createElement('input');
     this.searchInput.style.borderRadius = '5px';
     this.searchInput.placeholder = '학습 공간 검색';
     this.searchInput.style.width = '69%';
     this.searchInput.style.height = '100%';
-    // this.searchInput.style.margin = '0px 30px 0px 0px';
     this.middleContainer.appendChild(this.searchInput);
 
     this.searchInput.addEventListener('keyup', () => {
       this.searchInputFunc(this.searchInput.value);
     });
 
-    this.enterCodeBtn = document.createElement('div');
-    this.enterCodeBtn.style.borderRadius = '5px';
-    this.enterCodeBtn.innerHTML = '코드로 입장';
-    this.enterCodeBtn.style.backgroundColor = '#6758ff';
-    this.enterCodeBtn.style.width = '29%';
-    this.enterCodeBtn.style.height = '100%';
-    this.enterCodeBtn.style.textAlign = 'center';
-    this.enterCodeBtn.style.fontWeight = 'bold';
-    this.enterCodeBtn.style.lineHeight = 'normal';
-    this.enterCodeBtn.style.color = '#fff';
-    this.enterCodeBtn.style.display = 'flex';
-    this.enterCodeBtn.style.flexDirection = 'column';
-    this.enterCodeBtn.style.justifyContent = 'center';
-    this.middleContainer.appendChild(this.enterCodeBtn);
-
-    this.enterCodeBtn.onclick = () => {
-      console.log('코드로 입장 클릭!');
-      this.openCodeInputModal();
-    };
-    this.enterCodeBtn.addEventListener('mouseenter', () => {
-      this.enterCodeBtn.style.backgroundColor = '#8a7fff';
-      this.enterCodeBtn.style.cursor = 'pointer';
-    });
-    this.enterCodeBtn.addEventListener('mouseleave', () => {
-      this.enterCodeBtn.style.backgroundColor = '#6758ff';
-    });
-
     this.allSpaceList = document.createElement('div');
     this.allSpaceList.style.borderRadius = '5px';
-    this.allSpaceList.style.border = '2px solid white';
     this.allSpaceList.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     this.allSpaceList.style.display = 'flex';
     this.allSpaceList.style.flexDirection = 'column';
@@ -176,52 +275,16 @@ export default class MainScene extends Phaser.Scene {
     this.allSpaceList.style.overflowY = 'auto';
     this.allSpaceList.style.overflowX = 'hidden';
     this.allSpaceList.style.width = '100%';
-    this.allSpaceList.style.height = '32%';
-    this.allSpaceList.style.backgroundColor = '#F3F2FF';
-    this.allSpaceList.style.margin = '0px 0px 20px 0px';
+    this.allSpaceList.style.height = '45%';
+    this.allSpaceList.style.backgroundColor = '#ddf1ff';
     this.leftContainer.appendChild(this.allSpaceList);
 
     this.rightContainer = document.createElement('div');
     this.rightContainer.style.borderRadius = '10px';
-    // this.rightContainer.style.border = '2px solid white';
-    // this.rightContainer.style.boxShadow =
-    //   '0px 0px 10px rgba(74, 138, 255, 0.1)';
-    this.rightContainer.style.width = '40%';
-    this.rightContainer.style.margin = '0px 20px 20px 5px';
+    this.rightContainer.style.height = '100%';
+    this.rightContainer.style.width = '38%';
     this.rightContainer.style.flexDirection = 'column';
-    this.container.appendChild(this.rightContainer);
-
-    // 기욱
-    this.addSpaceBtn = document.createElement('div');
-    this.addSpaceBtn.innerText = '스페이스 생성';
-    this.addSpaceBtn.style.borderRadius = '5px';
-    this.addSpaceBtn.style.backgroundColor = '#6758ff';
-    this.addSpaceBtn.style.width = '100%';
-    this.addSpaceBtn.style.height = '8%';
-    this.addSpaceBtn.style.textAlign = 'center';
-    this.addSpaceBtn.style.fontWeight = 'bold';
-    this.addSpaceBtn.style.fontSize = '1.2rem';
-    this.addSpaceBtn.style.lineHeight = 'normal';
-    this.addSpaceBtn.style.margin = '0px 0px 10px 0px';
-    this.addSpaceBtn.style.color = '#fff';
-    this.addSpaceBtn.style.display = 'flex';
-    this.addSpaceBtn.style.flexDirection = 'column';
-    this.addSpaceBtn.style.justifyContent = 'center';
-    this.addSpaceBtn.onclick = () => {
-      this.createBox.style.display = 'flex';
-      this.detailBox.style.display = 'none';
-    };
-    this.rightContainer.appendChild(this.addSpaceBtn);
-    //
-
-    this.addSpaceBtn.addEventListener('mouseenter', () => {
-      this.addSpaceBtn.style.backgroundColor = '#8a7fff';
-      this.addSpaceBtn.style.cursor = 'pointer';
-    });
-
-    this.addSpaceBtn.addEventListener('mouseleave', () => {
-      this.addSpaceBtn.style.backgroundColor = '#6758ff';
-    });
+    this.botContaioner.appendChild(this.rightContainer);
 
     const detailContainer = document.createElement('div');
     detailContainer.style.borderRadius = '5px';
@@ -229,11 +292,8 @@ export default class MainScene extends Phaser.Scene {
     detailContainer.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
     detailContainer.style.display = 'flex';
     detailContainer.style.width = '100%';
-    // detailContainer.style.height = '85%';
-    detailContainer.style.height = 'calc(72% + 75px)';
+    detailContainer.style.height = 'calc(90% + 55px)';
     detailContainer.style.backgroundColor = 'white';
-    // detailContainer.style.margin = '0px 20px 20px 5px';
-    // detailContainer.style.padding = '20px';
     detailContainer.style.textAlign = 'center';
     detailContainer.style.display = 'flex';
     detailContainer.style.flexDirection = 'column';
@@ -259,7 +319,7 @@ export default class MainScene extends Phaser.Scene {
     this.nameInput.style.width = '80%';
     this.nameInput.style.border = 'none';
     this.nameInput.style.marginBottom = '20px';
-    this.nameInput.style.backgroundColor = '#F3F2FF';
+    this.nameInput.style.backgroundColor = '#edfaff';
     this.createBox.appendChild(this.nameInput);
 
     this.createImageBox = document.createElement('div');
@@ -267,7 +327,7 @@ export default class MainScene extends Phaser.Scene {
     this.createImageBox.style.width = '80%';
     this.createImageBox.style.height = '20%';
     this.createImageBox.style.marginBottom = '20px';
-    this.createImageBox.style.backgroundColor = '#F3F2FF';
+    this.createImageBox.style.backgroundColor = '#edfaff';
     this.createBox.appendChild(this.createImageBox);
 
     // 클래스 선택 및 정보를 표시할 Flex 컨테이너 생성
@@ -284,7 +344,7 @@ export default class MainScene extends Phaser.Scene {
     this.classSelect.style.height = '30px';
     this.classSelect.style.border = 'none';
     this.classSelect.style.borderRadius = '5px';
-    this.classSelect.style.backgroundColor = '#F3F2FF';
+    this.classSelect.style.backgroundColor = '#edfaff';
     classContainer.appendChild(this.classSelect);
 
     this.createPassword = document.createElement('input');
@@ -295,7 +355,7 @@ export default class MainScene extends Phaser.Scene {
     this.createPassword.style.height = '7%';
     this.createPassword.style.border = 'none';
     this.createPassword.style.marginBottom = '20px';
-    this.createPassword.style.backgroundColor = '#F3F2FF';
+    this.createPassword.style.backgroundColor = '#edfaff';
     this.createBox.appendChild(this.createPassword);
 
     this.createContent = document.createElement('input');
@@ -306,14 +366,9 @@ export default class MainScene extends Phaser.Scene {
     this.createContent.style.height = '20%';
     this.createContent.style.border = 'none';
     this.createContent.style.marginBottom = '20px';
-    this.createContent.style.backgroundColor = '#F3F2FF';
+    this.createContent.style.backgroundColor = '#edfaff';
     this.createBox.appendChild(this.createContent);
     //---------------------------------------------------
-
-    // const createHeader = document.createElement('div');
-    // createHeader.classList.add('modal-header');
-    // createHeader.innerText = 'CREATE SPACE';
-    // this.createBox.appendChild(createHeader);
 
     // 클래스 정보를 표시할 요소들
     const classInfoContainer = document.createElement('div');
@@ -338,17 +393,13 @@ export default class MainScene extends Phaser.Scene {
     nameGroup.classList.add('group');
     this.createBox.appendChild(nameGroup);
 
-    // const nameLabel = document.createElement('label');
-    // nameLabel.textContent = 'Space Name';
-    // nameGroup.appendChild(nameLabel);
-
     // TossPaymentPopup 인스턴스 생성
 
     const createButton = document.createElement('button');
     createButton.textContent = '생성 하기';
     createButton.style.width = '80%';
     createButton.style.height = '10%';
-    createButton.style.backgroundColor = '#6758ff';
+    createButton.style.backgroundColor = '#297ebd';
     createButton.style.borderRadius = '5px';
     createButton.style.fontWeight = 'bold';
     createButton.style.lineHeight = 'normal';
@@ -394,7 +445,7 @@ export default class MainScene extends Phaser.Scene {
     this.spaceImageBox.style.width = '80%';
     this.spaceImageBox.style.height = '25%';
     this.spaceImageBox.style.marginBottom = '20px';
-    this.spaceImageBox.style.backgroundColor = '#F3F2FF';
+    this.spaceImageBox.style.backgroundColor = '#edfaff';
     this.detailBox.appendChild(this.spaceImageBox);
 
     this.spaceInfoContainer = document.createElement('div');
@@ -418,7 +469,7 @@ export default class MainScene extends Phaser.Scene {
     this.spacePassword = document.createElement('input');
     this.spacePassword.type = 'password';
     this.spacePassword.style.borderRadius = '5px';
-    this.spacePassword.style.backgroundColor = '#F3F2FF';
+    this.spacePassword.style.backgroundColor = '#edfaff';
     this.spacePassword.style.width = '80%';
     this.spacePassword.style.height = '7%';
     this.spacePassword.style.border = 'none';
@@ -444,7 +495,7 @@ export default class MainScene extends Phaser.Scene {
     detailButton.textContent = '입장 하기';
     detailButton.style.width = '80%';
     detailButton.style.height = '10%';
-    detailButton.style.backgroundColor = '#6758ff';
+    detailButton.style.backgroundColor = '#297ebd';
     detailButton.style.borderRadius = '5px';
     detailButton.style.fontWeight = 'bold';
     detailButton.style.lineHeight = 'normal';
@@ -504,7 +555,8 @@ export default class MainScene extends Phaser.Scene {
       (obj2) => !memberSpaceList.data.some((obj1) => obj1.id === obj2.id),
     );
     this.createAllSpaceList(filteredSpace);
-    this.container.style.display = 'flex';
+    this.container.style.display = 'block';
+    this.logoutbutton.style.display = 'block';
     console.log('filter', filteredSpace);
   }
 
@@ -527,7 +579,8 @@ export default class MainScene extends Phaser.Scene {
 
     this.createSpaceClassList();
     // 스페이스 공간 컨테이너 보여주기
-    this.container.style.display = 'flex';
+    this.container.style.display = 'block';
+    this.logoutbutton.style.display = 'block';
     // 스페이스 목록
     // this.createSpaceList(response.data.member_spaces);
 
@@ -612,15 +665,16 @@ export default class MainScene extends Phaser.Scene {
     spaceCard.style.justifyContent = 'center';
     spaceCard.style.textAlign = 'center';
     // spaceCard.style.padding = '15px';
-    spaceCard.style.width = '95%';
+    spaceCard.style.width = '98%';
     spaceCard.style.margin = '5px';
-    spaceCard.style.height = '40px';
+    spaceCard.style.height = '50px';
     spaceCard.style.backgroundColor = 'white';
     spaceCard.style.cursor = 'pointer';
     spaceCard.style.transition = 'transform 0.3s ease-in-out';
     spaceCard.style.borderRadius = '5px';
     spaceCard.style.boxShadow = '0px 0px 10px rgba(0, 0, 0, 0.1)';
     spaceCard.style.textAlign = 'center';
+    spaceCard.style.color = '#297ebd';
     spaceCard.innerText = card.name;
 
     // Add hover effect
@@ -674,8 +728,10 @@ export default class MainScene extends Phaser.Scene {
     this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
     LoginModal.getInstance().closeModal();
-    this.title.style.display = 'none';
-    this.container.style.display = 'none';
+    // this.title.style.display = 'none';
+    // this.container.style.display = 'none';
+    // this.logoutbutton.style.display = 'none';
+    this.lobby.style.display = 'none';
 
     // await requestMemberProfile(
     //   { spaceId: this.spaceId },

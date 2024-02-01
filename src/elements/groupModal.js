@@ -95,80 +95,97 @@ export default class GroupModal {
 
   createGroup(groupNameArr) {
     // 클래스 목록 추가
-    groupNameArr.forEach((data) => {
+    if (groupNameArr) {
+      groupNameArr.forEach((data) => {
+        const option = document.createElement('option');
+        option.value = data.groupId;
+        option.textContent = data.groupName;
+        this.select.appendChild(option);
+      });
+    } else {
       const option = document.createElement('option');
-      option.value = data.groupId;
-      option.textContent = data.groupName;
+      option.textContent = '';
       this.select.appendChild(option);
-    });
+    }
   }
 
   createList(selectedValue) {
     this.listContainer.innerHTML = '';
-    let selectedList = this.results.filter(
-      (item) => item.groupId == selectedValue,
-    );
-    for (let i = 0; i < selectedList.length; i++) {
-      const list = document.createElement('div');
-      list.style.backgroundColor = '#F3F2FF';
-      list.style.margin = '10px';
-      list.style.borderRadius = '5px';
-      list.style.border = '1px solid #6758FF';
-      list.style.height = '50px';
-      this.listContainer.appendChild(list);
+    if (selectedValue) {
+      let selectedList = this.results.filter(
+        (item) => item.groupId == selectedValue,
+      );
+      for (let i = 0; i < selectedList.length; i++) {
+        const list = document.createElement('div');
+        list.style.backgroundColor = '#F3F2FF';
+        list.style.margin = '10px';
+        list.style.borderRadius = '5px';
+        list.style.border = '1px solid #6758FF';
+        list.style.height = '50px';
+        this.listContainer.appendChild(list);
 
-      const grid = document.createElement('div');
-      grid.style.marginTop = '5px';
-      grid.style.display = 'grid';
-      grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-      grid.style.gridGap = '10px';
-      grid.style.placeItems = 'center';
-      grid.style.textAlign = 'center';
-      list.appendChild(grid);
+        const grid = document.createElement('div');
+        grid.style.marginTop = '5px';
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        grid.style.gridGap = '10px';
+        grid.style.placeItems = 'center';
+        grid.style.textAlign = 'center';
+        list.appendChild(grid);
 
-      const name = document.createElement('div');
-      name.innerText = `${selectedList[i].nickName}`;
-      name.style.fontWeight = 'bold';
-      grid.appendChild(name);
+        const name = document.createElement('div');
+        name.innerText = `${selectedList[i].nickName}`;
+        name.style.fontWeight = 'bold';
+        grid.appendChild(name);
 
-      const button = document.createElement('button');
-      button.id = `${selectedList[i].groupId}`;
-      button.innerText = '그룹에서 삭제하기';
-      button.style.backgroundColor = '#6758FF';
-      button.style.margin = '0px';
-      button.onclick = async () => {
-        await deleteGroupMember(
-          selectedList[i].memberId,
-          selectedList[i].groupId,
-        );
-        await this.requestAndProcessGroupData();
-        this.createList(this.select.value);
-      };
+        const button = document.createElement('button');
+        button.id = `${selectedList[i].groupId}`;
+        button.innerText = '그룹에서 삭제하기';
+        button.style.backgroundColor = '#6758FF';
+        button.style.margin = '0px';
+        button.onclick = async () => {
+          await deleteGroupMember(
+            selectedList[i].memberId,
+            selectedList[i].groupId,
+          );
+          await this.requestAndProcessGroupData();
+          this.createList(this.select.value);
+        };
 
-      grid.appendChild(button);
+        grid.appendChild(button);
+      }
+    } else {
+      this.listContainer.innerHTML = '<h3>데이터가 없습니다.</h3>';
+      this.listContainer.style.display = 'flex';
+      this.listContainer.style.alignItems = 'center';
+      this.listContainer.style.justifyContent = 'center';
     }
   }
 
   requestAndProcessGroupData = async () => {
-    this.results = await requestGroupData();
+    try {
+      this.results = await requestGroupData();
+      let groupName = this.results.map((data) => ({
+        groupName: data.groupName,
+        groupId: data.groupId,
+      }));
+      let uniqueMap = new Map();
 
-    let groupName = this.results.map((data) => ({
-      groupName: data.groupName,
-      groupId: data.groupId,
-    }));
-    let uniqueMap = new Map();
+      groupName.forEach((item) => {
+        const identifier = `${item.groupName}-${item.groupId}`;
+        if (!uniqueMap.has(identifier)) {
+          uniqueMap.set(identifier, item);
+        }
+      });
 
-    groupName.forEach((item) => {
-      const identifier = `${item.groupName}-${item.groupId}`;
-      if (!uniqueMap.has(identifier)) {
-        uniqueMap.set(identifier, item);
+      let groupNameArr = Array.from(uniqueMap.values());
+      if (this.select.options.length === 0) {
+        this.createGroup(groupNameArr);
+        this.createList(this.select.value);
       }
-    });
-
-    let groupNameArr = Array.from(uniqueMap.values());
-    if (this.select.options.length === 0) {
-      this.createGroup(groupNameArr);
-      this.createList(this.select.value);
+    } catch (error) {
+      this.createGroup();
+      this.createList();
     }
   };
 

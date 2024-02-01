@@ -38,16 +38,16 @@ export default class Player {
 
     // 스프라이트 생성
     this.skinSprite = this.scene.physics.add.sprite(0, 0, skin);
-    this.skinSprite.setOrigin(0, 0);
+    this.skinSprite.setOrigin(0, 0.5);
 
     this.faceSprite = this.scene.physics.add.sprite(0, 0, face);
-    this.faceSprite.setOrigin(0, 0);
+    this.faceSprite.setOrigin(0, 0.5);
 
     this.clothesSprite = this.scene.physics.add.sprite(0, 0, clothes);
-    this.clothesSprite.setOrigin(0, 0);
+    this.clothesSprite.setOrigin(0, 0.5);
 
     this.hairSprite = this.scene.physics.add.sprite(0, 0, hair);
-    this.hairSprite.setOrigin(0, 0);
+    this.hairSprite.setOrigin(0, 0.5);
 
     this.nicknameText = this.scene.add.text(0, 0, this.nickName, {
       fontSize: '16px',
@@ -58,7 +58,7 @@ export default class Player {
         y: 8,
       },
     });
-    this.nicknameText.setOrigin(0, 0.5);
+    this.nicknameText.setOrigin(0, 1.5);
 
     // 컨테이너 생성
     this.player = this.scene.add.container(
