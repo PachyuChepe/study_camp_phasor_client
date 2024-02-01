@@ -74,7 +74,7 @@ export default class SocketManager extends Singleton {
     this.socket.on('AllDMHistory', (data) => {
       console.log('AllDMHistory', data);
       this.publish('AllDMHistory', data);
-    })
+    });
     this.socket.on('updateSkinPlayer', (data) => {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
@@ -115,17 +115,13 @@ export default class SocketManager extends Singleton {
       });
 
       peerConnection.onicecandidate = (event) => {
-        console.log(event);
-
         if (event.candidate) {
           this.sendIceCandidate(event, pc);
         } else {
-          console.log('추가된 후보자가 없을 때 else 문');
         }
       };
       peerConnection.addEventListener('track', (event) => {
         const [stream] = event.streams;
-        console.log('미디어 정보', stream);
         const streamId = stream.id;
 
         if (!this.streams) {
@@ -143,7 +139,6 @@ export default class SocketManager extends Singleton {
           const newVideo = UserCard.getInstance().createRemoteCard(pc);
           newVideo.srcObject = stream;
 
-          console.log('remote stream ===>', newVideo.srcObject);
           this.streams[streamId].videoCreated = true;
         }
       });
@@ -158,7 +153,6 @@ export default class SocketManager extends Singleton {
     });
 
     this.socket.on('mediaAnswer', async (data) => {
-      console.log('mediaAnswer : answer 메시지 받음');
       const pc = data.from;
       for (let i = 0; i < this.selectedUser.length; i++) {
         if (this.selectedUser_id[i] == pc) {
@@ -172,8 +166,6 @@ export default class SocketManager extends Singleton {
     });
 
     this.socket.on('remotePeerIceCandidate', async (data) => {
-      console.log('remotePeerIceCandidate : candidate 받음');
-      console.log('remotePeerIceCandidate :' + data);
       try {
         const candidate = new RTCIceCandidate(data.candidate);
         for (let i = 0; i < this.selectedUser.length; i++) {
@@ -267,7 +259,7 @@ export default class SocketManager extends Singleton {
       id: this.socket.id,
       nickName: PlayerData.nickName,
       message: message,
-      spaceId
+      spaceId,
     });
   }
 
@@ -300,9 +292,6 @@ export default class SocketManager extends Singleton {
   }
 
   handleSocketConnected = async () => {
-    console.log(`socket: ${this.socket.id}`);
-    console.log(`소켓 연결 되면 handleSocketConnected 함수 호출!`);
-    console.log(`onSocketConnected 함수 호출 예정`);
     this.onSocketConnected();
   };
 
@@ -315,25 +304,27 @@ export default class SocketManager extends Singleton {
   };
 
   onSocketConnected = async () => {
-    console.log(`onSocketConnected 함수 시작`);
     const constraints = {
       audio: true,
       video: { facingMode: 'user' },
     };
-
-    this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-    this.stream.getVideoTracks().forEach((track) => (track.enabled = false));
-    this.stream.getAudioTracks().forEach((track) => (track.enabled = false));
-    this.localStream = UserCard.getInstance().createLocalCard();
-    this.localStream.srcObject = this.stream;
-    this.socket.emit('requestUserList');
+    try {
+      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+      this.stream.getVideoTracks().forEach((track) => (track.enabled = false));
+      this.stream.getAudioTracks().forEach((track) => (track.enabled = false));
+      this.localStream = UserCard.getInstance().createLocalCard();
+      this.localStream.srcObject = this.stream;
+      this.socket.emit('requestUserList');
+    } catch (error) {
+      console.error('미디어 장치에 접근할 수 없습니다:', error);
+      alert('카메라 또는 마이크에 접근할 수 없습니다. 권한을 확인해주세요.');
+    }
   };
 
   onUpdateUserList = async ({ userIds }) => {
     this.allUserList = userIds;
     this.selectedUser = userIds.filter((id) => id !== this.socket.id);
     let userIdCount = userIds.length;
-    console.log('유저 수', userIdCount);
 
     if (userIdCount > 1 && this.socket.id == userIds[userIdCount - 1]) {
       for (let i = 0; i < userIdCount - 1; i++) {
@@ -363,7 +354,6 @@ export default class SocketManager extends Singleton {
           if (event.candidate) {
             this.sendIceCandidate(event, this.selectedUser[i]);
           } else {
-            console.log('후보자가 없으면 else문');
           }
         };
         peerConnection.addEventListener('track', (event) => {
@@ -382,13 +372,11 @@ export default class SocketManager extends Singleton {
           }
 
           if (!this.streams[streamId].videoCreated) {
-            console.log('selected User ====>', this.selectedUser);
             const newVideo = UserCard.getInstance().createRemoteCard(
               this.selectedUser[i],
             );
             newVideo.srcObject = stream;
 
-            console.log('remote stream ===>', newVideo.srcObject);
             this.streams[streamId].videoCreated = true;
           }
         });
@@ -419,7 +407,6 @@ export default class SocketManager extends Singleton {
   };
 
   sendMediaAnswer = (peerAnswer, data) => {
-    console.log('sendMediaAnswer 함수 시작 서버에 answer 보냄');
     this.socket.emit('mediaAnswer', {
       answer: peerAnswer,
       from: this.socket.id,
@@ -442,11 +429,11 @@ export default class SocketManager extends Singleton {
   };
 
   requestAllChat = async (spaceId) => {
-    this.socket.emit('AllChatHistory',{spaceId});
-  }
+    this.socket.emit('AllChatHistory', { spaceId });
+  };
 
   requestAllDM = async (memberId) => {
-    window.console.log("requestAllDMHistory");
-    this.socket.emit('AllDMHistory', {memberId})
-  }
+    window.console.log('requestAllDMHistory');
+    this.socket.emit('AllDMHistory', { memberId });
+  };
 }

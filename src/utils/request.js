@@ -413,7 +413,6 @@ export const requestGroupData = async () => {
 };
 
 export const deleteGroupMember = async (memberId, groupId) => {
-  console.log(memberId, groupId);
   const data = {
     groupId,
     memberId,
@@ -432,7 +431,6 @@ export const deleteGroupMember = async (memberId, groupId) => {
 };
 
 export const sendMessageToGroupMember = async (groupId, message) => {
-  console.log(groupId, message);
   const data = {
     groupId,
     message,
