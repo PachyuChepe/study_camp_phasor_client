@@ -242,6 +242,10 @@ export default class Player {
 
     this.moveAnimation(deltaX, deltaY);
     SocketManager.getInstance().sendMovePlayer(this.tilePos.x, this.tilePos.y);
+    // SocketManager.getInstance().handleSocketConnected(
+    //   this.tilePos.x,
+    //   this.tilePos.y,
+    // );
 
     const self = this;
     this.tween = this.scene.tweens.add({

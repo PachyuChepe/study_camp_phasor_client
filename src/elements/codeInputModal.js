@@ -81,14 +81,15 @@ export class CodeInputModal extends Singleton {
   submitInputFunc = async () => {
     let inputValues = '';
     for (let i = 0; i < 6; i++) {
-      const inputValue = document.getElementById(`input${i}`).value;
+      const inputValue = document
+        .getElementById(`input${i}`)
+        .value.toUpperCase();
       if (!inputValue) {
         alert('모두 입력 해주세요.');
       } else {
         inputValues += inputValue;
       }
     }
-    console.log(inputValues);
     const response = await signupInviteCode(inputValues);
     inputValues = '';
     this.enterSpaceFunc(response);

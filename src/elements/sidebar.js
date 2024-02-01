@@ -525,6 +525,20 @@ export default class Sidebar extends Singleton {
         event.target.value = '';
       }
     });
+    //focus이벤트
+    this.groupChatInput.addEventListener('focus', () => {
+      // 키보드 이벤트 리스너 추가
+      this.keydownHandler = (event) => {
+        event.stopPropagation();
+      };
+
+      this.groupChatInput.addEventListener('keydown', this.keydownHandler);
+    });
+    //blur이벤트 넣음
+    this.groupChatInput.addEventListener('blur', () => {
+      // 모달 끄면 키보드 이벤트 풀기
+      this.groupChatInput.removeEventListener('keydown', this.keydownHandler);
+    });
     this.groupChatContainer.appendChild(this.groupChatInput);
   }
 
@@ -569,6 +583,20 @@ export default class Sidebar extends Singleton {
         );
         event.target.value = '';
       }
+    });
+    //focus이벤트
+    this.sideChatInput.addEventListener('focus', () => {
+      // 키보드 이벤트 리스너 추가
+      this.keydownHandler = (event) => {
+        event.stopPropagation();
+      };
+
+      this.sideChatInput.addEventListener('keydown', this.keydownHandler);
+    });
+    //blur이벤트 넣음
+    this.sideChatInput.addEventListener('blur', () => {
+      // 모달 끄면 키보드 이벤트 풀기
+      this.sideChatInput.removeEventListener('keydown', this.keydownHandler);
     });
     this.chatContainer.appendChild(this.sideChatInput);
   }
@@ -634,17 +662,22 @@ export default class Sidebar extends Singleton {
     this.directMessageInput.style.backgroundColor = 'transparent';
     this.directMessageInput.style.marginTop = '10px';
     this.directMessageInput.style.color = 'white';
+    //focus이벤트
+    this.directMessageInput.addEventListener('focus', () => {
+      // 키보드 이벤트 리스너 추가
+      this.keydownHandler = (event) => {
+        event.stopPropagation();
+      };
+
+      this.directMessageInput.addEventListener('keydown', this.keydownHandler);
+    });
     //blur이벤트 넣음
     this.directMessageInput.addEventListener('blur', () => {
-      //이 방법보다 좋은 방법을 찾으면 좋겠다.
-      setTimeout(() => {
-        this.directMessageInput.value = '';
-        this.directMessageBox.style.display = 'none';
-        while (this.directMessageBox.firstChild) {
-          this.directMessageBox.removeChild(this.directMessageBox.firstChild);
-        }
-        this.isDMInputfocused = false;
-      }, 100);
+      // 모달 끄면 키보드 이벤트 풀기
+      this.directMessageInput.removeEventListener(
+        'keydown',
+        this.keydownHandler,
+      );
     });
 
     //start: 자동완성 기능 넣어줌
@@ -819,7 +852,28 @@ export default class Sidebar extends Singleton {
     ].chatInput.style.marginTop = '10px';
     this.directMessageRoomContainer[otherPlayerMemberId].chatInput.style.color =
       'white';
+    //focus이벤트
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.addEventListener('focus', () => {
+      // 키보드 이벤트 리스너 추가
+      this.keydownHandler = (event) => {
+        event.stopPropagation();
+      };
 
+      this.directMessageRoomContainer[
+        otherPlayerMemberId
+      ].chatInput.addEventListener('keydown', this.keydownHandler);
+    });
+    //blur이벤트 넣음
+    this.directMessageRoomContainer[
+      otherPlayerMemberId
+    ].chatInput.addEventListener('blur', () => {
+      // 모달 끄면 키보드 이벤트 풀기
+      this.directMessageRoomContainer[
+        otherPlayerMemberId
+      ].chatInput.removeEventListener('keydown', this.keydownHandler);
+    });
     this.directMessageRoomContainer[
       otherPlayerMemberId
     ].chatInput.addEventListener('keydown', (event) => {
@@ -891,8 +945,20 @@ export default class Sidebar extends Singleton {
     this.userSearchInput.style.backgroundColor = 'transparent';
     this.userSearchInput.style.marginTop = '10px';
     this.userSearchInput.style.color = 'white';
+    // focus 이벤트
+    this.userSearchInput.addEventListener('focus', () => {
+      // 키보드 이벤트 리스너 추가
+      this.keydownHandler = (event) => {
+        event.stopPropagation();
+      };
+
+      this.userSearchInput.addEventListener('keydown', this.keydownHandler);
+    });
+
     //blur이벤트 넣음
     this.userSearchInput.addEventListener('blur', () => {
+      // 모달 끄면 키보드 이벤트 풀기
+      this.userSearchInput.removeEventListener('keydown', this.keydownHandler);
       //이 방법보다 좋은 방법을 찾으면 좋겠다.
       setTimeout(() => {
         this.userSearchInput.value = '';
