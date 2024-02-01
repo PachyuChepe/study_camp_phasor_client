@@ -89,9 +89,9 @@ export class CodeInputModal extends Singleton {
       }
     }
     console.log(inputValues);
-    await signupInviteCode(inputValues);
+    const response = await signupInviteCode(inputValues);
     inputValues = '';
-    this.enterSpaceFunc();
+    this.enterSpaceFunc(response);
     this.codeInputModal.style.display = 'none';
   };
 }

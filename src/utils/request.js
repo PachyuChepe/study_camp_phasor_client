@@ -94,7 +94,7 @@ export const requestAllSpaceList = async () => {
     const response = await axios.get(`${process.env.DB}/spaces/all`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    console.log('학습공간 목록 전체 조회 성공', response.data);
+    // console.log('학습공간 목록 전체 조회 성공', response.data);
     return response; // 응답 데이터만 반환
   } catch (error) {
     console.error('학습공간 목록 전체 조회 실패', error);
@@ -128,7 +128,7 @@ export const requestSpaceList = async () => {
     const response = axios.get(`${process.env.DB}/spaces`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    console.log('학습공간 목록 조회 성공', response.data);
+    // console.log('학습공간 목록 조회 성공', response.data);
     return response;
   } catch (error) {
     console.error('학습공간 목록 조회 실패:', error);
@@ -141,7 +141,7 @@ export const requestMemberSpace = async () => {
     const response = await axios.get(`${process.env.DB}/spaces`, {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
-    console.log('멤버 학습공간 목록 조회 성공', response.data);
+    // console.log('멤버 학습공간 목록 조회 성공', response.data);
     return response;
   } catch (error) {
     console.error('멤버 학습공간 목록 조회 실패', error);
@@ -335,6 +335,26 @@ export const requestAllMemeberIdBySpaceId = async (spaceId) => {
   return result;
 };
 
+// 스페이스 입장 비밀번호 검증
+export const requestInvitePassword = async (password, spaceId) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.post(
+      `${process.env.DB}/spaces/invitation/password`,
+      { password, spaceId },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    // console.log(response);
+    return response;
+  } catch (error) {
+    console.error('코드 검증 실패', error);
+    //throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+    return null;
+  }
+};
+
 // 초대 코드 검증
 export const signupInviteCode = async (code) => {
   try {
@@ -350,7 +370,8 @@ export const signupInviteCode = async (code) => {
     return response;
   } catch (error) {
     console.error('코드 검증 실패', error);
-    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+    //throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+    return null;
   }
 };
 
