@@ -324,17 +324,16 @@ export const requestAddLecture = async (spaceId, title) => {
     },
   );
   return result;
-}
+};
 
 //해당 스페이스 내의 모든 멤버 정보 가져오기
 export const requestAllMemeberIdBySpaceId = async (spaceId) => {
   const accessToken = localStorage.getItem('access_token');
-  const result = await axios
-  .get(`${process.env.DB}/spaces/${spaceId}`,{
+  const result = await axios.get(`${process.env.DB}/spaces/${spaceId}`, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });
   return result;
-}
+};
 
 // 초대 코드 검증
 export const signupInviteCode = async (code) => {
@@ -372,7 +371,6 @@ export const createInviteCode = async () => {
     throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
   }
 };
-
 
 // 그룹 관리
 export const requestGroupData = async () => {
@@ -434,3 +432,70 @@ export const sendMessageToGroupMember = async (groupId, message) => {
   }
 };
 
+// spaceId에 해당하는 출석 데이터를 가져오는 함수
+export const fetchAttendanceData = async (spaceId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.SOCKET}/attendance/${spaceId}`,
+    );
+    console.log('response.data', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching attendance data:', error);
+    throw error;
+  }
+};
+
+// userId에 해당하는 출석 데이터를 가져오는 함수
+export const fetchUserAttendanceData = async (userId) => {
+  try {
+    const response = await axios.get(
+      `${process.env.SOCKET}/attendance/user/${userId}`,
+    );
+    console.log('Fetched data:', response.data); // 데이터 확인
+    return response.data; // 여기서 response.data를 반환해야 함
+  } catch (error) {
+    console.error('Error fetching user attendance data:', error);
+    throw error;
+  }
+};
+
+// 멤버 관리
+export const fetchMembers = async () => {
+  try {
+    const spaceId = PlayerData.spaceId;
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.get(
+      `${process.env.DB}/space-members/${spaceId}`,
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('멤버 정보를 불러오는 데 실패했습니다.', error);
+    return [];
+  }
+};
+
+// 멤버 관리: 멤버 역할 변경
+export const changeMemberRole = async (userId, spaceId, newRole) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.patch(
+      `${process.env.DB}/space-members/change-role`,
+      {
+        targetUserId: userId,
+        spaceId: spaceId,
+        newRole: newRole,
+      },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return response.data;
+  } catch (error) {
+    console.error('멤버 역할 변경에 실패했습니다.', error);
+    throw error;
+  }
+};
