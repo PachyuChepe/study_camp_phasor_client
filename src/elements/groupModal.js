@@ -1,5 +1,6 @@
 import GroupAlarmModal from '../elements/groupAlarmModal';
 import { deleteGroupMember, requestGroupData } from '../utils/request';
+import GroupCreateModal from './groupCreateModal';
 
 // 그룹관리 창
 export default class GroupModal {
@@ -46,6 +47,19 @@ export default class GroupModal {
     this.input.style.border = '1px solid #6758FF';
     this.optionContainer.appendChild(this.input);
 
+    this.createGroupButton = document.createElement('button');
+    this.createGroupButton.style.width = '20%';
+    this.createGroupButton.style.height = '10%';
+    this.createGroupButton.style.backgroundColor = '#6758FF';
+    this.createGroupButton.style.marginLeft = '169px';
+    this.createGroupButton.innerText = '그룹 생성';
+    this.createGroupButton.onclick = () => {
+      this.closeModal();
+      this.groupAlarmModal = new GroupCreateModal();
+      this.groupAlarmModal.openModal();
+    };
+    this.optionContainer.appendChild(this.createGroupButton);
+
     this.container = document.createElement('div');
     this.container.style.border = '4px solid #F3F2FF';
     this.container.style.height = '60%';
@@ -64,18 +78,18 @@ export default class GroupModal {
     this.buttonContainer.style.justifyContent = 'space-between';
     this.modal.appendChild(this.buttonContainer);
 
-    const alarmButton = document.createElement('button');
-    alarmButton.innerText = '그룹 메세지 보내기';
-    alarmButton.style.width = '49%';
-    alarmButton.style.backgroundColor = '#6758FF';
-    alarmButton.onclick = () => {
+    this.alarmButton = document.createElement('button');
+    this.alarmButton.innerText = '그룹 메세지 보내기';
+    this.alarmButton.style.width = '49%';
+    this.alarmButton.style.backgroundColor = '#6758FF';
+    this.alarmButton.onclick = () => {
       this.closeModal();
       const selectedOptionText =
         this.select.options[this.select.selectedIndex].textContent;
       this.groupAlarmModal = new GroupAlarmModal();
       this.groupAlarmModal.openModal(selectedOptionText, this.select.value);
     };
-    this.buttonContainer.appendChild(alarmButton);
+    this.buttonContainer.appendChild(this.alarmButton);
 
     const lectureButton = document.createElement('button');
     lectureButton.innerText = '그룹 강의 시작하기';
@@ -105,17 +119,19 @@ export default class GroupModal {
 
   createGroup(groupNameArr) {
     // 클래스 목록 추가
-    if (groupNameArr) {
+    if (groupNameArr && groupNameArr.length > 0) {
       groupNameArr.forEach((data) => {
         const option = document.createElement('option');
         option.value = data.groupId;
         option.textContent = data.groupName;
         this.select.appendChild(option);
       });
+      this.alarmButton.disabled = false;
     } else {
       const option = document.createElement('option');
       option.textContent = '';
       this.select.appendChild(option);
+      this.alarmButton.disabled = true;
     }
   }
 

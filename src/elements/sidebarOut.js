@@ -35,7 +35,7 @@ export default class SidebarOut extends Singleton {
 
     this.buttonbox.appendChild(this.micBtn);
 
-    this.isActiveCam = true;
+    this.isActiveCam = false;
     this.camBtn = document.createElement('button');
     this.camBtn.style.backgroundColor = '#a2cfff';
     this.camBtn.style.border = '2px solid white';
@@ -120,7 +120,6 @@ export default class SidebarOut extends Singleton {
     </span>`;
     }
     this.isActiveCam = !this.isActiveCam;
-    SocketManager.getInstance().handleSocketConnected();
   }
 
   clickShare() {

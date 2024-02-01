@@ -518,3 +518,21 @@ export const changeMemberRole = async (userId, spaceId, newRole) => {
     throw error;
   }
 };
+
+// 그룹 생성
+export const createGroup = async (name) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    await axios.post(
+      `${process.env.DB}/group/${PlayerData.spaceId}`,
+      { name },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return;
+  } catch (error) {
+    console.error('그룹 생성 실패.', error);
+    throw error;
+  }
+};
