@@ -92,9 +92,13 @@ export default class SpaceScene extends Phaser.Scene {
     });
 
     // 마우스 휠 이벤트 감지
-    let zoomSpeed = 0.02;
+    let zoomSpeed = 0.03;
     this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-      const newZoom = this.cameras.main.zoom + deltaY * zoomSpeed;
+      // const newZoom = this.cameras.main.zoom + deltaY * zoomSpeed;
+      const standardDeltaY = 100; // 마우스 휠 한 칸당 표준 deltaY 값
+      const zoomChange = (deltaY / standardDeltaY) * zoomSpeed; // 정규화된 deltaY 값을 사용한 줌 변화량 계산
+      const newZoom = this.cameras.main.zoom + zoomChange;
+
       // 배경의 크기에 따라 줌 제한 설정
       const maxZoom = Math.max(
         (window.innerWidth - 20) / bgWidth,
