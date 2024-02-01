@@ -654,7 +654,6 @@ export default class LoddyScene extends Phaser.Scene {
   }
 
   loadSpaceCard(card) {
-    this.cardContainer.innerHTML = '';
     const spaceCard = this.createSpaceCard(card);
     spaceCard.onclick = this.detailSpace.bind(this, card);
     this.cardContainer.appendChild(spaceCard);
