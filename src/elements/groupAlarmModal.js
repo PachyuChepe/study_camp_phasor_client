@@ -1,3 +1,4 @@
+import { sendMessageToGroupMember } from '../utils/request';
 import GroupModal from './groupModal';
 
 export default class GroupAlarmModal {
@@ -34,7 +35,7 @@ export default class GroupAlarmModal {
     this.gradeGroup.style.backgroundColor = '#F3F2FF';
     this.gradeGroup.style.fontWeight = 'bold';
     this.gradeGroup.style.padding = '5px';
-    this.gradeGroup.innerText = '챌린지';
+    this.gradeGroup.innerText = '';
     this.gradeContainer.appendChild(this.gradeGroup);
 
     this.message = document.createElement('input');
@@ -57,21 +58,22 @@ export default class GroupAlarmModal {
     this.summitButton.style.fontWeight = 'bold';
     this.summitButton.innerText = '알림 보내기';
     this.summitButton.onclick = () => {
-      console.log('굿');
+      this.sendMessage(this.groupId, this.message.value);
     };
     this.modal.appendChild(this.summitButton);
   }
 
-  openModal() {
+  openModal(selectedValue, groupId) {
     this.modal.style.display = 'block';
+    this.gradeGroup.innerText = `${selectedValue}`;
+    this.groupId = groupId;
+    console.log(selectedValue, groupId);
 
     // 키보드 이벤트 리스너 추가
     this.keydownHandler = (event) => {
-      // 모달 외부의 키보드 이벤트 방지
       event.stopPropagation();
     };
 
-    // 모달 자체에 이벤트 리스너를 추가하여 모달 내부에서만 이벤트가 처리되도록 함
     this.modal.addEventListener('keydown', this.keydownHandler);
   }
 
@@ -79,7 +81,13 @@ export default class GroupAlarmModal {
     this.groupModal = new GroupModal();
     this.modal.style.display = 'none';
     this.groupModal.openModal();
-    // 키보드 이벤트 리스너 제거
+    // 모달 끄면 키보드 이벤트 풀기
     this.modal.removeEventListener('keydown', this.keydownHandler);
+  }
+
+  async sendMessage(groupId, message) {
+    await sendMessageToGroupMember(groupId, message);
+    alert('메시지 전송 완료!');
+    this.closeModal();
   }
 }

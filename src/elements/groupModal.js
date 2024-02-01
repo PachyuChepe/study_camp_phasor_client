@@ -1,4 +1,5 @@
 import GroupAlarmModal from '../elements/groupAlarmModal';
+import { deleteGroupMember, requestGroupData } from '../utils/request';
 
 // 그룹관리 창
 export default class GroupModal {
@@ -32,6 +33,11 @@ export default class GroupModal {
     this.select.style.marginRight = '10px';
     this.select.style.border = '1px solid #6758FF';
     this.select.style.backgroundColor = '#F3F2FF';
+    this.select.addEventListener('change', (event) => {
+      const selectedValue = event.target.value;
+
+      this.createList(selectedValue);
+    });
     this.optionContainer.appendChild(this.select);
 
     this.input = document.createElement('input');
@@ -64,8 +70,10 @@ export default class GroupModal {
     alarmButton.style.backgroundColor = '#6758FF';
     alarmButton.onclick = () => {
       this.closeModal();
+      const selectedOptionText =
+        this.select.options[this.select.selectedIndex].textContent;
       this.groupAlarmModal = new GroupAlarmModal();
-      this.groupAlarmModal.openModal();
+      this.groupAlarmModal.openModal(selectedOptionText, this.select.value);
     };
     this.buttonContainer.appendChild(alarmButton);
 
@@ -74,61 +82,112 @@ export default class GroupModal {
     lectureButton.style.width = '49%';
     lectureButton.style.backgroundColor = '#6758FF';
     this.buttonContainer.appendChild(lectureButton);
-
-    this.createGroup();
-    this.createList();
   }
 
-  openModal() {
+  openModal = () => {
     this.modal.style.display = 'block';
-  }
+    this.requestAndProcessGroupData();
+  };
 
-  closeModal() {
+  closeModal = () => {
     this.modal.style.display = 'none';
-  }
+  };
 
-  createGroup() {
-    const datearray = ['챌린지', '스탠다드', '베이직', 'A반', 'B반'];
+  createGroup(groupNameArr) {
     // 클래스 목록 추가
-    datearray.forEach((date, index) => {
+    if (groupNameArr) {
+      groupNameArr.forEach((data) => {
+        const option = document.createElement('option');
+        option.value = data.groupId;
+        option.textContent = data.groupName;
+        this.select.appendChild(option);
+      });
+    } else {
       const option = document.createElement('option');
-      option.value = index;
-      option.textContent = date;
+      option.textContent = '';
       this.select.appendChild(option);
-    });
-  }
-
-  createList() {
-    for (let i = 0; i < 10; i++) {
-      const list = document.createElement('div');
-      list.style.backgroundColor = '#F3F2FF';
-      list.style.margin = '10px';
-      list.style.borderRadius = '5px';
-      list.style.border = '1px solid #6758FF';
-      list.style.height = '50px';
-      this.listContainer.appendChild(list);
-
-      const grid = document.createElement('div');
-      grid.style.marginTop = '5px';
-      grid.style.display = 'grid';
-      grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
-      grid.style.gridGap = '10px';
-      grid.style.placeItems = 'center';
-      grid.style.textAlign = 'center';
-      list.appendChild(grid);
-
-      const name = document.createElement('div');
-      name.innerText = '닉네임';
-      name.style.fontWeight = 'bold';
-      grid.appendChild(name);
-
-      const button = document.createElement('button');
-      button.innerText = '그룹에서 삭제하기';
-      button.style.backgroundColor = '#6758FF';
-      button.style.margin = '0px';
-      grid.appendChild(button);
     }
   }
+
+  createList(selectedValue) {
+    this.listContainer.innerHTML = '';
+    if (selectedValue) {
+      let selectedList = this.results.filter(
+        (item) => item.groupId == selectedValue,
+      );
+      for (let i = 0; i < selectedList.length; i++) {
+        const list = document.createElement('div');
+        list.style.backgroundColor = '#F3F2FF';
+        list.style.margin = '10px';
+        list.style.borderRadius = '5px';
+        list.style.border = '1px solid #6758FF';
+        list.style.height = '50px';
+        this.listContainer.appendChild(list);
+
+        const grid = document.createElement('div');
+        grid.style.marginTop = '5px';
+        grid.style.display = 'grid';
+        grid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        grid.style.gridGap = '10px';
+        grid.style.placeItems = 'center';
+        grid.style.textAlign = 'center';
+        list.appendChild(grid);
+
+        const name = document.createElement('div');
+        name.innerText = `${selectedList[i].nickName}`;
+        name.style.fontWeight = 'bold';
+        grid.appendChild(name);
+
+        const button = document.createElement('button');
+        button.id = `${selectedList[i].groupId}`;
+        button.innerText = '그룹에서 삭제하기';
+        button.style.backgroundColor = '#6758FF';
+        button.style.margin = '0px';
+        button.onclick = async () => {
+          await deleteGroupMember(
+            selectedList[i].memberId,
+            selectedList[i].groupId,
+          );
+          await this.requestAndProcessGroupData();
+          this.createList(this.select.value);
+        };
+
+        grid.appendChild(button);
+      }
+    } else {
+      this.listContainer.innerHTML = '<h3>데이터가 없습니다.</h3>';
+      this.listContainer.style.display = 'flex';
+      this.listContainer.style.alignItems = 'center';
+      this.listContainer.style.justifyContent = 'center';
+    }
+  }
+
+  requestAndProcessGroupData = async () => {
+    try {
+      this.results = await requestGroupData();
+      let groupName = this.results.map((data) => ({
+        groupName: data.groupName,
+        groupId: data.groupId,
+      }));
+      let uniqueMap = new Map();
+
+      groupName.forEach((item) => {
+        const identifier = `${item.groupName}-${item.groupId}`;
+        if (!uniqueMap.has(identifier)) {
+          uniqueMap.set(identifier, item);
+        }
+      });
+
+      let groupNameArr = Array.from(uniqueMap.values());
+      if (this.select.options.length === 0) {
+        this.createGroup(groupNameArr);
+        this.createList(this.select.value);
+      }
+    } catch (error) {
+      this.createGroup();
+      this.createList();
+    }
+  };
 
   groupAlarmModal() {}
 }

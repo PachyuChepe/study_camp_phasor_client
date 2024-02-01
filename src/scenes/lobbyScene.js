@@ -11,6 +11,7 @@ import {
   requestUserProfile,
   requestcustomerKey,
   requestLogout,
+  requestInvitePassword,
 } from '../utils/request.js';
 import PlayerData from '../config/playerData.js';
 import playerPayment from '../utils/playerPayment.js';
@@ -557,7 +558,7 @@ export default class LoddyScene extends Phaser.Scene {
     this.createAllSpaceList(filteredSpace);
     this.container.style.display = 'block';
     this.logoutbutton.style.display = 'block';
-    console.log('filter', filteredSpace);
+    // console.log('filter', filteredSpace);
   }
 
   async successLogin(response) {
@@ -636,6 +637,7 @@ export default class LoddyScene extends Phaser.Scene {
   }
 
   createAllSpaceList(allSpaceList) {
+    this.allSpaceList.innerHTML = '';
     allSpaceList.forEach((space) => {
       const spaceCard = this.createSpaceCard(space);
       spaceCard.onclick = this.detailOtherSpace.bind(this, space);
@@ -715,52 +717,50 @@ export default class LoddyScene extends Phaser.Scene {
   }
 
   //2번
-  async enterSpace() {
-    // this.createBox.style.display = 'none';
-    // this.detailBox.style.display = 'block';
-    // requestProfile(
-    //   this.successProfile.bind(this, this.spaceId),
-    // );
-    PlayerData.spaceId = this.spaceId;
+  async enterSpace(response) {
+    console.log('enterSpace  =>', response);
+    PlayerData.spaceId = response.data.space_id;
+    PlayerData.role = response.data.role;
+    PlayerData.memberId = response.data.id;
 
-    console.log(this.spaceId);
-    // 현재 씬 멈춤
-    this.scene.stop('MainScene');
     // 현재 씬 리소스들 감추기
     LoginModal.getInstance().closeModal();
-    // this.title.style.display = 'none';
-    // this.container.style.display = 'none';
-    // this.logoutbutton.style.display = 'none';
     this.lobby.style.display = 'none';
 
-    // await requestMemberProfile(
-    //   { spaceId: this.spaceId },
-    //   this.successMemberProfile.bind(this),
-    // );
-    const requestMemberProfileRespones = await requestMemberProfile({
-      spaceId: this.spaceId,
-    });
-    this.successMemberProfile(requestMemberProfileRespones);
-
-    // 스페이스 씬 시작
-    window.console.log('스페이스 씬 시작');
+    // 현재 씬 멈춤
+    this.scene.stop('MainScene');
     this.scene.start('SpaceScene');
   }
 
   async checkUserBelongSpace(spaceId) {
-    const space = await requestSpace({
-      spaceId: spaceId,
+    const requestMemberProfileRespones = await requestMemberProfile({
+      spaceId: this.spaceId,
     });
-
-    if (space.data.isUserInSpace) {
-      this.enterSpace();
+    if (requestMemberProfileRespones) {
+      this.enterSpace(requestMemberProfileRespones);
     } else {
-      this.spacePassword.value === space.data.space
-        ? this.enterSpace()
-        : space.data.space === null
-          ? this.enterSpace()
-          : alert('비밀번호가 틀립니다');
+      const password = this.spacePassword.value;
+      const reponse = await requestInvitePassword(password, this.spaceId);
+      if (reponse) {
+        this.enterSpace(reponse);
+      } else {
+        alert('비밀번호가 틀립니다');
+      }
     }
+
+    // const space = await requestSpace({
+    //   spaceId: spaceId,
+    // });
+
+    // if (space.data.isUserInSpace) {
+    //   this.enterSpace();
+    // } else {
+    //   this.spacePassword.value === space.data.space
+    //     ? this.enterSpace()
+    //     : space.data.space === null
+    //       ? this.enterSpace()
+    //       : alert('비밀번호가 틀립니다');
+    // }
   }
 
   async reqCreateSpace() {
@@ -779,11 +779,11 @@ export default class LoddyScene extends Phaser.Scene {
     this.createSpaceList(respone);
   }
 
-  successMemberProfile(response) {
-    console.log('successMemberProfile  =>', response);
-    PlayerData.role = response.data.role;
-    PlayerData.memberId = response.data.id;
-  }
+  // successMemberProfile(response) {
+  //   console.log('successMemberProfile  =>', response);
+  //   PlayerData.role = response.data.role;
+  //   PlayerData.memberId = response.data.id;
+  // }
 
   update() {}
 

@@ -101,8 +101,9 @@ export default class ManagerModal {
       roleSelect.style.fontWeight = 'bold';
       const roles = ['관리자', '매니저', '멘토', '멘티'];
 
+      console.log(PlayerData.role, '안들어옴?');
       // 현재 사용자의 role에 따라 콤보박스 옵션 설정
-      if (PlayerData.role === 0) {
+      if (PlayerData.role === '0') {
         // 관리자: 모든 옵션 추가
         roles.forEach((roleName, index) => {
           const option = document.createElement('option');
@@ -111,8 +112,8 @@ export default class ManagerModal {
           roleSelect.appendChild(option);
         });
       } else if (
-        PlayerData.role === 1 &&
-        (member.role === 2 || member.role === 3)
+        PlayerData.role === '1' &&
+        (member.role === '2' || member.role === '3')
       ) {
         // 매니저: 멘토와 멘티 옵션만 추가
         roles.slice(2).forEach((roleName, index) => {
@@ -163,7 +164,7 @@ export default class ManagerModal {
       grid.appendChild(logbutton);
 
       // '강의 진도 보기' 버튼은 role 3 (멘티)에게만 표시
-      if (member.role === 3) {
+      if (member.role === '3') {
         const lecturebutton = document.createElement('button');
         lecturebutton.innerText = '강의 진도 보기';
         lecturebutton.style.backgroundColor = '#6758FF';
