@@ -478,7 +478,7 @@ export default class Sidebar extends Singleton {
       myLogbutton.innerHTML = `<p><span class="material-symbols-outlined">
       how_to_reg
     </span> 출석 보기</p>`;
-      this.logModal = new LogModal();
+      this.logModal = new LogModal(PlayerData.userId);
       myLogbutton.onclick = this.logModal.openModal.bind(this.logModal);
       this.sideEditBox.appendChild(myLogbutton);
     }

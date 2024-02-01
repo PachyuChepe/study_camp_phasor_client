@@ -1,4 +1,8 @@
 // 출석 관리 창
+
+import { fetchAttendanceData } from '../utils/request';
+import PlayerData from '../config/playerData';
+
 export default class LogDateModal {
   constructor() {
     this.modal = document.createElement('div');
@@ -55,7 +59,7 @@ export default class LogDateModal {
     this.headContainer.appendChild(start);
 
     const end = document.createElement('div');
-    end.innerText = '입실';
+    end.innerText = '퇴실';
     end.style.fontWeight = 'bold';
     this.headContainer.appendChild(end);
 
@@ -68,39 +72,115 @@ export default class LogDateModal {
     this.listContainer.style.height = '85%';
     this.listContainer.style.overflowY = 'auto';
     this.container.appendChild(this.listContainer);
-
-    this.createDate();
-    this.createList();
   }
 
-  openModal() {
+  async openModal() {
     this.modal.style.display = 'block';
+    await this.createDate();
+    this.createList();
   }
 
   closeModal() {
     this.modal.style.display = 'none';
   }
 
-  createDate() {
-    const datearray = [
-      '2024 - 10 - 10',
-      '2024 - 10 - 10',
-      '2024 - 10 - 10',
-      '2024 - 10 - 10',
-      '2024 - 10 - 10',
-      '2024 - 10 - 10',
-    ];
-    // 클래스 목록 추가
-    datearray.forEach((date, index) => {
+  // createDate() {
+  //   const datearray = [
+  //     '2024 - 10 - 10',
+  //     '2024 - 10 - 10',
+  //     '2024 - 10 - 10',
+  //     '2024 - 10 - 10',
+  //     '2024 - 10 - 10',
+  //     '2024 - 10 - 10',
+  //   ];
+  //   // 클래스 목록 추가
+  //   datearray.forEach((date, index) => {
+  //     const option = document.createElement('option');
+  //     option.value = index;
+  //     option.textContent = date;
+  //     this.select.appendChild(option);
+  //   });
+  // }
+
+  async createDate() {
+    // 콤보박스의 기존 옵션들을 제거합니다.
+    while (this.select.firstChild) {
+      this.select.removeChild(this.select.firstChild);
+    }
+
+    const attendanceData = await fetchAttendanceData(PlayerData.spaceId);
+    this.attendanceData = attendanceData; // 클래스 변수로 저장
+
+    const uniqueDates = Array.from(
+      new Set(
+        attendanceData.map((data) =>
+          new Date(data.entryTime).toISOString().substring(0, 10),
+        ),
+      ),
+    );
+
+    uniqueDates.forEach((date, index) => {
       const option = document.createElement('option');
-      option.value = index;
+      option.value = date;
       option.textContent = date;
       this.select.appendChild(option);
     });
+
+    this.select.onchange = () => this.createList(); // 콤보박스 변경 시 createList 호출
   }
 
-  createList() {
-    for (let i = 0; i < 10; i++) {
+  // createList() {
+  //   for (let i = 0; i < 10; i++) {
+  //     const list = document.createElement('div');
+  //     list.style.backgroundColor = '#F3F2FF';
+  //     list.style.margin = '10px';
+  //     list.style.borderRadius = '5px';
+  //     list.style.border = '1px solid #6758FF';
+  //     list.style.height = '50px';
+  //     this.listContainer.appendChild(list);
+
+  //     const grid = document.createElement('div');
+  //     grid.style.marginTop = '15px';
+  //     grid.style.display = 'grid';
+  //     grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+  //     grid.style.gridGap = '10px';
+  //     grid.style.placeItems = 'center';
+  //     grid.style.textAlign = 'center';
+  //     list.appendChild(grid);
+
+  //     const name = document.createElement('div');
+  //     name.innerText = '닉네임';
+  //     grid.appendChild(name);
+
+  //     const start = document.createElement('div');
+  //     start.innerText = '09:00:00';
+  //     grid.appendChild(start);
+
+  //     const end = document.createElement('div');
+  //     end.innerText = '21:00:00';
+  //     grid.appendChild(end);
+
+  //     const time = document.createElement('div');
+  //     time.innerText = '12:00:00';
+  //     grid.appendChild(time);
+
+  //     const gridItems = Array.from(grid.children);
+  //     gridItems.forEach((item) => {
+  //       item.style.fontWeight = 'bold';
+  //     });
+  //   }
+  // }
+
+  async createList() {
+    const selectedDate = this.select.value;
+    const filteredData = this.attendanceData.filter(
+      (data) =>
+        new Date(data.entryTime).toISOString().substring(0, 10) ===
+        selectedDate,
+    );
+
+    this.listContainer.innerHTML = '';
+    filteredData.forEach((data) => {
       const list = document.createElement('div');
       list.style.backgroundColor = '#F3F2FF';
       list.style.margin = '10px';
@@ -118,26 +198,39 @@ export default class LogDateModal {
       grid.style.textAlign = 'center';
       list.appendChild(grid);
 
-      const name = document.createElement('div');
-      name.innerText = '닉네임';
-      grid.appendChild(name);
+      // 각 로그에 대한 데이터 추가
+      this.addLogDataToGrid(grid, data);
+    });
+  }
 
-      const start = document.createElement('div');
-      start.innerText = '09:00:00';
-      grid.appendChild(start);
+  addLogDataToGrid(grid, data) {
+    // 닉네임
+    const name = document.createElement('div');
+    name.innerText = data.nickName;
+    grid.appendChild(name);
 
-      const end = document.createElement('div');
-      end.innerText = '21:00:00';
-      grid.appendChild(end);
+    // 입실 시간
+    const start = document.createElement('div');
+    start.innerText = new Date(data.entryTime).toLocaleTimeString();
+    grid.appendChild(start);
 
-      const time = document.createElement('div');
-      time.innerText = '12:00:00';
-      grid.appendChild(time);
-
-      const gridItems = Array.from(grid.children);
-      gridItems.forEach((item) => {
-        item.style.fontWeight = 'bold';
-      });
+    // 퇴실 시간
+    const end = document.createElement('div');
+    if (data.exitTime) {
+      end.innerText = new Date(data.exitTime).toLocaleTimeString();
+    } else {
+      end.innerText = '퇴실입력대기';
     }
+    grid.appendChild(end);
+
+    // 총 시간 계산
+    const time = document.createElement('div');
+    if (data.exitTime) {
+      const duration = new Date(data.exitTime) - new Date(data.entryTime);
+      time.innerText = new Date(duration).toISOString().substr(11, 8);
+    } else {
+      time.innerText = '계산중...';
+    }
+    grid.appendChild(time);
   }
 }
