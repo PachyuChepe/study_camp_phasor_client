@@ -107,11 +107,12 @@ export default class SpaceScene extends Phaser.Scene {
     this.mockOtherPlayers = {};
 
     this.otherPlayers = {};
-    SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
-    SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
 
+    SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
     UserCard.getInstance();
     Sidebar.getInstance().setScene(this);
+    SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
+
     // this.sidebar = new Sidebar(this);
   }
 

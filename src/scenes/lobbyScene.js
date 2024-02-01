@@ -719,7 +719,7 @@ export default class LoddyScene extends Phaser.Scene {
   //2번
   async enterSpace(response) {
     console.log('enterSpace  =>', response);
-    PlayerData.spaceId = this.spaceId;
+    PlayerData.spaceId = response.data.id;
     PlayerData.role = response.data.role;
     PlayerData.memberId = response.data.id;
 
