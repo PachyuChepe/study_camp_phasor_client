@@ -18,6 +18,7 @@ import playerPayment from '../utils/playerPayment.js';
 import TossPaymentPopup from '../elements/tossPaymentPopup.js';
 import { CodeInputModal } from '../elements/codeInputModal.js';
 import titleImage from '../assets/images/title.png';
+import SocketManager from '../managers/socket.js';
 
 export default class LoddyScene extends Phaser.Scene {
   static instance;

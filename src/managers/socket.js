@@ -79,7 +79,7 @@ export default class SocketManager extends Singleton {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
     });
-    this.socket.on('connect', this.handleSocketConnected);
+    // this.socket.on('connect', this.handleSocketConnected);
     this.socket.on('disconnected', (data) => {
       this.removeDisconnectedUser(data);
     });
@@ -309,12 +309,21 @@ export default class SocketManager extends Singleton {
       video: { facingMode: 'user' },
     };
     try {
-      this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-      this.stream.getVideoTracks().forEach((track) => (track.enabled = false));
-      this.stream.getAudioTracks().forEach((track) => (track.enabled = false));
-      this.localStream = UserCard.getInstance().createLocalCard();
-      this.localStream.srcObject = this.stream;
-      this.socket.emit('requestUserList');
+      if (!this.localStream || !this.localStream.srcObject) {
+        this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+        this.stream
+          .getVideoTracks()
+          .forEach((track) => (track.enabled = false));
+        this.stream
+          .getAudioTracks()
+          .forEach((track) => (track.enabled = false));
+        this.localStream = UserCard.getInstance().createLocalCard();
+
+        if (!this.localStream.srcObject) {
+          this.localStream.srcObject = this.stream;
+          this.socket.emit('requestUserList', PlayerData);
+        }
+      }
     } catch (error) {
       console.error('미디어 장치에 접근할 수 없습니다:', error);
       alert('카메라 또는 마이크에 접근할 수 없습니다. 권한을 확인해주세요.');

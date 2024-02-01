@@ -87,10 +87,20 @@ export default class GroupModal {
   openModal = () => {
     this.modal.style.display = 'block';
     this.requestAndProcessGroupData();
+
+    // 키보드 이벤트 리스너 추가
+    this.keydownHandler = (event) => {
+      event.stopPropagation();
+    };
+
+    this.modal.addEventListener('keydown', this.keydownHandler);
   };
 
   closeModal = () => {
     this.modal.style.display = 'none';
+
+    // 모달 끄면 키보드 이벤트 풀기
+    this.modal.removeEventListener('keydown', this.keydownHandler);
   };
 
   createGroup(groupNameArr) {
