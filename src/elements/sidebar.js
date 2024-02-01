@@ -678,6 +678,14 @@ export default class Sidebar extends Singleton {
         'keydown',
         this.keydownHandler,
       );
+      setTimeout(() => {
+        this.directMessageInput.value = '';
+        this.directMessageBox.style.display = 'none';
+        while (this.directMessageBox.firstChild) {
+          this.directMessageBox.removeChild(this.directMessageBox.firstChild);
+        }
+        this.isDMInputfocused = false;
+      }, 100);
     });
 
     //start: 자동완성 기능 넣어줌
