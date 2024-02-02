@@ -299,6 +299,7 @@ export default class SocketManager extends Singleton {
 
   removeDisconnectedUser = (disconnectedUserId) => {
     const videoElementId = `remote-video-${disconnectedUserId}`;
+    console.log('나간 사람', videoElementId);
     const videoElement = document.getElementById(videoElementId);
     if (videoElement) {
       videoElement.parentNode.removeChild(videoElement);
