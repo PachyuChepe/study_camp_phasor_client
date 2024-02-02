@@ -86,6 +86,7 @@ export default class GroupAlarmModal {
   }
 
   async sendMessage(groupId, message) {
+    console.log('확인해보자잇', groupId, message);
     await sendMessageToGroupMember(groupId, message);
     alert('메시지 전송 완료!');
     this.closeModal();

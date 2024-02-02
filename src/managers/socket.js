@@ -98,6 +98,16 @@ export default class SocketManager extends Singleton {
       this.selectedUser_id.push(pc);
       this.pcs.push(peerConnection);
 
+      // PeerConnection의 ice 상태 및 연결 상태 추적 로그
+      peerConnection.addEventListener('iceconnectionstatechange', () => {
+        console.log(
+          `ICE connection state: ${peerConnection.iceConnectionState}`,
+        );
+      });
+      peerConnection.addEventListener('connectionstatechange', () => {
+        console.log(`Connection state: ${peerConnection.connectionState}`);
+      });
+
       peerConnection.addEventListener('icegatheringstatechange', async (ev) => {
         switch (peerConnection.iceGatheringState) {
           case 'new':
@@ -350,6 +360,16 @@ export default class SocketManager extends Singleton {
         this.stream
           .getTracks()
           .forEach((track) => peerConnection.addTrack(track, this.stream));
+
+        // PeerConnection의 ice 상태 및 연결 상태 추적 로그
+        peerConnection.addEventListener('iceconnectionstatechange', () => {
+          console.log(
+            `ICE connection state: ${peerConnection.iceConnectionState}`,
+          );
+        });
+        peerConnection.addEventListener('connectionstatechange', () => {
+          console.log(`Connection state: ${peerConnection.connectionState}`);
+        });
         peerConnection.addEventListener('icegatheringstatechange', (ev) => {
           switch (peerConnection.iceGatheringState) {
             case 'new':

@@ -1,5 +1,10 @@
 import GroupAlarmModal from '../elements/groupAlarmModal';
-import { deleteGroupMember, requestGroupData } from '../utils/request';
+import {
+  deleteGroupMember,
+  requestGroupData,
+  requestGroupMemberData,
+  sendMessageToGroupMember,
+} from '../utils/request';
 import GroupCreateModal from './groupCreateModal';
 
 // 그룹관리 창
@@ -34,10 +39,9 @@ export default class GroupModal {
     this.select.style.marginRight = '10px';
     this.select.style.border = '1px solid #6758FF';
     this.select.style.backgroundColor = '#F3F2FF';
-    this.select.addEventListener('change', (event) => {
-      const selectedValue = event.target.value;
-
-      this.createList(selectedValue);
+    this.select.addEventListener('change', async (event) => {
+      this.selectedValue = event.target.value;
+      this.createList(this.selectedValue);
     });
     this.optionContainer.appendChild(this.select);
 
@@ -91,16 +95,17 @@ export default class GroupModal {
     };
     this.buttonContainer.appendChild(this.alarmButton);
 
-    const lectureButton = document.createElement('button');
-    lectureButton.innerText = '그룹 강의 시작하기';
-    lectureButton.style.width = '49%';
-    lectureButton.style.backgroundColor = '#6758FF';
-    this.buttonContainer.appendChild(lectureButton);
+    this.lectureButton = document.createElement('button');
+    this.lectureButton.innerText = '그룹 강의 시작하기';
+    this.lectureButton.style.width = '49%';
+    this.lectureButton.style.backgroundColor = '#6758FF';
+    this.buttonContainer.appendChild(this.lectureButton);
   }
 
-  openModal = () => {
+  openModal = async () => {
     this.modal.style.display = 'block';
-    this.requestAndProcessGroupData();
+    await this.requestAndProcessGroupData();
+    this.requestAndProcessGroupMembersData();
 
     // 키보드 이벤트 리스너 추가
     this.keydownHandler = (event) => {
@@ -118,6 +123,7 @@ export default class GroupModal {
   };
 
   createGroup(groupNameArr) {
+    console.log(groupNameArr);
     // 클래스 목록 추가
     if (groupNameArr && groupNameArr.length > 0) {
       groupNameArr.forEach((data) => {
@@ -126,18 +132,18 @@ export default class GroupModal {
         option.textContent = data.groupName;
         this.select.appendChild(option);
       });
-      this.alarmButton.disabled = false;
     } else {
       const option = document.createElement('option');
       option.textContent = '';
       this.select.appendChild(option);
-      this.alarmButton.disabled = true;
     }
   }
 
   createList(selectedValue) {
+    console.log('선택 한 groupId', selectedValue);
+    console.log('그룹 멤버 조회 결과', this.results);
     this.listContainer.innerHTML = '';
-    if (selectedValue) {
+    if (this.results.length > 0) {
       let selectedList = this.results.filter(
         (item) => item.groupId == selectedValue,
       );
@@ -174,7 +180,7 @@ export default class GroupModal {
             selectedList[i].memberId,
             selectedList[i].groupId,
           );
-          await this.requestAndProcessGroupData();
+          // await this.requestAndProcessGroupData();
           this.createList(this.select.value);
         };
 
@@ -188,12 +194,29 @@ export default class GroupModal {
     }
   }
 
+  requestAndProcessGroupMembersData = async () => {
+    try {
+      this.results = await requestGroupMemberData();
+      if (this.results.length === 0) {
+        this.alarmButton.disabled = true;
+        this.lectureButton.disabled = true;
+      }
+      this.createList(this.results);
+    } catch (error) {
+      this.createList();
+    }
+  };
+
   requestAndProcessGroupData = async () => {
     try {
-      this.results = await requestGroupData();
-      let groupName = this.results.map((data) => ({
-        groupName: data.groupName,
-        groupId: data.groupId,
+      const response = await requestGroupData();
+      if (response.length === 0) {
+        this.alarmButton.disabled = true;
+        this.lectureButton.disabled = true;
+      }
+      let groupName = response.map((data) => ({
+        groupName: data.name,
+        groupId: data.id,
       }));
       let uniqueMap = new Map();
 
@@ -203,17 +226,15 @@ export default class GroupModal {
           uniqueMap.set(identifier, item);
         }
       });
-
       let groupNameArr = Array.from(uniqueMap.values());
+      console.log('groupNameArr ===> ', groupNameArr);
       if (this.select.options.length === 0) {
         this.createGroup(groupNameArr);
-        this.createList(this.select.value);
       }
     } catch (error) {
       this.createGroup();
-      this.createList();
     }
   };
 
-  groupAlarmModal() {}
+  groupAlarmModal = async () => {};
 }
