@@ -79,7 +79,7 @@ export default class SocketManager extends Singleton {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
     });
-    // this.socket.on('connect', this.handleSocketConnected);
+    this.socket.on('connect', this.handleSocketConnected);
     this.socket.on('disconnected', (data) => {
       this.removeDisconnectedUser(data);
     });
