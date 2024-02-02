@@ -88,9 +88,7 @@ export default class SocketManager extends Singleton {
       console.log(
         'mediaOffer : 웹브라우저에서 다른 유저의 offer 메시지 받고 peerConnection 생성',
       );
-      let peerConnection = new RTCPeerConnection({
-        iceServers: [{ urls: 'stun:stun1.1.google.com:19302' }],
-      });
+      let peerConnection = new RTCPeerConnection(this.iceServers);
 
       this.stream
         .getTracks()
@@ -148,11 +146,13 @@ export default class SocketManager extends Singleton {
       );
 
       const peerAnswer = await peerConnection.createAnswer();
+      console.log('9. answer 생성', peerAnswer);
       peerConnection.setLocalDescription(new RTCSessionDescription(peerAnswer));
       this.sendMediaAnswer(peerAnswer, data);
     });
 
     this.socket.on('mediaAnswer', async (data) => {
+      console.log('11. answer 받음', data);
       const pc = data.from;
       for (let i = 0; i < this.selectedUser.length; i++) {
         if (this.selectedUser_id[i] == pc) {
@@ -175,6 +175,7 @@ export default class SocketManager extends Singleton {
             await peerConnection.addIceCandidate(candidate);
           }
         }
+        console.log('9. remotePeerIceCandidate 받음', candidate);
       } catch (error) {
         console.error(error);
       }
@@ -292,6 +293,7 @@ export default class SocketManager extends Singleton {
   }
 
   handleSocketConnected = async () => {
+    console.log('1. 소켓 서버 연결 성공!');
     this.onSocketConnected();
   };
 
@@ -304,6 +306,7 @@ export default class SocketManager extends Singleton {
   };
 
   onSocketConnected = async () => {
+    console.log('2. 미디어 연결 시작...');
     const constraints = {
       audio: true,
       video: { facingMode: 'user' },
@@ -318,10 +321,11 @@ export default class SocketManager extends Singleton {
           .getAudioTracks()
           .forEach((track) => (track.enabled = false));
         this.localStream = UserCard.getInstance().createLocalCard();
-
+        console.log('3. 미디어 연결 완료!');
         if (!this.localStream.srcObject) {
           this.localStream.srcObject = this.stream;
           this.socket.emit('requestUserList', PlayerData);
+          console.log('4. 유저 정보 요청 시작...');
         }
       }
     } catch (error) {
@@ -331,15 +335,14 @@ export default class SocketManager extends Singleton {
   };
 
   onUpdateUserList = async ({ userIds }) => {
+    console.log('5. 연결 된 유저 리스트:', userIds);
     this.allUserList = userIds;
     this.selectedUser = userIds.filter((id) => id !== this.socket.id);
     let userIdCount = userIds.length;
 
     if (userIdCount > 1 && this.socket.id == userIds[userIdCount - 1]) {
       for (let i = 0; i < userIdCount - 1; i++) {
-        const peerConnection = new RTCPeerConnection({
-          iceServers: [{ urls: 'stun:stun1.1.google.com:19302' }],
-        });
+        const peerConnection = new RTCPeerConnection(this.iceServers);
         this.selectedUser_id.push(this.selectedUser[i]);
         this.pcs.push(peerConnection);
 
@@ -389,8 +392,8 @@ export default class SocketManager extends Singleton {
             this.streams[streamId].videoCreated = true;
           }
         });
-
         this.localPeerOffer = await peerConnection.createOffer();
+        console.log('6. offer 생성', this.localPeerOffer);
         peerConnection.setLocalDescription(
           new RTCSessionDescription(this.localPeerOffer),
         );
@@ -405,9 +408,11 @@ export default class SocketManager extends Singleton {
       to: toUser,
       candidate: event.candidate,
     });
+    console.log('8. iceCandidate 보냄', event);
   };
 
   sendMediaOffer = (localPeerOffer, toUser) => {
+    console.log('7. offer 보냄', localPeerOffer, toUser);
     this.socket.emit('mediaOffer', {
       offer: localPeerOffer,
       from: this.socket.id,
@@ -416,6 +421,7 @@ export default class SocketManager extends Singleton {
   };
 
   sendMediaAnswer = (peerAnswer, data) => {
+    console.log('10. answer 보냄', peerAnswer, data);
     this.socket.emit('mediaAnswer', {
       answer: peerAnswer,
       from: this.socket.id,
