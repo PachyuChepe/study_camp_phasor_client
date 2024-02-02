@@ -20,7 +20,7 @@ export default class SocketManager extends Singleton {
     this.pcs = []; //[{socket.id : peerConnection}]
     this.localPeerOffer; // offer 생성후 담는 변수
     this.iceServers = {
-      iceServer: [
+      iceServers: [
         {
           urls: [
             'stun:stun1.1.google.com:19302',
@@ -367,6 +367,10 @@ export default class SocketManager extends Singleton {
           if (event.candidate) {
             this.sendIceCandidate(event, this.selectedUser[i]);
           } else {
+            console.log(
+              'ICE candidate gathering completed for',
+              this.selectedUser[i],
+            );
           }
         };
         peerConnection.addEventListener('track', (event) => {
