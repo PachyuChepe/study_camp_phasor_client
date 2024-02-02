@@ -8,7 +8,17 @@ export default class TossPaymentPopup extends Singleton {
     this.loadTossPaymentsSDK();
   }
 
-  request(classId, spaceName, spaceContent, spacePassword, email, customerKey) {
+  request(
+    classId,
+    spaceName,
+    spaceContent,
+    spacePassword,
+    email,
+    customerKey,
+    spaceClassPaymentId,
+    spaceClassPaymentName,
+    spaceClassPaymentPrice,
+  ) {
     console.log(
       classId,
       spaceName,
@@ -16,8 +26,11 @@ export default class TossPaymentPopup extends Singleton {
       spacePassword,
       email,
       customerKey,
+      spaceClassPaymentId,
+      spaceClassPaymentName,
+      spaceClassPaymentPrice,
     );
-    this.successUrl = `${process.env.DB}/payment/successpage?classId=${encodeURIComponent(classId)}&spaceName=${encodeURIComponent(spaceName)}&spaceContent=${encodeURIComponent(spaceContent)}&spacePassword=${encodeURIComponent(spacePassword)}&email=${encodeURIComponent(email)}`;
+    this.successUrl = `${process.env.DB}/payment/successpage?classId=${encodeURIComponent(classId)}&spaceName=${encodeURIComponent(spaceName)}&spaceContent=${encodeURIComponent(spaceContent)}&spacePassword=${encodeURIComponent(spacePassword)}&email=${encodeURIComponent(email)}&spaceClassPaymentId=${encodeURIComponent(spaceClassPaymentId)}&spaceClassPaymentName=${encodeURIComponent(spaceClassPaymentName)}&spaceClassPaymentPrice=${encodeURIComponent(spaceClassPaymentPrice)}`;
     this.failUrl = 'https://my-store.com/fail';
     this.clientKey = process.env.TOSS_CLIENT_KEY;
     this.customerKey = customerKey;
