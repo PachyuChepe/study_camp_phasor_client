@@ -414,9 +414,9 @@ export default class Sidebar extends Singleton {
       groupbutton.innerHTML = `<p><span class="material-symbols-outlined">
     groups_3
     </span> 그룹 관리</p>`;
-      this.groupModal = new GroupModal();
+
       groupbutton.onclick = async () => {
-        this.groupModal.openModal();
+        GroupModal.getInstance().openModal();
       };
       this.sideEditBox.appendChild(groupbutton);
     }

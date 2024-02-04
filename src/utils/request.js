@@ -550,3 +550,22 @@ export const createGroup = async (name) => {
     throw error;
   }
 };
+
+// 그룹에 맴버 추가
+export const requestAddMemberToGroup = async (memberId, selectedValue) => {
+  console.log(+selectedValue, memberId);
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    await axios.post(
+      `${process.env.DB}/group-members`,
+      { groupId: +selectedValue, memberId: memberId },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return;
+  } catch (error) {
+    console.error('멤버 추가 실패.', error);
+    throw error;
+  }
+};

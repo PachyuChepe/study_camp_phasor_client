@@ -1,15 +1,21 @@
 import GroupAlarmModal from '../elements/groupAlarmModal';
+import Singleton from '../utils/Singleton';
 import {
   deleteGroupMember,
   requestGroupData,
   requestGroupMemberData,
-  sendMessageToGroupMember,
 } from '../utils/request';
 import GroupCreateModal from './groupCreateModal';
+import GroupInviteMemModal from './groupInviteMemModal';
 
 // 그룹관리 창
-export default class GroupModal {
+export default class GroupModal extends Singleton {
+  // 모달창 열 때마다 db접근 때문에 싱글톤이 필요함.
+  // static instance;
+
   constructor() {
+    super();
+
     this.modal = document.createElement('div');
     this.modal.classList.add('modal');
     this.modal.style.width = '50%';
@@ -45,17 +51,24 @@ export default class GroupModal {
     });
     this.optionContainer.appendChild(this.select);
 
-    this.input = document.createElement('input');
-    this.input.style.width = '200px';
-    this.input.placeholder = '그룹에 초대 할 멤버 검색';
-    this.input.style.border = '1px solid #6758FF';
-    this.optionContainer.appendChild(this.input);
+    this.createGroupButton = document.createElement('button');
+    this.createGroupButton.style.width = '20%';
+    this.createGroupButton.style.height = '10%';
+    this.createGroupButton.style.backgroundColor = '#6758FF';
+    this.createGroupButton.style.marginLeft = '40%';
+    this.createGroupButton.innerText = '멤버 추가';
+    this.createGroupButton.onclick = () => {
+      this.groupInviteMemModal = new GroupInviteMemModal();
+      this.groupInviteMemModal.openModal(this.results, this.selectedValue);
+      this.closeModal();
+    };
+    this.optionContainer.appendChild(this.createGroupButton);
 
     this.createGroupButton = document.createElement('button');
     this.createGroupButton.style.width = '20%';
     this.createGroupButton.style.height = '10%';
     this.createGroupButton.style.backgroundColor = '#6758FF';
-    this.createGroupButton.style.marginLeft = '169px';
+    this.createGroupButton.style.marginLeft = '10px';
     this.createGroupButton.innerText = '그룹 생성';
     this.createGroupButton.onclick = () => {
       this.closeModal();
@@ -104,8 +117,11 @@ export default class GroupModal {
 
   openModal = async () => {
     this.modal.style.display = 'block';
-    await this.requestAndProcessGroupData();
-    this.requestAndProcessGroupMembersData();
+    if (!this.results && !this.response) {
+      console.log('실행되나??..;;');
+      await this.requestAndProcessGroupData();
+      this.requestAndProcessGroupMembersData();
+    }
 
     // 키보드 이벤트 리스너 추가
     this.keydownHandler = (event) => {
@@ -143,10 +159,15 @@ export default class GroupModal {
     console.log('선택 한 groupId', selectedValue);
     console.log('그룹 멤버 조회 결과', this.results);
     this.listContainer.innerHTML = '';
-    if (this.results.length > 0) {
-      let selectedList = this.results.filter(
-        (item) => item.groupId == selectedValue,
-      );
+    let selectedList = this.results.filter(
+      (item) => item.groupId == selectedValue,
+    );
+
+    if (selectedList.length > 0) {
+      // 데이터가 있을 때 flex 스타일 제거
+      this.listContainer.style.display = '';
+      this.listContainer.style.alignItems = '';
+      this.listContainer.style.justifyContent = '';
       for (let i = 0; i < selectedList.length; i++) {
         const list = document.createElement('div');
         list.style.backgroundColor = '#F3F2FF';
@@ -180,28 +201,32 @@ export default class GroupModal {
             selectedList[i].memberId,
             selectedList[i].groupId,
           );
-          // await this.requestAndProcessGroupData();
+          list.remove();
           this.createList(this.select.value);
         };
-
+        this.alarmButton.disabled = false;
+        this.lectureButton.disabled = false;
         grid.appendChild(button);
       }
-    } else {
+    } else if (selectedList.length === 0) {
       this.listContainer.innerHTML = '<h3>데이터가 없습니다.</h3>';
+      // 데이터가 없을 때 flex 스타일 생성
       this.listContainer.style.display = 'flex';
       this.listContainer.style.alignItems = 'center';
       this.listContainer.style.justifyContent = 'center';
+      this.alarmButton.disabled = true;
+      this.lectureButton.disabled = true;
     }
   }
 
   requestAndProcessGroupMembersData = async () => {
     try {
       this.results = await requestGroupMemberData();
-      if (this.results.length === 0) {
-        this.alarmButton.disabled = true;
-        this.lectureButton.disabled = true;
-      }
-      this.createList(this.results);
+      // 모달 최초 실행 시 첫 번째 그룹 선택
+      this.select.selectedIndex = 0;
+      this.selectedValue = this.select.options[this.select.selectedIndex].value;
+      // 첫 번째 그룹에 대한 리스트 생성
+      this.createList(this.selectedValue);
     } catch (error) {
       this.createList();
     }
@@ -209,12 +234,8 @@ export default class GroupModal {
 
   requestAndProcessGroupData = async () => {
     try {
-      const response = await requestGroupData();
-      if (response.length === 0) {
-        this.alarmButton.disabled = true;
-        this.lectureButton.disabled = true;
-      }
-      let groupName = response.map((data) => ({
+      this.response = await requestGroupData();
+      let groupName = this.response.map((data) => ({
         groupName: data.name,
         groupId: data.id,
       }));

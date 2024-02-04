@@ -25,6 +25,7 @@ export default class GroupCreateModal {
     this.modal.appendChild(this.gradeContainer);
 
     this.message = document.createElement('input');
+    this.message.placeholder = '그룹 이름을 입력하세요.';
     this.message.style.width = '100%';
     this.message.style.height = '20%';
     this.message.style.fontWeight = 'bold';
@@ -61,9 +62,9 @@ export default class GroupCreateModal {
   }
 
   closeModal() {
-    this.groupModal = new GroupModal();
     this.modal.style.display = 'none';
-    this.groupModal.openModal();
+    GroupModal.getInstance().openModal();
+
     // 모달 끄면 키보드 이벤트 풀기
     this.modal.removeEventListener('keydown', this.keydownHandler);
   }

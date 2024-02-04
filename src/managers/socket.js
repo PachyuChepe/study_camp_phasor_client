@@ -126,6 +126,7 @@ export default class SocketManager extends Singleton {
         if (event.candidate) {
           this.sendIceCandidate(event, pc);
         } else {
+          console.log('ICE candidate gathering completed for', pc);
         }
       };
       peerConnection.addEventListener('track', (event) => {

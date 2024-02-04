@@ -78,9 +78,9 @@ export default class GroupAlarmModal {
   }
 
   closeModal() {
-    this.groupModal = new GroupModal();
     this.modal.style.display = 'none';
-    this.groupModal.openModal();
+    GroupModal.getInstance().openModal();
+
     // 모달 끄면 키보드 이벤트 풀기
     this.modal.removeEventListener('keydown', this.keydownHandler);
   }
