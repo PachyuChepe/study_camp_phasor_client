@@ -62,6 +62,7 @@ export default class TossPaymentPopup extends Singleton {
         if (error.code === 'USER_CANCEL') {
           console.log('사용자가 결제를 취소하였습니다.');
         } else {
+          console.error('실패에러?', error);
           console.error('결제 실패:', error.message);
         }
       });
