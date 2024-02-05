@@ -68,11 +68,11 @@ export default class GroupInviteMemModal extends Singleton {
 
   closeModal = () => {
     this.modal.style.display = 'none';
-    GroupModal.getInstance().openModal();
+    this.groupModal = new GroupModal();
+    this.groupModal.openModal();
 
     // 모달 끄면 키보드 이벤트 풀기
     this.modal.removeEventListener('keydown', this.keydownHandler);
-    GroupModal.getInstance().createList(this.selectedValue);
   };
 
   createMemberList = async (members, selectedValue) => {

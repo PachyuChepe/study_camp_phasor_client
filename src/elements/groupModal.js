@@ -9,12 +9,12 @@ import GroupCreateModal from './groupCreateModal';
 import GroupInviteMemModal from './groupInviteMemModal';
 
 // 그룹관리 창
-export default class GroupModal extends Singleton {
+export default class GroupModal {
   // 모달창 열 때마다 db접근 때문에 싱글톤이 필요함.
   // static instance;
 
   constructor() {
-    super();
+    // super();
 
     this.modal = document.createElement('div');
     this.modal.classList.add('modal');
@@ -117,11 +117,11 @@ export default class GroupModal extends Singleton {
 
   openModal = async () => {
     this.modal.style.display = 'block';
-    if (!this.results && !this.response) {
-      console.log('실행되나??..;;');
-      await this.requestAndProcessGroupData();
-      this.requestAndProcessGroupMembersData();
-    }
+    // if (!this.results && !this.response) {
+    console.log('실행되나??..;;');
+    await this.requestAndProcessGroupData();
+    this.requestAndProcessGroupMembersData();
+    // }
 
     // 키보드 이벤트 리스너 추가
     this.keydownHandler = (event) => {
@@ -201,8 +201,7 @@ export default class GroupModal extends Singleton {
             selectedList[i].memberId,
             selectedList[i].groupId,
           );
-          list.remove();
-          this.createList(this.select.value);
+          this.createList();
         };
         this.alarmButton.disabled = false;
         this.lectureButton.disabled = false;
