@@ -44,6 +44,9 @@ export default class GroupInviteMemModal extends Singleton {
     this.input.style.width = '100%';
     this.input.placeholder = '그룹에 초대 할 멤버 검색';
     this.input.style.border = '1px solid #6758FF';
+    this.input.addEventListener('keyup', () => {
+      this.searchInputFunc(this.input.value);
+    });
     this.searchContainer.appendChild(this.input);
 
     this.listContainer = document.createElement('div');
@@ -146,4 +149,17 @@ export default class GroupInviteMemModal extends Singleton {
       a.nickName.localeCompare(b.nickName),
     );
   };
+
+  searchInputFunc(inputValue) {
+    const searchPost = this.listContainer.childNodes;
+
+    searchPost.forEach((post) => {
+      const postText = post.innerText;
+      if (postText.includes(inputValue)) {
+        post.style.display = '';
+      } else {
+        post.style.display = 'none';
+      }
+    });
+  }
 }
