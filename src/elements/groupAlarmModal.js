@@ -78,14 +78,16 @@ export default class GroupAlarmModal {
   }
 
   closeModal() {
-    this.groupModal = new GroupModal();
     this.modal.style.display = 'none';
+    this.groupModal = new GroupModal();
     this.groupModal.openModal();
+
     // 모달 끄면 키보드 이벤트 풀기
     this.modal.removeEventListener('keydown', this.keydownHandler);
   }
 
   async sendMessage(groupId, message) {
+    console.log('확인해보자잇', groupId, message);
     await sendMessageToGroupMember(groupId, message);
     alert('메시지 전송 완료!');
     this.closeModal();
