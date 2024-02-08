@@ -1,3 +1,4 @@
+const Dotenv = require('dotenv-webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -48,6 +49,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
+    new Dotenv(), // 플러그인 상단
     new webpack.DefinePlugin({
       'typeof CANVAS_RENDERER': JSON.stringify(true),
       'typeof WEBGL_RENDERER': JSON.stringify(true),
