@@ -393,8 +393,8 @@ export const createInviteCode = async () => {
   }
 };
 
-// 그룹 관리
-export const requestGroupData = async () => {
+// 그룹 멤버 요청
+export const requestGroupMemberData = async () => {
   try {
     const spaceId = PlayerData.spaceId;
     const accessToken = localStorage.getItem('access_token');
@@ -404,7 +404,21 @@ export const requestGroupData = async () => {
         headers: { Authorization: `Bearer ${accessToken}` },
       },
     );
-    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error('그룹 멤버 데이터 요청 실패', error);
+    throw error; // 오류를 다시 throw하여 호출 측에서 처리할 수 있도록 함
+  }
+};
+
+// 그룹 요청
+export const requestGroupData = async () => {
+  try {
+    const spaceId = PlayerData.spaceId;
+    const accessToken = localStorage.getItem('access_token');
+    const response = await axios.get(`${process.env.DB}/group/${spaceId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
     return response.data;
   } catch (error) {
     console.error('그룹 데이터 요청 실패', error);
@@ -515,6 +529,43 @@ export const changeMemberRole = async (userId, spaceId, newRole) => {
     return response.data;
   } catch (error) {
     console.error('멤버 역할 변경에 실패했습니다.', error);
+    throw error;
+  }
+};
+
+// 그룹 생성
+export const createGroup = async (name) => {
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    await axios.post(
+      `${process.env.DB}/group/${PlayerData.spaceId}`,
+      { name },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return;
+  } catch (error) {
+    console.error('그룹 생성 실패.', error);
+    throw error;
+  }
+};
+
+// 그룹에 맴버 추가
+export const requestAddMemberToGroup = async (memberId, selectedValue) => {
+  console.log(+selectedValue, memberId);
+  try {
+    const accessToken = localStorage.getItem('access_token');
+    await axios.post(
+      `${process.env.DB}/group-members`,
+      { groupId: +selectedValue, memberId: memberId },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    return;
+  } catch (error) {
+    console.error('멤버 추가 실패.', error);
     throw error;
   }
 };

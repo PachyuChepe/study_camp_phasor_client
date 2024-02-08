@@ -28,6 +28,14 @@ export default class UserCard extends Singleton {
     this.cardList = [];
   }
 
+  show() {
+    this.container.style.display = 'flex';
+  }
+
+  hide() {
+    this.container.style.display = 'none';
+  }
+
   createLocalCard() {
     const localCard = document.createElement('video');
     localCard.id = 'local-video';

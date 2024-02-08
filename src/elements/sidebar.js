@@ -68,6 +68,7 @@ export default class Sidebar extends Singleton {
 
     SidebarOut.getInstance();
     this.createInSideButtons();
+    this.hideSidebar();
 
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
   }
@@ -79,10 +80,32 @@ export default class Sidebar extends Singleton {
 
   hideSidebar() {
     this.sidebar.style.display = 'none';
+    this.editbutton.style.display = 'none';
+    this.loddybutton.style.display = 'none';
+    this.codebutton.style.display = 'none';
+    this.memberbutton.style.display = 'none';
+    this.logbutton.style.display = 'none';
+    this.groupbutton.style.display = 'none';
+    this.lecturebutton.style.display = 'none';
+    this.brodcastbutton.style.display = 'none';
+    this.myLecturebutton.style.display = 'none';
+    this.myLogbutton.style.display = 'none';
   }
 
   showSidebar() {
     this.sidebar.style.display = 'block';
+    this.editbutton.style.display = 'block';
+    this.loddybutton.style.display = 'block';
+    this.codebutton.style.display = PlayerData.role === '0' ? 'block' : 'none';
+    this.memberbutton.style.display =
+      PlayerData.role === '0' || PlayerData.role === '1' ? 'block' : 'none';
+    this.logbutton.style.display =
+      PlayerData.role === '0' || PlayerData.role === '1' ? 'block' : 'none';
+    // this.groupbutton.style.display = PlayerData.role === '0' || PlayerData.role === '1' || PlayerData.role === '2'? 'block' : 'none';
+    // this.lecturebutton.style.display  = PlayerData.role === '0' ? 'block' : 'none';
+    // this.brodcastbutton.style.display = PlayerData.role === '0' || PlayerData.role === '1' ? 'block' : 'none';
+    // this.myLecturebutton.style.display = PlayerData.role === '3' ? 'block' : 'none';
+    this.myLogbutton.style.display = PlayerData.role === '3' ? 'block' : 'none';
   }
 
   async mockingOtherPlayers() {
@@ -315,173 +338,158 @@ export default class Sidebar extends Singleton {
     this.editContainer.appendChild(this.sideEditBox);
 
     // 아바타 꾸미기 버튼
-    const editbutton = document.createElement('button');
-    editbutton.style.padding = '0px';
-    editbutton.style.width = '100%';
-    editbutton.style.backgroundColor = 'white';
-    editbutton.style.border = '2px solid white';
-    editbutton.style.color = '#a2cfff';
-    editbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    this.editbutton = document.createElement('button');
+    this.editbutton.style.padding = '0px';
+    this.editbutton.style.width = '100%';
+    this.editbutton.style.backgroundColor = 'white';
+    this.editbutton.style.border = '2px solid white';
+    this.editbutton.style.color = '#a2cfff';
+    this.editbutton.innerHTML = `<p><span class="material-symbols-outlined">
     apparel
     </span> 아바타 꾸미기</p>`;
-    editbutton.onclick = () => {
+    this.editbutton.onclick = () => {
       this.editModal.openModal();
     };
-    this.sideEditBox.appendChild(editbutton);
+    this.sideEditBox.appendChild(this.editbutton);
     this.editModal = new EditModal();
 
     // 로비로 돌아가기 버튼
-    const loddybutton = document.createElement('button');
-    loddybutton.style.padding = '0px';
-    loddybutton.style.width = '100%';
-    loddybutton.style.backgroundColor = 'white';
-    loddybutton.style.border = '2px solid white';
-    loddybutton.style.color = '#a2cfff';
-    loddybutton.innerHTML = `<p><span class="material-symbols-outlined">
+    this.loddybutton = document.createElement('button');
+    this.loddybutton.style.padding = '0px';
+    this.loddybutton.style.width = '100%';
+    this.loddybutton.style.backgroundColor = 'white';
+    this.loddybutton.style.border = '2px solid white';
+    this.loddybutton.style.color = '#a2cfff';
+    this.loddybutton.innerHTML = `<p><span class="material-symbols-outlined">
     door_open
     </span> 돌아가기</p>`;
-    loddybutton.onclick = () => {
+    this.loddybutton.onclick = () => {
       // lobby scene
-      // this.hideSidebar();
-      // this.scene.scene.start('LoddyScene');
+      this.hideSidebar();
+      this.scene.back();
     };
-    this.sideEditBox.appendChild(loddybutton);
+    this.sideEditBox.appendChild(this.loddybutton);
 
-    if (PlayerData.role === '0') {
-      // 입장 코드 생성 버튼
-      const codebutton = document.createElement('button');
-      codebutton.style.padding = '0px';
-      codebutton.style.width = '100%';
-      codebutton.style.backgroundColor = 'white';
-      codebutton.style.border = '2px solid white';
-      codebutton.style.color = '#a2cfff';
-      codebutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 입장 코드 생성 버튼
+    this.codebutton = document.createElement('button');
+    this.codebutton.style.padding = '0px';
+    this.codebutton.style.width = '100%';
+    this.codebutton.style.backgroundColor = 'white';
+    this.codebutton.style.border = '2px solid white';
+    this.codebutton.style.color = '#a2cfff';
+    this.codebutton.innerHTML = `<p><span class="material-symbols-outlined">
     vpn_key
     </span> 입장 코드 생성</p>`;
-      codebutton.onclick = () => {
-        this.codeCreateModal.openModal();
-      };
-      this.sideEditBox.appendChild(codebutton);
-      this.codeCreateModal = new CodeCreateModal();
-    }
+    this.codebutton.onclick = () => {
+      this.codeCreateModal.openModal();
+    };
+    this.sideEditBox.appendChild(this.codebutton);
+    this.codeCreateModal = new CodeCreateModal();
 
-    if (PlayerData.role === '0' || PlayerData.role === '1') {
-      // 멤버 관리 버튼
-      const memberbutton = document.createElement('button');
-      memberbutton.style.padding = '0px';
-      memberbutton.style.width = '100%';
-      memberbutton.style.backgroundColor = 'white';
-      memberbutton.style.border = '2px solid white';
-      memberbutton.style.color = '#a2cfff';
-      memberbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 멤버 관리 버튼
+    this.memberbutton = document.createElement('button');
+    this.memberbutton.style.padding = '0px';
+    this.memberbutton.style.width = '100%';
+    this.memberbutton.style.backgroundColor = 'white';
+    this.memberbutton.style.border = '2px solid white';
+    this.memberbutton.style.color = '#a2cfff';
+    this.memberbutton.innerHTML = `<p><span class="material-symbols-outlined">
     person
     </span> 멤버 관리</p>`;
-      memberbutton.onclick = () => {
-        this.memberModal.openModal();
-      };
-      this.sideEditBox.appendChild(memberbutton);
-      this.memberModal = new ManagerModal();
-    }
+    this.memberbutton.onclick = () => {
+      this.memberModal.openModal();
+    };
+    this.sideEditBox.appendChild(this.memberbutton);
+    this.memberModal = new ManagerModal();
 
-    if (PlayerData.role === '0' || PlayerData.role === '1') {
-      // 출석 관리 버튼
-      const logbutton = document.createElement('button');
-      logbutton.style.padding = '0px';
-      logbutton.style.width = '100%';
-      logbutton.style.backgroundColor = 'white';
-      logbutton.style.border = '2px solid white';
-      logbutton.style.color = '#a2cfff';
-      logbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 출석 관리 버튼
+    this.logbutton = document.createElement('button');
+    this.logbutton.style.padding = '0px';
+    this.logbutton.style.width = '100%';
+    this.logbutton.style.backgroundColor = 'white';
+    this.logbutton.style.border = '2px solid white';
+    this.logbutton.style.color = '#a2cfff';
+    this.logbutton.innerHTML = `<p><span class="material-symbols-outlined">
     how_to_reg
     </span> 출석 관리</p>`;
-      this.logDateModal = new LogDateModal();
-      logbutton.onclick = this.logDateModal.openModal.bind(this.logDateModal);
-      this.sideEditBox.appendChild(logbutton);
-    }
+    this.logDateModal = new LogDateModal();
+    this.logbutton.onclick = this.logDateModal.openModal.bind(
+      this.logDateModal,
+    );
+    this.sideEditBox.appendChild(this.logbutton);
 
-    if (
-      PlayerData.role === '0' ||
-      PlayerData.role === '1' ||
-      PlayerData.role === '2'
-    ) {
-      // 그룹 관리 버튼
-      const groupbutton = document.createElement('button');
-      groupbutton.style.padding = '0px';
-      groupbutton.style.width = '100%';
-      groupbutton.style.backgroundColor = 'white';
-      groupbutton.style.border = '2px solid white';
-      groupbutton.style.color = '#a2cfff';
-      groupbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 그룹 관리 버튼
+    this.groupbutton = document.createElement('button');
+    this.groupbutton.style.padding = '0px';
+    this.groupbutton.style.width = '100%';
+    this.groupbutton.style.backgroundColor = 'white';
+    this.groupbutton.style.border = '2px solid white';
+    this.groupbutton.style.color = '#a2cfff';
+    this.groupbutton.innerHTML = `<p><span class="material-symbols-outlined">
     groups_3
     </span> 그룹 관리</p>`;
-      this.groupModal = new GroupModal();
-      groupbutton.onclick = async () => {
-        this.groupModal.openModal();
-      };
-      this.sideEditBox.appendChild(groupbutton);
-    }
 
-    if (PlayerData.role === '0') {
-      // 강의 관리 버튼
-      const lecturebutton = document.createElement('button');
-      lecturebutton.style.padding = '0px';
-      lecturebutton.style.width = '100%';
-      lecturebutton.style.backgroundColor = 'white';
-      lecturebutton.style.border = '2px solid white';
-      lecturebutton.style.color = '#a2cfff';
-      lecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
+    this.groupbutton.onclick = async () => {
+      this.groupModal = new GroupModal();
+      this.groupModal.openModal();
+    };
+    this.sideEditBox.appendChild(this.groupbutton);
+
+    // 강의 관리 버튼
+    this.lecturebutton = document.createElement('button');
+    this.lecturebutton.style.padding = '0px';
+    this.lecturebutton.style.width = '100%';
+    this.lecturebutton.style.backgroundColor = 'white';
+    this.lecturebutton.style.border = '2px solid white';
+    this.lecturebutton.style.color = '#a2cfff';
+    this.lecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
     slideshow
     </span> 강의 관리</p>`;
-      lecturebutton.onclick = () => {
-        ShowLectureModal.getInstance().openModal();
-        CreateLecutreModal.getInstance().closeModal();
-      };
-      this.sideEditBox.appendChild(lecturebutton);
-    }
+    this.lecturebutton.onclick = () => {
+      ShowLectureModal.getInstance().openModal();
+      CreateLecutreModal.getInstance().closeModal();
+    };
+    this.sideEditBox.appendChild(this.lecturebutton);
 
-    if (PlayerData.role === '0' || PlayerData.role === '1') {
-      // 브로드캐스트 관리 버튼
-      const brodcastbutton = document.createElement('button');
-      brodcastbutton.style.padding = '0px';
-      brodcastbutton.style.width = '100%';
-      brodcastbutton.style.backgroundColor = 'white';
-      brodcastbutton.style.border = '2px solid white';
-      brodcastbutton.style.color = '#a2cfff';
-      brodcastbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 브로드캐스트 관리 버튼
+    this.brodcastbutton = document.createElement('button');
+    this.brodcastbutton.style.padding = '0px';
+    this.brodcastbutton.style.width = '100%';
+    this.brodcastbutton.style.backgroundColor = 'white';
+    this.brodcastbutton.style.border = '2px solid white';
+    this.brodcastbutton.style.color = '#a2cfff';
+    this.brodcastbutton.innerHTML = `<p><span class="material-symbols-outlined">
     campaign
     </span> 브로드캐스트</p>`;
-      brodcastbutton.onclick = () => {};
-      this.sideEditBox.appendChild(brodcastbutton);
-    }
+    this.brodcastbutton.onclick = () => {};
+    this.sideEditBox.appendChild(this.brodcastbutton);
 
-    if (PlayerData.role === '3') {
-      // 내강의 보기
-      const myLecturebutton = document.createElement('button');
-      myLecturebutton.style.padding = '0px';
-      myLecturebutton.style.width = '100%';
-      myLecturebutton.style.backgroundColor = 'white';
-      myLecturebutton.style.border = '2px solid white';
-      myLecturebutton.style.color = '#a2cfff';
-      myLecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 내강의 보기
+    this.myLecturebutton = document.createElement('button');
+    this.myLecturebutton.style.padding = '0px';
+    this.myLecturebutton.style.width = '100%';
+    this.myLecturebutton.style.backgroundColor = 'white';
+    this.myLecturebutton.style.border = '2px solid white';
+    this.myLecturebutton.style.color = '#a2cfff';
+    this.myLecturebutton.innerHTML = `<p><span class="material-symbols-outlined">
       slideshow
     </span> 강의 보기</p>`;
-      myLecturebutton.onclick = () => {};
-      this.sideEditBox.appendChild(myLecturebutton);
+    this.myLecturebutton.onclick = () => {};
+    this.sideEditBox.appendChild(this.myLecturebutton);
 
-      // 내 출석 보기
-      const myLogbutton = document.createElement('button');
-      myLogbutton.style.padding = '0px';
-      myLogbutton.style.width = '100%';
-      myLogbutton.style.backgroundColor = 'white';
-      myLogbutton.style.border = '2px solid white';
-      myLogbutton.style.color = '#a2cfff';
-      myLogbutton.innerHTML = `<p><span class="material-symbols-outlined">
+    // 내 출석 보기
+    this.myLogbutton = document.createElement('button');
+    this.myLogbutton.style.padding = '0px';
+    this.myLogbutton.style.width = '100%';
+    this.myLogbutton.style.backgroundColor = 'white';
+    this.myLogbutton.style.border = '2px solid white';
+    this.myLogbutton.style.color = '#a2cfff';
+    this.myLogbutton.innerHTML = `<p><span class="material-symbols-outlined">
       how_to_reg
     </span> 출석 보기</p>`;
-      this.logModal = new LogModal(PlayerData.userId);
-      myLogbutton.onclick = this.logModal.openModal.bind(this.logModal);
-      this.sideEditBox.appendChild(myLogbutton);
-    }
+    this.logModal = new LogModal(PlayerData.userId);
+    this.myLogbutton.onclick = this.logModal.openModal.bind(this.logModal);
+    this.sideEditBox.appendChild(this.myLogbutton);
   }
 
   createGroupBox() {

@@ -113,11 +113,18 @@ export default class SpaceScene extends Phaser.Scene {
     this.otherPlayers = {};
 
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
-    UserCard.getInstance();
+    UserCard.getInstance().show();
     Sidebar.getInstance().setScene(this);
     SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
 
     // this.sidebar = new Sidebar(this);
+  }
+
+  back() {
+    SocketManager.getInstance().sendLeaveSpacePlayer();
+    SocketManager.getInstance().removeCallbacks();
+    UserCard.getInstance().hide();
+    this.scene.start('LoddyScene');
   }
 
   createTileMap(width, height) {

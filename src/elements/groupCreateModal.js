@@ -1,14 +1,12 @@
-import { sendMessageToGroupMember } from '../utils/request';
+import { createGroup } from '../utils/request';
 import GroupModal from './groupModal';
 
-export default class GroupAlarmModal {
+export default class GroupCreateModal {
   constructor() {
     this.modal = document.createElement('div');
     this.modal.classList.add('modal');
-    this.modal.style.width = '45%';
-    this.modal.style.maxWidth = '450px';
-    this.modal.style.height = '350px';
-    this.modal.style.height = '35%';
+    this.modal.style.maxWidth = '300px';
+    this.modal.style.height = '150px';
     document.body.appendChild(this.modal);
 
     const closeButton = document.createElement('span');
@@ -19,28 +17,17 @@ export default class GroupAlarmModal {
 
     const modalHeader = document.createElement('div');
     modalHeader.classList.add('modal-header');
-    modalHeader.innerText = '그룹 알림 보내기';
+    modalHeader.innerText = '그룹 생성';
     this.modal.appendChild(modalHeader);
 
     this.gradeContainer = document.createElement('div');
     this.gradeContainer.style.marginBottom = '20px';
     this.modal.appendChild(this.gradeContainer);
 
-    this.to = document.createElement('span');
-    this.to.innerText = 'To.';
-    this.to.style.fontWeight = 'bold';
-    this.gradeContainer.appendChild(this.to);
-
-    this.gradeGroup = document.createElement('span');
-    this.gradeGroup.style.backgroundColor = '#F3F2FF';
-    this.gradeGroup.style.fontWeight = 'bold';
-    this.gradeGroup.style.padding = '5px';
-    this.gradeGroup.innerText = '';
-    this.gradeContainer.appendChild(this.gradeGroup);
-
     this.message = document.createElement('input');
+    this.message.placeholder = '그룹 이름을 입력하세요.';
     this.message.style.width = '100%';
-    this.message.style.height = '50%';
+    this.message.style.height = '20%';
     this.message.style.fontWeight = 'bold';
     this.message.style.backgroundColor = '#F3F2FF';
     this.message.style.marginBottom = '10px';
@@ -49,25 +36,22 @@ export default class GroupAlarmModal {
     this.summitButton = document.createElement('button');
     this.summitButton.style.borderRadius = '5px';
     this.summitButton.style.width = '100%';
-    this.summitButton.style.height = '13%';
+    this.summitButton.style.height = '20%';
     this.summitButton.style.display = 'flex';
     this.summitButton.style.alignItems = 'center';
     this.summitButton.style.justifyContent = 'center';
     this.summitButton.style.backgroundColor = '#6758FF';
     this.summitButton.style.color = '#fff';
     this.summitButton.style.fontWeight = 'bold';
-    this.summitButton.innerText = '알림 보내기';
+    this.summitButton.innerText = '확인';
     this.summitButton.onclick = () => {
-      this.sendMessage(this.groupId, this.message.value);
+      this.sendMessage(this.message.value);
     };
     this.modal.appendChild(this.summitButton);
   }
 
-  openModal(selectedValue, groupId) {
+  openModal() {
     this.modal.style.display = 'block';
-    this.gradeGroup.innerText = `${selectedValue}`;
-    this.groupId = groupId;
-    console.log(selectedValue, groupId);
 
     // 키보드 이벤트 리스너 추가
     this.keydownHandler = (event) => {
@@ -86,10 +70,9 @@ export default class GroupAlarmModal {
     this.modal.removeEventListener('keydown', this.keydownHandler);
   }
 
-  async sendMessage(groupId, message) {
-    console.log('확인해보자잇', groupId, message);
-    await sendMessageToGroupMember(groupId, message);
-    alert('메시지 전송 완료!');
+  async sendMessage(name) {
+    await createGroup(name);
+    alert('그룹 생성 완료');
     this.closeModal();
   }
 }
