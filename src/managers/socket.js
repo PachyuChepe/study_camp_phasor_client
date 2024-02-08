@@ -197,6 +197,10 @@ export default class SocketManager extends Singleton {
     this.callbacks.push(callback);
   }
 
+  removeCallbacks() {
+    this.callbacks.length = 0;
+  }
+
   publish(namespace, data) {
     this.callbacks.forEach((callback) => callback(namespace, data));
   }
@@ -237,6 +241,12 @@ export default class SocketManager extends Singleton {
     //가설 1. 중간에서 PlayerData가 0이 된다.
     //가설 2. 애초에 PlayerData가 0이 였다.
     //가설 2가 맞다고 생각하고 가자.
+  }
+
+  sendLeaveSpacePlayer() {
+    this.socket.emit('leave', {
+      id: this.socket.id,
+    });
   }
 
   sendMovePlayer(tileX, tileY) {
