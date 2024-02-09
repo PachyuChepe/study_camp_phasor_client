@@ -191,6 +191,22 @@ export default class SocketManager extends Singleton {
         console.error(error);
       }
     });
+
+    this.socket.on('connect_error', (error) => {
+      console.error('Connection error:', error);
+    });
+
+    this.socket.on('connect', () => {
+      console.log(`Connected to server with socket ID ${this.socket.id}`);
+    });
+
+    this.socket.on('reconnect_attempt', () => {
+      console.log(`Attempting to reconnect to server...`);
+    });
+
+    this.socket.on('disconnect', (reason) => {
+      console.log(`Disconnected from server: ${reason}`);
+    });
   }
 
   subscribe(callback) {
