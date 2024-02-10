@@ -8,7 +8,9 @@ export default class SocketManager extends Singleton {
     super();
     console.log('SocketManager 생성');
 
-    this.socket = io(process.env.SOCKET);
+    this.socket = io(process.env.SOCKET, {
+      transports: ['websocket'], // WebSocket만 사용하도록 설정
+    });
 
     // 변수
     this.stream;
