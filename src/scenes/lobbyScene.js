@@ -264,10 +264,6 @@ export default class LoddyScene extends Phaser.Scene {
     this.searchInput.style.height = '100%';
     this.middleContainer.appendChild(this.searchInput);
 
-    this.searchInput.addEventListener('keyup', () => {
-      this.searchInputFunc(this.searchInput.value);
-    });
-
     this.allSpaceList = document.createElement('div');
     this.allSpaceList.style.borderRadius = '5px';
     this.allSpaceList.style.boxShadow = '0px 0px 10px rgba(74, 138, 255, 0.1)';
