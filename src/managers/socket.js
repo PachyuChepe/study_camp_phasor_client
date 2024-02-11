@@ -81,7 +81,7 @@ export default class SocketManager extends Singleton {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
     });
-    this.socket.on('connect', this.handleSocketConnected);
+    // this.socket.on('connect', this.handleSocketConnected);
     this.socket.on('disconnected', (data) => {
       this.removeDisconnectedUser(data);
     });
@@ -216,13 +216,6 @@ export default class SocketManager extends Singleton {
   }
 
   sendJoinSpacePlayer(tileX, tileY) {
-    window.console.log(
-      'in sendnJoinSpacePlayer, PlayerData=>',
-      PlayerData,
-      PlayerData.memberId,
-    );
-    //memberId와 userId가 찍히는게 다르다.
-
     this.socket.emit('joinSpace', {
       id: this.socket.id,
       nickName: PlayerData.nickName,
@@ -239,10 +232,8 @@ export default class SocketManager extends Singleton {
       clothes: PlayerData.clothes,
       clothes_color: PlayerData.clothes_color,
     });
-    window.console.log('PlayerData=>', PlayerData.memberId);
-    //가설 1. 중간에서 PlayerData가 0이 된다.
-    //가설 2. 애초에 PlayerData가 0이 였다.
-    //가설 2가 맞다고 생각하고 가자.
+
+    this.handleSocketConnected();
   }
 
   sendLeaveSpacePlayer() {
@@ -490,3 +481,5 @@ export default class SocketManager extends Singleton {
     this.socket.emit('AllDMHistory', { memberId });
   };
 }
+
+SocketManager.getInstance();
