@@ -22,13 +22,12 @@ export default class SocketManager extends Singleton {
     this.iceServers = {
       iceServers: [
         {
-          urls: [
-            'stun:stun1.1.google.com:19302',
-            'stun:stun1.l.google.com:19302',
-            'stun:stun2.l.google.com:19302',
-            'stun:stun3.l.google.com:19302',
-            'stun:stun4.l.google.com:19302',
-          ],
+          urls: ['stun:stun1.1.google.com:19302'],
+        },
+        {
+          urls: 'turn:3.35.138.101:3478',
+          username: 'woogi',
+          credential: 'woogi123',
         },
       ],
     };
