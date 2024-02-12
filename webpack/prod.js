@@ -5,6 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = {
   mode: 'production',
@@ -51,6 +52,8 @@ module.exports = {
     new CleanWebpackPlugin(),
     new Dotenv(), // 플러그인 상단
     new webpack.DefinePlugin({
+      'process.env.SOCKET': JSON.stringify(process.env.SOCKET),
+      'process.env.DB': JSON.stringify(process.env.DB),
       'typeof CANVAS_RENDERER': JSON.stringify(true),
       'typeof WEBGL_RENDERER': JSON.stringify(true),
       'typeof WEBGL_DEBUG': JSON.stringify(false),
