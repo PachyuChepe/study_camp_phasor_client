@@ -1,3 +1,4 @@
+const Dotenv = require('dotenv-webpack');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -49,7 +50,7 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    new Dotenv(),
+    new Dotenv(), // 플러그인 상단
     new webpack.DefinePlugin({
       'process.env.SOCKET': JSON.stringify(process.env.SOCKET),
       'process.env.DB': JSON.stringify(process.env.DB),
