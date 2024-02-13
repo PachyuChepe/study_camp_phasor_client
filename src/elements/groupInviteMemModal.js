@@ -55,10 +55,10 @@ export default class GroupInviteMemModal extends Singleton {
     this.container.appendChild(this.listContainer);
   }
 
-  openModal = async (members, selectedValue) => {
+  openModal = async (members, selectedValue, groupMembers) => {
     this.selectedValue = selectedValue;
     this.members = members;
-    this.createMemberList(members, selectedValue);
+    this.createMemberList(members, selectedValue, groupMembers);
     this.modal.style.display = 'block';
 
     // 키보드 이벤트 리스너 추가
@@ -78,9 +78,13 @@ export default class GroupInviteMemModal extends Singleton {
     this.modal.removeEventListener('keydown', this.keydownHandler);
   };
 
-  createMemberList = async (members, selectedValue) => {
-    const filteredData = this.filterUniqueUsers(members, selectedValue);
-    console.log('dodhjdiasd =>', filteredData);
+  createMemberList = async (members, selectedValue, groupMembers) => {
+    console.log('들어오나? =>', members);
+    const filteredData = this.filterUniqueUsers(
+      members,
+      selectedValue,
+      groupMembers,
+    );
     if (filteredData.length === 0) {
       this.listContainer.innerHTML = '<h3>추가할 멤버가 없습니다.</h3>';
       this.listContainer.style.display = 'flex';
@@ -119,7 +123,7 @@ export default class GroupInviteMemModal extends Singleton {
         lecturebutton.style.backgroundColor = '#6758FF';
         lecturebutton.style.margin = '0px';
         lecturebutton.onclick = async () => {
-          await requestAddMemberToGroup(data.memberId, selectedValue);
+          await requestAddMemberToGroup(data.id, selectedValue);
           list.remove();
         };
         grid.appendChild(lecturebutton);
@@ -127,27 +131,24 @@ export default class GroupInviteMemModal extends Singleton {
     }
   };
 
-  filterUniqueUsers = (members, selectedValue) => {
-    const selectedGroupUserIds = new Set(
-      members
-        .filter((item) => item.groupId === +selectedValue)
-        .map((item) => item.userId),
+  filterUniqueUsers = (members, selectedValue, groupMembers) => {
+    // groupMembers 배열에서 memberId만 추출하여 Set 객체 생성
+    const groupMemberIdsSet = new Set(
+      groupMembers.map((member) => member.memberId),
     );
 
     const uniqueUsersMap = new Map();
+    members
+      .filter((item) => item.role !== '0' && !groupMemberIdsSet.has(item.id)) // role이 '0'이 아닌 멤버 중 groupMemberIdsSet에 없는 멤버만 필터링
+      .forEach((item) => {
+        const userObject = {
+          id: item.id,
+          nickName: item.user.nick_name,
+        };
+        uniqueUsersMap.set(item.id, userObject); // id를 키로 사용하여 Map에 사용자 객체 저장
+      });
 
-    members.forEach((item) => {
-      if (
-        !selectedGroupUserIds.has(item.userId) &&
-        !uniqueUsersMap.has(item.userId)
-      ) {
-        uniqueUsersMap.set(item.userId, item);
-      }
-    });
-
-    return Array.from(uniqueUsersMap.values()).sort((a, b) =>
-      a.nickName.localeCompare(b.nickName),
-    );
+    return Array.from(uniqueUsersMap.values());
   };
 
   searchInputFunc(inputValue) {

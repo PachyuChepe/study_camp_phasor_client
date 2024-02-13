@@ -414,6 +414,9 @@ export default class LoddyScene extends Phaser.Scene {
           this.createPassword.value,
           PlayerData.email,
           playerPayment.customer_key,
+          playerPayment.space_class_payment_id,
+          playerPayment.space_class_payment_name,
+          playerPayment.space_class_payment_price,
         );
         TossPaymentPopup.getInstance().openPaymentPopup();
       } else {
@@ -623,11 +626,18 @@ export default class LoddyScene extends Phaser.Scene {
           this.selectedClassId = selectedClass.id;
           this.classPriceDiv.textContent = `Price: ${selectedClass.price}`;
           this.classCapacityDiv.textContent = `Capacity: ${selectedClass.capacity}`;
+          playerPayment.space_class_payment_id = this.selectedClassId;
+          playerPayment.space_class_payment_name = selectedClass.name;
+          playerPayment.space_class_payment_price = selectedClass.price;
         } else {
           // 초기 옵션("-----")이 선택된 경우
           this.selectedClassId = null;
           this.classPriceDiv.textContent = '';
           this.classCapacityDiv.textContent = '';
+
+          playerPayment.space_class_payment_id = this.selectedClassId;
+          playerPayment.space_class_payment_name = selectedClass.name;
+          playerPayment.space_class_payment_price = selectedClass.price;
         }
       };
     });

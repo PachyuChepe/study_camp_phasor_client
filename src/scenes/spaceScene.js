@@ -113,11 +113,44 @@ export default class SpaceScene extends Phaser.Scene {
     this.otherPlayers = {};
 
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
-    UserCard.getInstance();
+    UserCard.getInstance().show();
     Sidebar.getInstance().setScene(this);
     SocketManager.getInstance().sendJoinSpacePlayer(1, 1);
 
     // this.sidebar = new Sidebar(this);
+
+    //sse 연결
+    const eventSource = new EventSource('http://localhost:4000/sse');
+    eventSource.onmessage = function (event) {
+      const data = JSON.parse(event.data);
+      console.log(data);
+
+      if (data.member_id === PlayerData.memberId) {
+        this.mailcontainerBox = document.createElement('div');
+        this.mailcontainerBox.style.height = '10%';
+        this.mailcontainerBox.style.width = '100%';
+        this.mailcontainerBox.style.color = 'white';
+        Sidebar.getInstance().mailBox.appendChild(this.mailcontainerBox);
+
+        this.mailtitle = document.createElement('p');
+        this.mailtitle.style.fontWeight = 'bold';
+        this.mailtitle.style.color = 'white';
+        this.mailtitle.textContent = data.title;
+        this.mailcontainerBox.appendChild(this.mailtitle);
+
+        this.mailcontent = document.createElement('p');
+        this.mailcontent.style.color = 'white';
+        this.mailcontent.textContent = data.content;
+        this.mailcontainerBox.appendChild(this.mailcontent);
+      }
+    };
+  }
+
+  back() {
+    SocketManager.getInstance().sendLeaveSpacePlayer();
+    SocketManager.getInstance().removeCallbacks();
+    UserCard.getInstance().hide();
+    this.scene.start('LoddyScene');
   }
 
   createTileMap(width, height) {
