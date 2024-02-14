@@ -120,7 +120,7 @@ export default class SpaceScene extends Phaser.Scene {
     // this.sidebar = new Sidebar(this);
 
     //sse 연결
-    const eventSource = new EventSource(process.env.SSE);
+    const eventSource = new EventSource(`${process.env.DB}/sse`);
     eventSource.onmessage = function (event) {
       const data = JSON.parse(event.data);
       console.log(data);
