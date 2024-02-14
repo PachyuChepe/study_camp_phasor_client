@@ -42,6 +42,9 @@ WORKDIR /app
 ARG SOCKET
 ARG DB
 ARG TOSS_CLIENT_KEY
+ARG TURN_URLS
+ARG TURN_USERNAME
+ARG TURN_CREDENTIAL
 
 # 의존성 파일 복사 및 설치
 COPY package*.json ./
@@ -54,6 +57,9 @@ COPY . .
 RUN echo "SOCKET=${SOCKET}" > .env
 RUN echo "DB=${DB}" >> .env
 RUN echo "TOSS_CLIENT_KEY=${TOSS_CLIENT_KEY}" >> .env
+RUN echo "TURN_URLS=${TURN_URLS}" >> .env
+RUN echo "TURN_USERNAME=${TURN_USERNAME}" >> .env
+RUN echo "TURN_CREDENTIAL=${TURN_CREDENTIAL}" >> .env
 
 # 빌드 실행
 RUN npm run build

@@ -101,7 +101,12 @@ export default class Sidebar extends Singleton {
       PlayerData.role === '0' || PlayerData.role === '1' ? 'block' : 'none';
     this.logbutton.style.display =
       PlayerData.role === '0' || PlayerData.role === '1' ? 'block' : 'none';
-    // this.groupbutton.style.display = PlayerData.role === '0' || PlayerData.role === '1' || PlayerData.role === '2'? 'block' : 'none';
+    this.groupbutton.style.display =
+      PlayerData.role === '0' ||
+      PlayerData.role === '1' ||
+      PlayerData.role === '2'
+        ? 'block'
+        : 'none';
     // this.lecturebutton.style.display  = PlayerData.role === '0' ? 'block' : 'none';
     // this.brodcastbutton.style.display = PlayerData.role === '0' || PlayerData.role === '1' ? 'block' : 'none';
     // this.myLecturebutton.style.display = PlayerData.role === '3' ? 'block' : 'none';
@@ -201,6 +206,7 @@ export default class Sidebar extends Singleton {
     mail
     </span>`;
     this.insidebuttonbox.appendChild(this.mailBtn);
+    this.createMailList();
     this.mailBtn.onclick = this.showContainers.bind(this, 'mail');
 
     // 접속자
@@ -227,6 +233,7 @@ export default class Sidebar extends Singleton {
     this.directMessageListContainer.style.display = 'none';
     this.groupChatContainer.style.display = 'none';
     this.userSearchContainer.style.display = 'none';
+    this.mailContainer.style.display = 'none';
     //TODO socketId -> memberId
     for (const otherPlayerMemberId in this.directMessageRoomContainer) {
       this.directMessageRoomContainer[otherPlayerMemberId].style.display =
@@ -306,9 +313,12 @@ export default class Sidebar extends Singleton {
         this.chatContainer.style.display = 'flex';
         break;
       case 'mail':
+        this.mailContainer.style.display = 'flex';
+        console.log('mail');
         break;
       case 'users':
         this.userSearchContainer.style.display = 'flex';
+        console.log('users');
         break;
     }
   }
@@ -607,6 +617,27 @@ export default class Sidebar extends Singleton {
       this.sideChatInput.removeEventListener('keydown', this.keydownHandler);
     });
     this.chatContainer.appendChild(this.sideChatInput);
+  }
+
+  //Mail List를 만든다.
+  createMailList() {
+    this.mailContainer = document.createElement('div');
+    this.mailContainer.style.width = '95%';
+    this.mailContainer.style.height = '98%';
+    this.mailContainer.style.alignItems = 'center';
+    this.mailContainer.style.justifyContent = 'center';
+    this.mailContainer.style.display = 'none';
+    this.mailContainer.style.flexDirection = 'column';
+    this.mailContainer.style.padding = '5px';
+    this.sidebar.appendChild(this.mailContainer);
+
+    this.mailBox = document.createElement('div');
+    this.mailBox.style.height = '80vh';
+    this.mailBox.style.width = '100%';
+    this.mailBox.style.overflowY = 'auto';
+    this.mailBox.style.transition = 'transform 0.3s ease-in-out';
+    this.mailBox.style.boxShadow = 'inset 0 0 10px rgba(0, 0, 0, 0.1)';
+    this.mailContainer.appendChild(this.mailBox);
   }
 
   //DM List를 만듭니다.

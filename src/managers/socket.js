@@ -27,9 +27,9 @@ export default class SocketManager extends Singleton {
           urls: ['stun:stun1.1.google.com:19302'],
         },
         {
-          urls: 'turn:3.35.138.101:3478',
-          username: 'woogi',
-          credential: 'woogi123',
+          urls: process.env.TURN_URLS,
+          username: process.env.TURN_USERNAME,
+          credential: process.env.TURN_CREDENTIAL,
         },
       ],
     };
@@ -81,9 +81,9 @@ export default class SocketManager extends Singleton {
       this.publish('updateSkinPlayer', data);
     });
     // this.socket.on('connect', this.handleSocketConnected);
-    this.socket.on('disconnected', (data) => {
-      this.removeDisconnectedUser(data);
-    });
+    // this.socket.on('disconnected', (data) => {
+    //   this.removeDisconnectedUser(data);
+    // });
     this.socket.on('update-user-list', this.onUpdateUserList);
     this.socket.on('mediaOffer', async (data) => {
       console.log(
@@ -239,6 +239,7 @@ export default class SocketManager extends Singleton {
     this.socket.emit('leave', {
       id: this.socket.id,
     });
+    this.removeDisconnectedUser();
   }
 
   sendMovePlayer(tileX, tileY) {
@@ -310,8 +311,8 @@ export default class SocketManager extends Singleton {
     this.onSocketConnected();
   };
 
-  removeDisconnectedUser = (disconnectedUserId) => {
-    const videoElementId = `remote-video-${disconnectedUserId}`;
+  removeDisconnectedUser = () => {
+    const videoElementId = `remote-video-${this.socket.id}`;
     console.log('나간 사람', videoElementId);
     const videoElement = document.getElementById(videoElementId);
     if (videoElement) {
