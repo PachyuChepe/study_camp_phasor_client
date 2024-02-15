@@ -327,6 +327,13 @@ export default class SocketManager extends Singleton {
     if (videoElement) {
       videoElement.parentNode.removeChild(videoElement);
     }
+
+    this.pcs.forEach((pc) => {
+      if (pc && pc.close) {
+        pc.close();
+      }
+    });
+    this.pcs = [];
   };
 
   onSocketConnected = async () => {
