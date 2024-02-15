@@ -330,13 +330,9 @@ export default class SocketManager extends Singleton {
     }
 
     const pcIndex = this.pcs.findIndex((pc) => pc[data]);
-    if (pcIndex !== -1) {
-      // Close the peer connection
-      if (this.pcs[pcIndex][data].close) {
-        this.pcs[pcIndex][data].close();
-      }
-      // Remove the peer connection from the array
+    if (pcIndex) {
       this.pcs.splice(pcIndex, 1);
+      console.log('떳!!!!!!!!!!!!!냐!!!!!!!!!!!!!!!!!!!!', this.pcs);
     }
   };
 
