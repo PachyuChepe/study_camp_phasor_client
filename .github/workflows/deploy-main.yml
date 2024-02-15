@@ -35,6 +35,12 @@ jobs:
                   value: ${{ secrets.DB }}
                 - name: TOSS_CLIENT_KEY
                   value: ${{ secrets.TOSS_CLIENT_KEY }}
+                - name: TURN_URLS
+                  value: ${{ secrets.TURN_URLS }}
+                - name: TURN_USERNAME
+                  value: ${{ secrets.TURN_USERNAME }}
+                - name: TURN_CREDENTIAL
+                  value: ${{ secrets.TURN_CREDENTIAL }}
             context:
               git:
                 url: git@github.com:${{ github.repository }}.git
