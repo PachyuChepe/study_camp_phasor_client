@@ -23,6 +23,16 @@ export default class SocketManager extends Singleton {
     this.localPeerOffer; // offer 생성후 담는 변수
     this.iceServers = {
       iceServers: [
+        // {
+        //   urls: [
+        //     'stun:stun1.1.google.com:19302',
+        //     'stun:stun1.l.google.com:19302',
+        //     'stun:stun2.l.google.com:19302',
+        //     'stun:stun3.l.google.com:19302',
+        //     'stun:stun4.l.google.com:19302',
+        //   ],
+        // },
+
         {
           urls: ['stun:stun1.1.google.com:19302'],
         },
