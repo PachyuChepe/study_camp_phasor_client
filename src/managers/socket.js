@@ -23,6 +23,15 @@ export default class SocketManager extends Singleton {
     this.localPeerOffer; // offer 생성후 담는 변수
     this.iceServers = {
       iceServers: [
+        // {
+        //   urls: [
+        //     'stun:stun1.1.google.com:19302',
+        //     'stun:stun1.l.google.com:19302',
+        //     'stun:stun2.l.google.com:19302',
+        //     'stun:stun3.l.google.com:19302',
+        //     'stun:stun4.l.google.com:19302',
+        //   ],
+        // },
         {
           urls: ['stun:stun1.1.google.com:19302'],
         },
@@ -80,10 +89,10 @@ export default class SocketManager extends Singleton {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
     });
-    // this.socket.on('connect', this.handleSocketConnected);
-    // this.socket.on('disconnected', (data) => {
-    //   this.removeDisconnectedUser(data);
-    // });
+    this.socket.on('connect', this.handleSocketConnected);
+    this.socket.on('disconnected', (data) => {
+      this.removeDisconnectedUser(data);
+    });
     this.socket.on('update-user-list', this.onUpdateUserList);
     this.socket.on('mediaOffer', async (data) => {
       console.log(
@@ -232,14 +241,14 @@ export default class SocketManager extends Singleton {
       clothes_color: PlayerData.clothes_color,
     });
 
-    this.handleSocketConnected();
+    // this.handleSocketConnected();
   }
 
   sendLeaveSpacePlayer() {
     this.socket.emit('leave', {
       id: this.socket.id,
     });
-    this.removeDisconnectedUser();
+    // this.removeDisconnectedUser();
   }
 
   sendMovePlayer(tileX, tileY) {
@@ -311,12 +320,19 @@ export default class SocketManager extends Singleton {
     this.onSocketConnected();
   };
 
-  removeDisconnectedUser = () => {
-    const videoElementId = `remote-video-${this.socket.id}`;
+  removeDisconnectedUser = (data) => {
+    console.log('나감', data);
+    const videoElementId = `remote-video-${data}`;
     console.log('나간 사람', videoElementId);
     const videoElement = document.getElementById(videoElementId);
     if (videoElement) {
       videoElement.parentNode.removeChild(videoElement);
+    }
+
+    const pcIndex = this.pcs.findIndex((pc) => pc[data]);
+    if (pcIndex) {
+      this.pcs.splice(pcIndex, 1);
+      console.log('떳!!!!!!!!!!!!!냐!!!!!!!!!!!!!!!!!!!!', this.pcs);
     }
   };
 
@@ -482,4 +498,4 @@ export default class SocketManager extends Singleton {
   };
 }
 
-SocketManager.getInstance();
+// SocketManager.getInstance();
