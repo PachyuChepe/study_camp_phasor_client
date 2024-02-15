@@ -320,20 +320,24 @@ export default class SocketManager extends Singleton {
     this.onSocketConnected();
   };
 
-  removeDisconnectedUser = (disconnectedUserId) => {
-    const videoElementId = `remote-video-${disconnectedUserId}`;
+  removeDisconnectedUser = (data) => {
+    console.log('나감', data);
+    const videoElementId = `remote-video-${data}`;
     console.log('나간 사람', videoElementId);
     const videoElement = document.getElementById(videoElementId);
     if (videoElement) {
       videoElement.parentNode.removeChild(videoElement);
     }
 
-    this.pcs.forEach((pc) => {
-      if (pc && pc.close) {
-        pc.close();
+    const pcIndex = this.pcs.findIndex((pc) => pc[data]);
+    if (pcIndex !== -1) {
+      // Close the peer connection
+      if (this.pcs[pcIndex][data].close) {
+        this.pcs[pcIndex][data].close();
       }
-    });
-    this.pcs = [];
+      // Remove the peer connection from the array
+      this.pcs.splice(pcIndex, 1);
+    }
   };
 
   onSocketConnected = async () => {
