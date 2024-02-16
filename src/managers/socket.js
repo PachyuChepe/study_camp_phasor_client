@@ -36,7 +36,7 @@ export default class SocketManager extends Singleton {
         //   urls: ['stun:stun1.1.google.com:19302'],
         // },
         {
-          urls: [`${process.env.TURN_URLS}?transport=tcp`],
+          urls: [`${process.env.TURN_URLS}`],
           username: process.env.TURN_USERNAME,
           credential: process.env.TURN_CREDENTIAL,
         },
