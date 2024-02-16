@@ -321,6 +321,18 @@ export default class SocketManager extends Singleton {
   };
 
   removeDisconnectedUser = (data) => {
+    // 연결이 끊긴 사용자의 peerConnection 찾기 및 닫기
+    const index = this.selectedUser_id.indexOf(data);
+    if (index !== -1) {
+      // PeerConnection이 존재하면 닫는다.
+      if (this.pcs[index]) {
+        this.pcs[index].close();
+      }
+      // 배열에서 해당 사용자 제거
+      this.selectedUser_id.splice(index, 1);
+      this.pcs.splice(index, 1);
+    }
+
     console.log('나감', data);
     const videoElementId = `remote-video-${data}`;
     console.log('나간 사람', videoElementId);
