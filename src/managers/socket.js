@@ -32,11 +32,11 @@ export default class SocketManager extends Singleton {
         //     'stun:stun4.l.google.com:19302',
         //   ],
         // },
+        // {
+        //   urls: ['stun:stun1.1.google.com:19302'],
+        // },
         {
-          urls: ['stun:stun1.1.google.com:19302'],
-        },
-        {
-          urls: process.env.TURN_URLS,
+          urls: [`${process.env.TURN_URLS}`],
           username: process.env.TURN_USERNAME,
           credential: process.env.TURN_CREDENTIAL,
         },
@@ -321,6 +321,18 @@ export default class SocketManager extends Singleton {
   };
 
   removeDisconnectedUser = (data) => {
+    // 연결이 끊긴 사용자의 peerConnection 찾기 및 닫기
+    const index = this.selectedUser_id.indexOf(data);
+    if (index !== -1) {
+      // PeerConnection이 존재하면 닫는다.
+      if (this.pcs[index]) {
+        this.pcs[index].close();
+      }
+      // 배열에서 해당 사용자 제거
+      this.selectedUser_id.splice(index, 1);
+      this.pcs.splice(index, 1);
+    }
+
     console.log('나감', data);
     const videoElementId = `remote-video-${data}`;
     console.log('나간 사람', videoElementId);
@@ -329,11 +341,17 @@ export default class SocketManager extends Singleton {
       videoElement.parentNode.removeChild(videoElement);
     }
 
-    const pcIndex = this.pcs.findIndex((pc) => pc[data]);
-    if (pcIndex) {
-      this.pcs.splice(pcIndex, 1);
-      console.log('떳!!!!!!!!!!!!!냐!!!!!!!!!!!!!!!!!!!!', this.pcs);
-    }
+    // this.pcs.forEach((pc) => {
+    //   if (pc && pc.close) {
+    //     pc.close();
+    //   }
+    // });
+    // this.pcs = [];
+    // const pcIndex = this.pcs.findIndex((pc) => pc[data]);
+    // if (pcIndex) {
+    //   this.pcs.splice(pcIndex, 1);
+    //   console.log('떳!!!!!!!!!!!!!냐!!!!!!!!!!!!!!!!!!!!', this.pcs);
+    // }
   };
 
   onSocketConnected = async () => {
