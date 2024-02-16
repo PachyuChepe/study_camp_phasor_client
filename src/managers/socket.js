@@ -329,12 +329,12 @@ export default class SocketManager extends Singleton {
       videoElement.parentNode.removeChild(videoElement);
     }
 
-    this.pcs.forEach((pc) => {
-      if (pc && pc.close) {
-        pc.close();
-      }
-    });
-    this.pcs = [];
+    // this.pcs.forEach((pc) => {
+    //   if (pc && pc.close) {
+    //     pc.close();
+    //   }
+    // });
+    // this.pcs = [];
     // const pcIndex = this.pcs.findIndex((pc) => pc[data]);
     // if (pcIndex) {
     //   this.pcs.splice(pcIndex, 1);
