@@ -32,9 +32,9 @@ export default class SocketManager extends Singleton {
         //     'stun:stun4.l.google.com:19302',
         //   ],
         // },
-        // {
-        //   urls: ['stun:stun1.1.google.com:19302'],
-        // },
+        {
+          urls: ['stun:stun1.1.google.com:19302'],
+        },
         {
           urls: [`${process.env.TURN_URLS}`],
           username: process.env.TURN_USERNAME,
