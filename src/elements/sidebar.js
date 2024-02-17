@@ -536,10 +536,7 @@ export default class Sidebar extends Singleton {
     this.groupChatInput.style.color = 'white';
     this.groupChatInput.addEventListener('keydown', (event) => {
       if (event.key === 'Enter' && event.target.value) {
-        SocketManager.getInstance().sendGroupChatMessage(
-          this.scene.room,
-          event.target.value,
-        );
+        SocketManager.getInstance().sendGroupChatMessage(event.target.value);
         event.target.value = '';
       }
     });

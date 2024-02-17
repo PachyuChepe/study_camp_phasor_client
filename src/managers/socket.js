@@ -7,7 +7,10 @@ export default class SocketManager extends Singleton {
   constructor() {
     super();
     console.log('SocketManager 생성');
+    this.callbacks = [];
+  }
 
+  connect() {
     this.socket = io(process.env.SOCKET, {
       transports: ['websocket'], // WebSocket만 사용하도록 설정
     });
@@ -43,8 +46,6 @@ export default class SocketManager extends Singleton {
       ],
     };
 
-    this.callbacks = [];
-
     this.socket.on('spaceUsers', (data) => {
       console.log('spaceUsers', data);
       this.publish('spaceUsers', data);
@@ -60,6 +61,10 @@ export default class SocketManager extends Singleton {
     this.socket.on('movePlayer', (data) => {
       console.log('movePlayer', data);
       this.publish('movePlayer', data);
+    });
+    this.socket.on('innerLayerPlayer', (data) => {
+      console.log('innerLayerPlayer', data);
+      this.publish('innerLayerPlayer', data);
     });
     this.socket.on('sitPlayer', (data) => {
       console.log('sitPlayer', data);
@@ -203,6 +208,10 @@ export default class SocketManager extends Singleton {
     });
   }
 
+  disconnect() {
+    this.socket.disconnect();
+  }
+
   subscribe(callback) {
     this.callbacks.push(callback);
   }
@@ -259,6 +268,14 @@ export default class SocketManager extends Singleton {
     });
   }
 
+  sendInnerLayerPlayer(layer) {
+    // PlayerData.layer = layer;
+    this.socket.emit('innerLayer', {
+      id: this.socket.id,
+      layer: layer,
+    });
+  }
+
   sendSitPlayer(isSit) {
     this.socket.emit('sit', {
       id: this.socket.id,
@@ -306,9 +323,8 @@ export default class SocketManager extends Singleton {
     });
   }
 
-  sendGroupChatMessage(room, message) {
+  sendGroupChatMessage(message) {
     this.socket.emit('groupChat', {
-      room,
       message,
       senderId: this.socket.id,
       nickName: PlayerData.nickName,
