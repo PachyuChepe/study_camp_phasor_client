@@ -36,6 +36,11 @@ export default class UserCard extends Singleton {
     this.container.style.display = 'none';
   }
 
+  reset() {
+    this.cardList.length = 0;
+    this.container.innerHTML = '';
+  }
+
   createLocalCard() {
     const localCard = document.createElement('video');
     localCard.id = 'local-video';

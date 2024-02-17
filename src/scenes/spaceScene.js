@@ -120,10 +120,10 @@ export default class SpaceScene extends Phaser.Scene {
   }
 
   back() {
+    UserCard.getInstance().reset();
     SocketManager.getInstance().sendLeaveSpacePlayer();
-    SocketManager.getInstance().removeCallbacks();
-    SocketManager.getInstance().disconnect();
-    UserCard.getInstance().hide();
+    // SocketManager.getInstance().removeCallbacks();
+    // SocketManager.getInstance().disconnect();
     this.scene.start('LoddyScene');
   }
 
