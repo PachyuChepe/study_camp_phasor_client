@@ -11,5 +11,6 @@ const PlayerData = {
   hair_color: 0,
   clothes: 0,
   clothes_color: 0,
+  layer: 'layer_0',
 };
 export default PlayerData;
