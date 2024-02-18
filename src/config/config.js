@@ -12,7 +12,7 @@ const Config = {
   scene: [LoadingScene, LoddyScene, SpaceScene],
 
   // pixelArt를 사용할 경우 pixelArt: true로 설정해야 선명하게 보입니다.
-  pixelArt: true,
+  // pixelArt: true,
 
   // 물리엔진은 arcade, matter 등이 있는데 가벼운 arcade를 사용할 것입니다.
   // .env 파일에 DEBUG=true로 설정되어 있으면 디버그 모드로 실행됩니다.

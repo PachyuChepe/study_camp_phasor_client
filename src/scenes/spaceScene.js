@@ -19,7 +19,7 @@ export default class SpaceScene extends Phaser.Scene {
     this.tileMapHeight = 30;
 
     //소켓 통신을 위한 구역 지정 변수
-    this.room = 'outLayer';
+    // this.room = 'outLayer';
     this.map = this.make.tilemap({
       data: this.createTileMap(MapData.column, MapData.row),
       tileWidth: MapData.tileSize,
@@ -28,44 +28,16 @@ export default class SpaceScene extends Phaser.Scene {
     this.map.addTilesetImage('tiles');
     this.layers = [];
     this.mainLayer = this.map.createLayer(0, 'tiles', 0, 0);
+    this.mainLayer.setName('layer_0');
     this.layers.push(this.mainLayer);
 
-    const group = [
-      [3, 4, 4, 4, 4, 5],
-      [9, 10, 10, 10, 10, 11],
-      [9, 10, 10, 10, 10, 11],
-      [9, 10, 10, 10, 10, 11],
-      [9, 10, 10, 10, 10, 11],
-      [9, 10, 10, 10, 10, 11],
-      [15, 16, 16, 16, 16, 17],
-    ];
-    this.groupmap = this.make.tilemap({
-      data: group,
-      tileWidth: MapData.tileSize,
-      tileHeight: MapData.tileSize,
-    });
-    this.groupmap.addTilesetImage('tiles');
-    this.layers.push(
-      (this.grouplayer = this.groupmap.createLayer(
-        0,
-        'tiles',
-        MapData.tileSize * 3,
-        MapData.tileSize * 3,
-      )),
-    );
+    this.createTileMapGroup(3, 3);
+    this.createTileMapGroup(12, 3);
+    this.createTileMapGroup(3, 12);
+    this.createTileMapGroup(12, 12);
 
     const bgWidth = MapData.tileSize * MapData.column;
     const bgHeight = MapData.tileSize * MapData.row;
-
-    this.m_table0 = this.add
-      .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 0, 'table')
-      .setOrigin(0, 0);
-    this.m_table1 = this.add
-      .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 1, 'table')
-      .setOrigin(0, 0);
-    this.m_table2 = this.add
-      .sprite(MapData.tileSize * 4 - MapData.tileSize / 2, 96 + 96 * 2, 'table')
-      .setOrigin(0, 0);
     //혹시 모르니 일단 이렇게
     // this.player = new Player(this, PlayerData.nickName, this.tileSize, {
     //   x: 1,
@@ -112,6 +84,7 @@ export default class SpaceScene extends Phaser.Scene {
 
     this.otherPlayers = {};
 
+    SocketManager.getInstance().connect();
     SocketManager.getInstance().subscribe(this.eventscallback.bind(this));
     UserCard.getInstance().show();
     Sidebar.getInstance().setScene(this);
@@ -147,9 +120,10 @@ export default class SpaceScene extends Phaser.Scene {
   }
 
   back() {
+    UserCard.getInstance().reset();
     SocketManager.getInstance().sendLeaveSpacePlayer();
-    SocketManager.getInstance().removeCallbacks();
-    UserCard.getInstance().hide();
+    // SocketManager.getInstance().removeCallbacks();
+    // SocketManager.getInstance().disconnect();
     this.scene.start('LoddyScene');
   }
 
@@ -191,13 +165,60 @@ export default class SpaceScene extends Phaser.Scene {
     return tileMap;
   }
 
+  createTileMapGroup(x, y) {
+    const group = [
+      [3, 4, 4, 4, 4, 5],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [9, 10, 10, 10, 10, 11],
+      [15, 16, 16, 16, 16, 17],
+    ];
+    this.groupmap = this.make.tilemap({
+      data: group,
+      tileWidth: MapData.tileSize,
+      tileHeight: MapData.tileSize,
+    });
+    this.groupmap.addTilesetImage('tiles');
+    this.grouplayer = this.groupmap.createLayer(
+      0,
+      'tiles',
+      MapData.tileSize * x,
+      MapData.tileSize * y,
+    );
+    this.grouplayer.setName('layer_' + this.layers.length);
+    this.layers.push(this.grouplayer);
+
+    this.m_table0 = this.add
+      .sprite(
+        MapData.tileSize * (x + 1) - MapData.tileSize / 2,
+        MapData.tileSize * (y - 1),
+        'table',
+      )
+      .setOrigin(0, 0);
+    this.m_table1 = this.add
+      .sprite(
+        MapData.tileSize * (x + 1) - MapData.tileSize / 2,
+        MapData.tileSize * (y + 1),
+        'table',
+      )
+      .setOrigin(0, 0);
+    this.m_table2 = this.add
+      .sprite(
+        MapData.tileSize * (x + 1) - MapData.tileSize / 2,
+        MapData.tileSize * (y + 3),
+        'table',
+      )
+      .setOrigin(0, 0);
+  }
+
   //여기서 join해야하는건 알고 있다.
   //join이후가 문제다.
   //join을 어떻게 삭제할것이며
   //어떻게 플레이어가 구역내에서 채팅보냈다는걸 알려줄래?
   //이거 작동방식도 어떤지 몰라서 한번 봐야겠네
   innerLayer() {
-    const self = this;
     this.layers.forEach((layer) => {
       if (
         Phaser.Geom.Rectangle.Contains(
@@ -211,16 +232,22 @@ export default class SpaceScene extends Phaser.Scene {
           this.layers.forEach(function (otherLayer) {
             if (otherLayer !== layer) {
               otherLayer.setAlpha(0.9);
-              //내부
-              self.room = 'inLayer';
-              window.console.log('내부??????????????????????????????????');
+              window.console.log('레이어 이름 ' + layer.name);
+              if (PlayerData.mapLayer !== layer.name) {
+                PlayerData.mapLayer = layer.name;
+                SocketManager.getInstance().sendInnerLayerPlayer(layer.name);
+              }
             }
           });
+        } else {
+          window.console.log('레이어 이름 ' + this.mainLayer.name);
+          if (PlayerData.mapLayer !== this.mainLayer.name) {
+            PlayerData.mapLayer = this.mainLayer.name;
+            SocketManager.getInstance().sendInnerLayerPlayer(
+              this.mainLayer.name,
+            );
+          }
         }
-      } else {
-        //외부
-        this.room = 'outLayer';
-        window.console.log('외부??????????????????????????????????');
       }
     });
   }

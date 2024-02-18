@@ -7,20 +7,24 @@ export default class SocketManager extends Singleton {
   constructor() {
     super();
     console.log('SocketManager 생성');
+    this.callbacks = [];
+  }
 
+  connect() {
     this.socket = io(process.env.SOCKET, {
       transports: ['websocket'], // WebSocket만 사용하도록 설정
     });
 
     // 변수
-    this.stream;
+    this.stream = null;
+    this.streams = null;
     this.shareScreenStream;
-    this.localStream;
+    this.localStream = null;
     this.allUserList; //서버로부터 받는 현재 참가한 유저 리스트
     this.selectedUser = []; // 나를 제외한 유저 리스트
     this.selectedUser_id = [];
     this.pcs = []; //[{socket.id : peerConnection}]
-    this.localPeerOffer; // offer 생성후 담는 변수
+    this.localPeerOffer = null; // offer 생성후 담는 변수
     this.iceServers = {
       iceServers: [
         // {
@@ -43,8 +47,6 @@ export default class SocketManager extends Singleton {
       ],
     };
 
-    this.callbacks = [];
-
     this.socket.on('spaceUsers', (data) => {
       console.log('spaceUsers', data);
       this.publish('spaceUsers', data);
@@ -55,11 +57,17 @@ export default class SocketManager extends Singleton {
     });
     this.socket.on('leaveSpace', (data) => {
       console.log('leaveSpace', data);
+
+      this.removeDisconnectedUser(data.id);
       this.publish('leaveSpace', data);
     });
     this.socket.on('movePlayer', (data) => {
       console.log('movePlayer', data);
       this.publish('movePlayer', data);
+    });
+    this.socket.on('innerLayerPlayer', (data) => {
+      console.log('innerLayerPlayer', data);
+      this.publish('innerLayerPlayer', data);
     });
     this.socket.on('sitPlayer', (data) => {
       console.log('sitPlayer', data);
@@ -89,10 +97,10 @@ export default class SocketManager extends Singleton {
       console.log('updateSkinPlayer', data);
       this.publish('updateSkinPlayer', data);
     });
-    this.socket.on('connect', this.handleSocketConnected);
-    this.socket.on('disconnected', (data) => {
-      this.removeDisconnectedUser(data);
-    });
+    // this.socket.on('connect', this.handleSocketConnected);
+    // this.socket.on('disconnected', (data) => {
+    //   this.removeDisconnectedUser(data);
+    // });
     this.socket.on('update-user-list', this.onUpdateUserList);
     this.socket.on('mediaOffer', async (data) => {
       console.log(
@@ -203,6 +211,18 @@ export default class SocketManager extends Singleton {
     });
   }
 
+  disconnect() {
+    this.pcs.forEach((pc) => {
+      if (pc && pc.close) {
+        pc.close();
+      }
+    });
+    this.pcs = [];
+
+    this.socket.disconnect();
+    this.socket = null;
+  }
+
   subscribe(callback) {
     this.callbacks.push(callback);
   }
@@ -241,14 +261,15 @@ export default class SocketManager extends Singleton {
       clothes_color: PlayerData.clothes_color,
     });
 
-    // this.handleSocketConnected();
+    this.handleSocketConnected();
   }
 
-  sendLeaveSpacePlayer() {
-    this.socket.emit('leave', {
+  async sendLeaveSpacePlayer() {
+    await this.socket.emit('leave', {
       id: this.socket.id,
     });
-    // this.removeDisconnectedUser();
+    await this.removeCallbacks();
+    await this.disconnect();
   }
 
   sendMovePlayer(tileX, tileY) {
@@ -256,6 +277,14 @@ export default class SocketManager extends Singleton {
       id: this.socket.id,
       x: tileX,
       y: tileY,
+    });
+  }
+
+  sendInnerLayerPlayer(layer) {
+    // PlayerData.layer = layer;
+    this.socket.emit('innerLayer', {
+      id: this.socket.id,
+      layer: layer,
     });
   }
 
@@ -306,9 +335,8 @@ export default class SocketManager extends Singleton {
     });
   }
 
-  sendGroupChatMessage(room, message) {
+  sendGroupChatMessage(message) {
     this.socket.emit('groupChat', {
-      room,
       message,
       senderId: this.socket.id,
       nickName: PlayerData.nickName,
@@ -322,6 +350,7 @@ export default class SocketManager extends Singleton {
 
   removeDisconnectedUser = (data) => {
     // 연결이 끊긴 사용자의 peerConnection 찾기 및 닫기
+
     const index = this.selectedUser_id.indexOf(data);
     if (index !== -1) {
       // PeerConnection이 존재하면 닫는다.
