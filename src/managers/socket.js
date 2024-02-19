@@ -386,7 +386,9 @@ export default class SocketManager extends Singleton {
   onSocketConnected = async () => {
     console.log('2. 미디어 연결 시작...');
     const constraints = {
-      audio: true,
+      audio: {
+        echoCancellation: true,
+      },
       video: { facingMode: 'user' },
     };
     try {
